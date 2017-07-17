@@ -11,10 +11,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Who Login</title>
+    <title><%=session.getAttribute("username")%> - 进行中</title>
 
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
+    <style>
+        .progress {
+            margin-bottom: 0px;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,7 +30,7 @@
         <div class="container-fluid">
             <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span
                     class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a> <a
-                href="#" class="brand">Distributed Rendering Engine - Dr. Who</a>
+                href="#" class="brand">Distributed Rendering Engine - <%=session.getAttribute("username")%></a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav">
                     <li>
@@ -45,6 +50,9 @@
                     <li>
                         <a href="javascript:void(0);" onclick="visit('help')">帮助</a>
                     </li>
+                    <li>
+                        <a href="/">退出</a>
+                    </li>
                 </ul>
             </div>
 
@@ -58,7 +66,7 @@
         </div>
         <div class="span8">
             <h2>
-                任务列表
+                正在进行的任务
             </h2>
             <table class="table table-bordered">
                 <thead>
@@ -76,23 +84,34 @@
                         状态
                     </th>
                     <th>
+                        已用时
+                    </th>
+                    <th>
                         操作
                     </th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
+                <tr class="danger">
                     <td>
                         1
                     </td>
                     <td>
-                        TB - Monthly
+                        17/7终稿
                     </td>
                     <td>
-                        01/04/2012
+                        2017/07/02
                     </td>
                     <td>
-                        Default
+                        <div class="progress progress-striped active">
+                            <div class="bar bar-danger" style="width: 0%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        1 时 0 分
+                    </td>
+                    <td>
+                        <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
                 <tr class="success">
@@ -100,13 +119,21 @@
                         2
                     </td>
                     <td>
-                        TB - Monthly
+                        公司景观设计
                     </td>
                     <td>
-                        01/04/2012
+                        2017/05/06
                     </td>
                     <td>
-                        Approved
+                        <div class="progress progress-striped active">
+                            <div class="bar bar-success" style="width: 90%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        2 时 0 分
+                    </td>
+                    <td>
+                        <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
                 <tr class="error">
@@ -114,13 +141,21 @@
                         3
                     </td>
                     <td>
-                        TB - Monthly
+                        图形学大作业
                     </td>
                     <td>
-                        02/04/2012
+                        2017/05/25
                     </td>
                     <td>
-                        Declined
+                        <div class="progress progress-striped active">
+                            <div class="bar bar-danger" style="width: 10%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        3 时 0 分
+                    </td>
+                    <td>
+                        <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
                 <tr class="warning">
@@ -128,13 +163,21 @@
                         4
                     </td>
                     <td>
-                        TB - Monthly
+                        光线追踪测试
                     </td>
                     <td>
-                        03/04/2012
+                        2017/06/60
                     </td>
                     <td>
-                        Pending
+                        <div class="progress progress-striped active">
+                            <div class="bar bar-warning" style="width: 40%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        4 时 0 分
+                    </td>
+                    <td>
+                        <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
                 <tr class="info">
@@ -142,13 +185,21 @@
                         5
                     </td>
                     <td>
-                        TB - Monthly
+                        宣传片初稿
                     </td>
                     <td>
-                        04/04/2012
+                        2017/01/20
                     </td>
                     <td>
-                        Call in to confirm
+                        <div class="progress progress-striped active">
+                            <div class="bar bar-info" style="width: 70%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        5 时 0 分
+                    </td>
+                    <td>
+                        <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
                 </tbody>
@@ -159,24 +210,9 @@
     </div>
 </div>
 
-<script src="vendor/jQuery/jquery-1.11.3.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-<script>
-    visit = function (target) {
-        var form = document.createElement('form');
-        form.action = '/' + target;
-
-        form.target = '_self';
-        form.method = 'post';
-
-        var opt = document.createElement('input');
-        opt.name = 'username';
-        opt.value = $.cookie('username');
-        form.appendChild(opt);
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-</script>
+<script src="../vendor/jQuery/jquery-1.11.3.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="../vendor/cookie/jquery.cookie.js"></script>
+<script src="../js/navbar.js"></script>
 </body>
 </html>

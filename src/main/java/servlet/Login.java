@@ -1,7 +1,5 @@
 package servlet;
 
-import sun.security.x509.CertificateIssuerName;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +26,7 @@ public class Login extends HttpServlet {
             session.setAttribute("username", username);
             req.getRequestDispatcher("views/info.jsp").forward(req, res);
         } else {
-            session.setAttribute("failed", "1");
+            session.setAttribute("failType", "login");
             req.getRequestDispatcher("views/failed.jsp").forward(req, res);
         }
 
@@ -36,15 +34,10 @@ public class Login extends HttpServlet {
 
     private boolean verifyLogin(String username, String password) {
 
-        System.out.println(username);
-        System.out.println(password);
-
         //verify...
         if (username.equals("admin") && password.equals("admin")) {
             return true;
         }
-
-
 
 
         return false;

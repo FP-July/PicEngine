@@ -61,7 +61,7 @@
     </div>
     <form class="form-signin" id="login_form" method="post" action="/login">
         <h3 class="form-signin-heading">登录失败！</h3>
-        <h5>3秒后将返回登录界面。</h5>
+        <h5>2秒后将返回登录界面。</h5>
     </form>
 
 </div> <!-- /container -->
@@ -72,7 +72,7 @@
 </body>
 <script>
     $(document).ready(function () {
-        var t = setTimeout("window.location.href='/';", 3000);
+        var t = setTimeout("window.location.href='/';", 1500);
     });
 </script>
 </html>

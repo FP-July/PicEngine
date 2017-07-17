@@ -8,15 +8,16 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Created by THU73 on 17/7/17.
+ * Created by THU73 on 17/7/18.
  */
-public class Create extends HttpServlet {
+public class Help extends HttpServlet {
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");
 
         session.setAttribute("username", username);
-        req.getRequestDispatcher("views/create.jsp").forward(req, res);
+        req.getRequestDispatcher("views/help.jsp").forward(req, res);
     }
 }
