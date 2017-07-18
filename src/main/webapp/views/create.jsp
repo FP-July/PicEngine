@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;">
 
 
 <div class="navbar">
@@ -60,7 +60,36 @@
         <div class="span2">
         </div>
         <div class="span8">
-            <h2>创建新任务</h2>
+            <h2 style="margin-bottom: 50px; padding-left: 110px;">创建新任务</h2>
+            <form class="form-horizontal" method="post" action="/taskcreate">
+                <div class="control-group">
+                    <label class="control-label" for="task_name">任务名称</label>
+                    <div class="controls">
+                        <input type="text" id="task_name" placeholder="请输入任务名称" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="task_type">任务类型</label>
+                    <div class="controls">
+                        <select id="task_type" class="input-xlarge">
+                            <option>图像渲染</option>
+                            <option>视频渲染</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="task_file">任务文件</label>
+                    <div class="controls">
+                        <input type="file" id="task_file" class="filestyle"
+                               data-input="false" data-icon="false">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-primary btn-small" type="submit">提交任务</button>
+                    </div>
+                </div>
+            </form>
         </div>
         <div class="span2">
         </div>
@@ -70,6 +99,12 @@
 <script src="../vendor/jQuery/jquery-1.11.3.min.js"></script>
 <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="../vendor/cookie/jquery.cookie.js"></script>
+<script src="../vendor/bootstrap-file/bootstrap-filestyle.min.js"></script>
 <script src="../js/navbar.js"></script>
+<script>
+    $(document).ready(function() {
+        $(":file").filestyle();
+    });
+</script>
 </body>
 </html>

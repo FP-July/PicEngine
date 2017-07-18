@@ -1,5 +1,7 @@
 package servlet;
 
+import bean.UserInfo;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,8 @@ public class Login extends HttpServlet {
 
         if(success) {
             session.setAttribute("username", username);
+            UserInfo userInfo = Info.getUserInfo(username);
+            session.setAttribute("userInfo", userInfo);
             req.getRequestDispatcher("views/info.jsp").forward(req, res);
         } else {
             session.setAttribute("failType", "login");

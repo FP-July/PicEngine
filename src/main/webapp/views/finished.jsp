@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;">
 
 
 <div class="navbar">
@@ -73,6 +73,9 @@
                         任务名称
                     </th>
                     <th>
+                        任务种类
+                    </th>
+                    <th>
                         提交时间
                     </th>
                     <th>
@@ -95,6 +98,9 @@
                         17/7终稿
                     </td>
                     <td>
+                        图像渲染
+                    </td>
+                    <td>
                         2017/07/02
                     </td>
                     <td>
@@ -113,6 +119,9 @@
                     </td>
                     <td>
                         公司景观设计
+                    </td>
+                    <td>
+                        图像渲染
                     </td>
                     <td>
                         2017/05/06
@@ -136,6 +145,9 @@
                         图形学大作业
                     </td>
                     <td>
+                        图像渲染
+                    </td>
+                    <td>
                         2017/05/25
                     </td>
                     <td>
@@ -157,6 +169,9 @@
                         光线追踪测试
                     </td>
                     <td>
+                        图像渲染
+                    </td>
+                    <td>
                         2017/06/60
                     </td>
                     <td>
@@ -176,6 +191,9 @@
                     </td>
                     <td>
                         宣传片初稿
+                    </td>
+                    <td>
+                        图像渲染
                     </td>
                     <td>
                         2017/01/20

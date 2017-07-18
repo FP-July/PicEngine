@@ -23,11 +23,13 @@ public class Info extends HttpServlet {
 
         UserInfo userInfo = getUserInfo(username);
 
+
         session.setAttribute("userInfo", userInfo);
+        session.setAttribute("username", username);
         req.getRequestDispatcher("views/info.jsp").forward(req, res);
     }
 
-    UserInfo getUserInfo(String username) {
+    public static UserInfo getUserInfo(String username) {
 
         // return the on-going tasks of this user
         UserInfo user = new UserInfo();

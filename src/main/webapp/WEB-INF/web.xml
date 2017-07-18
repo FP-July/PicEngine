@@ -84,5 +84,17 @@
         <servlet-name>Help</servlet-name>
         <url-pattern>/help</url-pattern>
     </servlet-mapping>
+
+    <!-- TaskCreate Servlet -->
+    <servlet>
+        <servlet-name>TaskCreate</servlet-name>
+        <servlet-class>servlet.TaskCreate</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TaskCreate</servlet-name>
+        <url-pattern>/taskcreate</url-pattern>
+    </servlet-mapping>
+
 </web-app>
 

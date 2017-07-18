@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;">
 
 
 <div class="navbar">

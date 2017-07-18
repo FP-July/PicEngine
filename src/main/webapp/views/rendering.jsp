@@ -1,3 +1,5 @@
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="bean.Task" %>
 <%--
   Created by IntelliJ IDEA.
   User: THU73
@@ -22,7 +24,7 @@
     </style>
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;">
 
 
 <div class="navbar">
@@ -30,7 +32,8 @@
         <div class="container-fluid">
             <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span
                     class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a> <a
-                href="#" class="brand">Distributed Rendering Engine - <%=session.getAttribute("username")%></a>
+                href="#" class="brand">Distributed Rendering Engine - <%=session.getAttribute("username")%>
+        </a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav">
                     <li>
@@ -68,6 +71,16 @@
             <h2>
                 正在进行的任务
             </h2>
+            <%
+                ArrayList<Task> taskList = (ArrayList<Task>) session.getAttribute("taskList");
+                if (taskList.size() == 0) {
+            %>
+            <h4>
+                当前没有正在进行的任务。
+            </h4>
+            <%
+            } else {
+            %>
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -76,6 +89,9 @@
                     </th>
                     <th>
                         任务名称
+                    </th>
+                    <th>
+                        任务种类
                     </th>
                     <th>
                         提交时间
@@ -92,116 +108,54 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="danger">
+                <%
+                    for (int i = 0; i < taskList.size(); ++i) {
+                        Task task = taskList.get(i);
+                        String color = null;
+                        int percent = task.getPercent();
+                        if (percent < 10) {
+                            color = "danger";
+                        } else if (percent < 40) {
+                            color = "warning";
+                        } else if (percent < 70) {
+                            color = "info";
+                        } else {
+                            color = "success";
+                        }
+                        int minutes = task.getMinutes();
+                        int hours = minutes / 60;
+                        minutes = minutes % 60;
+                %>
+                <tr class="<%=color%>">
                     <td>
-                        1
+                        <%=task.getId()%>
                     </td>
                     <td>
-                        17/7终稿
+                        <%=task.getName()%>
                     </td>
                     <td>
-                        2017/07/02
+                        <%=task.getType()%>
+                    </td>
+                    <td>
+                        <%=task.getDate()%>
                     </td>
                     <td>
                         <div class="progress progress-striped active">
-                            <div class="bar bar-danger" style="width: 0%;"></div>
+                            <div class="bar bar-<%=color%>" style="width: <%=task.getPercent()%>%;"></div>
                         </div>
                     </td>
                     <td>
-                        1 时 0 分
+                        <%=hours%> 时 <%=minutes%> 分
                     </td>
                     <td>
                         <button class="btn btn-small btn-danger">删除</button>
                     </td>
                 </tr>
-                <tr class="success">
-                    <td>
-                        2
-                    </td>
-                    <td>
-                        公司景观设计
-                    </td>
-                    <td>
-                        2017/05/06
-                    </td>
-                    <td>
-                        <div class="progress progress-striped active">
-                            <div class="bar bar-success" style="width: 90%;"></div>
-                        </div>
-                    </td>
-                    <td>
-                        2 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                    </td>
-                </tr>
-                <tr class="error">
-                    <td>
-                        3
-                    </td>
-                    <td>
-                        图形学大作业
-                    </td>
-                    <td>
-                        2017/05/25
-                    </td>
-                    <td>
-                        <div class="progress progress-striped active">
-                            <div class="bar bar-danger" style="width: 10%;"></div>
-                        </div>
-                    </td>
-                    <td>
-                        3 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                    </td>
-                </tr>
-                <tr class="warning">
-                    <td>
-                        4
-                    </td>
-                    <td>
-                        光线追踪测试
-                    </td>
-                    <td>
-                        2017/06/60
-                    </td>
-                    <td>
-                        <div class="progress progress-striped active">
-                            <div class="bar bar-warning" style="width: 40%;"></div>
-                        </div>
-                    </td>
-                    <td>
-                        4 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                    </td>
-                </tr>
-                <tr class="info">
-                    <td>
-                        5
-                    </td>
-                    <td>
-                        宣传片初稿
-                    </td>
-                    <td>
-                        2017/01/20
-                    </td>
-                    <td>
-                        <div class="progress progress-striped active">
-                            <div class="bar bar-info" style="width: 70%;"></div>
-                        </div>
-                    </td>
-                    <td>
-                        5 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                    </td>
-                </tr>
+                <%
+
+                        }
+                    }
+                %>
                 </tbody>
             </table>
         </div>

@@ -7,12 +7,31 @@ import java.util.Date;
  */
 public class Task {
 
-    public static final String picture = "PICTURE";
+    public static final String picture = "图像渲染";
+    public static final String video = "视频渲染";
+    public static final String ongoing = "正在进行";
+    public static final String finished = "已完成";
 
+    private int id;
     private String name;
     private String type;
+    private String state;
     private String fileLocation;
     private Date date;
+    // these parameters stored in database.
+
+    private int minutes;
+    private int percent;
+    // these parameters will be queried from hadoop platform,
+    // manually set in the servlet function then passed to frontend.
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -30,6 +49,14 @@ public class Task {
         this.type = type;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public String getFileLocation() {
         return fileLocation;
     }
@@ -44,5 +71,21 @@ public class Task {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public int getMinutes() {
+        return minutes;
+    }
+
+    public void setMinutes(int minutes) {
+        this.minutes = minutes;
+    }
+
+    public int getPercent() {
+        return percent;
+    }
+
+    public void setPercent(int percent) {
+        this.percent = percent;
     }
 }
