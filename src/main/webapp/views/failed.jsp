@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distributed Rendering - 登录</title>
+    <title>登录失败</title>
 
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
@@ -31,14 +31,16 @@
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
             border-radius: 5px;
-            -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-            -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
         }
+
         .form-signin .form-signin-heading,
         .form-signin .checkbox {
             margin-bottom: 14px;
         }
+
         .form-signin input[type="text"],
         .form-signin input[type="password"] {
             font-size: 16px;
@@ -58,16 +60,8 @@
         </div>
     </div>
     <form class="form-signin" id="login_form" method="post" action="/login">
-        <h2 class="form-signin-heading"></h2>
-        <input type="text" class="input-block-level" placeholder="账户名" id="username" name="username">
-        <input type="password" class="input-block-level" placeholder="密码" id="password" name="password">
-        <label class="checkbox">
-            <input type="checkbox" value="remember-me" id="remember_me"> 记住我
-        </label>
-        <div align="center">
-            <button class="btn btn-success" type="button" id="login">登录</button>
-            <button class="btn btn-info" id="register">注册</button>
-        </div>
+        <h3 class="form-signin-heading">登录失败！</h3>
+        <h5>2秒后将返回登录界面。</h5>
     </form>
 
 </div> <!-- /container -->
@@ -77,18 +71,8 @@
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 </body>
 <script>
-    $('#login').click(function() {
-        var username = $('#username').val();
-        var password = $('#password').val();
-        if(username === '') {
-            alert('请输入用户名！');
-            return;
-        }
-        if(password === '') {
-            alert('请输入密码！');
-            return;
-        }
-        $('#login_form').submit();
-    })
+    $(document).ready(function () {
+        var t = setTimeout("window.location.href='/';", 1500);
+    });
 </script>
 </html>
