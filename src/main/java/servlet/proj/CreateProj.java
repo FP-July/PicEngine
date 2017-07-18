@@ -35,6 +35,7 @@ public class CreateProj extends HttpServlet {
 			if(type == null)
 				argLack += "type ";
 			resp.sendError(ServletConstants.LACK_ARG, argLack);
+			return;
 		}
 		
 		try {

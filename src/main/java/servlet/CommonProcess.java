@@ -59,7 +59,7 @@ public class CommonProcess {
 		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
 		if(userSession == null) {
 			try {
-				resp.sendError(ServletConstants.NO_COOKIE);
+				resp.sendError(ServletConstants.NO_COOKIE, "no cookie");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -67,7 +67,7 @@ public class CommonProcess {
 		}
 		if(!SessionManager.testSession(userSession[0], userSession[1])) {
 			try {
-				resp.sendError(ServletConstants.SESSION_EXPIRE);
+				resp.sendError(ServletConstants.SESSION_EXPIRE,"session expired");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -82,14 +82,14 @@ public class CommonProcess {
 	 * @param infos
 	 * @throws IOException
 	 */
-	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos) throws IOException {
+	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos, String targetPage) throws IOException {
 		List<Task> taskList = new ArrayList<>();
 		for(ProjInfo info : infos) 
 			taskList.add(info.convertToTask());
 		HttpSession session = req.getSession();
 		session.setAttribute("taskList", taskList);
 		try {
-			req.getRequestDispatcher("views/finished.jsp").forward(req, res);
+			req.getRequestDispatcher(targetPage).forward(req, res);
 		} catch (ServletException e) {
 			e.printStackTrace();
 		}

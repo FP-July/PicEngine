@@ -44,7 +44,7 @@ public class FindFinishedProj extends HttpServlet{
 				resp.sendError(DBConstants.NO_SUCH_PROJ);
 				return;
 			}
-			CommonProcess.sendProjsToClient(req, resp, infos);
+			CommonProcess.sendProjsToClient(req, resp, infos, "views/finished.jsp");
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);
