@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
+import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 
-public class CreateProj extends HttpServlet {
-
+public class FindProj extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
@@ -37,15 +37,22 @@ public class CreateProj extends HttpServlet {
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.createProj(projName, username);
-			PrintWriter writer = resp.getWriter();
-			writer.write(status + "\n");
-			writer.flush();
-			writer.close();
+			ProjInfo info = projDao.findProj(username, projName);
+			if(info == null) {
+				resp.sendError(DBConstants.NO_SUCH_PROJ);
+				return;
+			}
+			sendProjToClient(resp, info);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);
 		}
 	}
-
+	
+	private void sendProjToClient(HttpServletResponse response, ProjInfo info) throws IOException {
+		PrintWriter writer = response.getWriter();
+		writer.write(info.toJSON().toString());
+		writer.flush();
+		writer.close();
+	}
 }

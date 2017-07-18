@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.naming.spi.DirStateFactory.Result;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public class ProjInfo {
 		init, ready, running, stop, done, error
 	};
 	
-	public int projectID = -1;
+	public int projID = -1;
 	public String username;
 	public String projName;
 	public int status;
@@ -28,7 +29,7 @@ public class ProjInfo {
 			if(set == null)
 				 return null;
 			ProjInfo info = new ProjInfo();
-			info.projectID = set.getInt("projectID");
+			info.projID = set.getInt("projectID");
 			info.username = set.getString("username");
 			info.projName = set.getString("projName");
 			info.status = set.getInt("status");
@@ -40,5 +41,17 @@ public class ProjInfo {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public JSONObject toJSON() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("projID", projID);
+		jsonObject.put("username", username);
+		jsonObject.put("status", status);
+		jsonObject.put("runtime", runtime);
+		jsonObject.put("progress", progress);
+		jsonObject.put("createTime", createTime);
+	
+		return jsonObject;
 	}
 }

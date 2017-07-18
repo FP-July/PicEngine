@@ -9,14 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 
-public class CreateProj extends HttpServlet {
-
+public class DeleteProj extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
@@ -37,7 +35,7 @@ public class CreateProj extends HttpServlet {
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.createProj(projName, username);
+			int status = projDao.deleteProj(username, projName);
 			PrintWriter writer = resp.getWriter();
 			writer.write(status + "\n");
 			writer.flush();
@@ -47,5 +45,4 @@ public class CreateProj extends HttpServlet {
 			CommonProcess.dataBaseFailure(resp, e);
 		}
 	}
-
 }
