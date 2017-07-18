@@ -32,6 +32,7 @@ public class DBConstants {
 			"status INTEGER NOT NULL," +
 			"runtime INTEGER NOT NULL," +
 			"progress INTEGER NOT NULL," +
+			"type TEXT NOT NULL," +
 			"createTime LONG NOT NULL);"
 	};
 }

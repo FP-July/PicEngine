@@ -31,7 +31,7 @@ public class FindProj extends HttpServlet {
 				argLack += "username ";
 			if(projName == null)
 				argLack += "projName ";
-			resp.sendError(ServletConstants.CODE_LACK_ARG, argLack);
+			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
 		
 		try {

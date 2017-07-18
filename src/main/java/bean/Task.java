@@ -9,6 +9,11 @@ public class Task {
 
     public static final String picture = "图像渲染";
     public static final String video = "视频渲染";
+    
+    public static final String init = "初始化";
+    public static final String ready = "就绪";
+    public static final String stop = "停止";
+    public static final String error = "错误";
     public static final String ongoing = "正在进行";
     public static final String finished = "已完成";
 

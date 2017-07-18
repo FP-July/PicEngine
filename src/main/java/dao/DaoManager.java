@@ -5,9 +5,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import bean.UserInfo;
+import model.ProjInfo;
 
 public class DaoManager {
 	private static Logger logger = LoggerFactory.getLogger(DaoManager.class);
@@ -31,6 +35,7 @@ public class DaoManager {
 		createTables();
 		setUserDao(new UserDao(statement));
 		setProjDao(new ProjDao(statement));
+		userDao.createUser("admin", "admin");
 	}
 	
 	private void connect2DB() throws SQLException, ClassNotFoundException {
@@ -48,6 +53,33 @@ public class DaoManager {
 			if(!success)
 				logger.error("sql " + sql + " fails to excute");
 		}
+	}
+	
+	public UserInfo gatherUserInfo(String username) {
+		int failedCount = 0, finishedCount = 0, renderingCount = 0;
+		List<ProjInfo> projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.error.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		failedCount = projInfos.size();
+		
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ongoing.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		renderingCount = projInfos.size();
+		
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		finishedCount = projInfos.size();
+		
+		UserInfo userInfo = new UserInfo();
+		userInfo.setFailedCount(failedCount);
+		userInfo.setFinishedCount(finishedCount);
+		userInfo.setRenderingCount(renderingCount);
+		return userInfo;
 	}
 
 	public UserDao getUserDao() {

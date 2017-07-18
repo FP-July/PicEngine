@@ -17,7 +17,7 @@ public class Logout extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
 		if(userSession == null) {
-			resp.sendError(ServletConstants.CODE_NO_COOKIE);
+			resp.sendError(ServletConstants.NO_COOKIE);
 			return;
 		}
 		

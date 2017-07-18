@@ -24,20 +24,23 @@ public class CreateProj extends HttpServlet {
 			return;
 		
 		String username = req.getParameter("username"),
-				projName = req.getParameter("projName");
+				projName = req.getParameter("projName"),
+				type = req.getParameter("type");
 		if(username == null || projName == null) {
 			String argLack = "";
 			if(username == null)
 				argLack += "username ";
 			if(projName == null)
 				argLack += "projName ";
-			resp.sendError(ServletConstants.CODE_LACK_ARG, argLack);
+			if(type == null)
+				argLack += "type ";
+			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
 		
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.createProj(projName, username);
+			int status = projDao.createProj(projName, username, type);
 			PrintWriter writer = resp.getWriter();
 			writer.write(status + "\n");
 			writer.flush();

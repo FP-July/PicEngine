@@ -8,6 +8,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import dao.DBConstants;
+import dao.DaoManager;
+import dao.ProjDao;
 import model.ProjInfo;
 
 public class ProjTest {
@@ -31,10 +34,10 @@ public class ProjTest {
 		ProjDao projDao = daoManager.getProjDao();
 		projDao.deleteProj(username, projName);
 		
-		status = projDao.createProj(projName, username);
+		status = projDao.createProj(projName, username,"none");
 		assertTrue(status == DBConstants.SUCCESS);
-		status = projDao.createProj(projName, username);
-		assertTrue(status == DBConstants.USER_ALREADY_EXIST);
+		status = projDao.createProj(projName, username,"none");
+		assertTrue(status == DBConstants.PROJ_ALREADY_EXIST);
 		
 		ProjInfo info = projDao.findProj(username, projName);
 		assertFalse(info == null);
@@ -55,7 +58,7 @@ public class ProjTest {
 		ProjDao projDao = daoManager.getProjDao();
 		for(int i = 0; i < 5; i++) {
 			projDao.deleteProj(username + i, projName);
-			projDao.createProj(projName + i, username);
+			projDao.createProj(projName + i, username, "none");
 		}
 		
 		List<ProjInfo> list = projDao.listUserProj(username);
@@ -69,12 +72,12 @@ public class ProjTest {
 		String projName = "secondProj", username = "newuser2";
 		int status = DBConstants.SQL_EXCUTION_ERROR;
 		ProjDao projDao = daoManager.getProjDao();
-		status = projDao.createProj(projName, username);
+		status = projDao.createProj(projName, username,"none");
 		
-		status = projDao.updateProjStatus(username, projName, ProjInfo.statusEnum.done.ordinal());
+		status = projDao.updateProjStatus(username, projName, ProjInfo.statusEnum.finished.ordinal());
 		assertTrue(status == DBConstants.SUCCESS);
 		ProjInfo info = projDao.findProj(username, projName);
-		assertTrue(info.status == ProjInfo.statusEnum.done.ordinal());
+		assertTrue(info.status == ProjInfo.statusEnum.finished.ordinal());
 		
 		status = projDao.updateProjInt(username, projName, "progress", 100);
 		assertTrue(status == DBConstants.SUCCESS);
@@ -89,7 +92,7 @@ public class ProjTest {
 		ProjDao projDao = daoManager.getProjDao();
 		projDao.deleteProj(username, projName);
 		projDao.deleteProj(username,newName);
-		projDao.createProj(projName, username);
+		projDao.createProj(projName, username,"none");
 		
 		status = projDao.renameProj(username, projName, newName);
 		assertTrue(status == DBConstants.SUCCESS);
@@ -97,5 +100,24 @@ public class ProjTest {
 		assertTrue(info != null);
 		info = projDao.findProj(username, projName);
 		assertTrue(info == null);
+	}
+	
+	@Test
+	public void findTest() {
+		String projName = "findTest", username = "newuserfindtest";
+		int status = DBConstants.SQL_EXCUTION_ERROR;
+		ProjDao projDao = daoManager.getProjDao();
+		for(int i = 0; i < 10; i++) {
+			projDao.deleteProj(username, projName + i);
+			projDao.createProj(projName + i, username,"none");
+		}
+		
+		for(int i = 0; i < 3; i++) {
+			projDao.updateProjInt(username, projName + i, "status", ProjInfo.statusEnum.finished.ordinal());
+		}
+		List<ProjInfo> list = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
+		assertTrue(list.size() == 3);
+		list = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
+		assertTrue(list.size() == 7);
 	}
 }

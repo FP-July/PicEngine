@@ -11,7 +11,7 @@
     <!-- Login Servlet -->
     <servlet>
         <servlet-name>Login</servlet-name>
-        <servlet-class>servlet.Login</servlet-class>
+        <servlet-class>servlet.user.Login</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -33,7 +33,7 @@
     <!-- Info Servlet -->
     <servlet>
         <servlet-name>Info</servlet-name>
-        <servlet-class>servlet.Info</servlet-class>
+        <servlet-class>servlet.user.Info</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -55,7 +55,7 @@
     <!-- Rendering Servlet -->
     <servlet>
         <servlet-name>Rendering</servlet-name>
-        <servlet-class>servlet.Rendering</servlet-class>
+        <servlet-class>servlet.proj.FindOngoingProj</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -66,7 +66,7 @@
     <!-- Finished Servlet -->
     <servlet>
         <servlet-name>Finished</servlet-name>
-        <servlet-class>servlet.Finished</servlet-class>
+        <servlet-class>servlet.proj.FindFinishedProj</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -88,7 +88,7 @@
     <!-- TaskCreate Servlet -->
     <servlet>
         <servlet-name>TaskCreate</servlet-name>
-        <servlet-class>servlet.TaskCreate</servlet-class>
+        <servlet-class>servlet.proj.CreateProj</servlet-class>
     </servlet>
 
     <servlet-mapping>

@@ -9,6 +9,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bean.Task;
+import bean.UserInfo;
 import model.ProjInfo;
 
 public class ProjDao {
@@ -26,12 +28,13 @@ public class ProjDao {
 	 * @param username
 	 * @return status code
 	 */
-	public int createProj(String projName, String username) {
+	public int createProj(String projName, String username, String type) {
 		if(findProj(username, projName) != null)
 			return DBConstants.PROJ_ALREADY_EXIST;
 		String sql = "INSERT OR IGNORE INTO " + DBConstants.PROJ_TABLE
-				+ "(username,projName,status,runtime,progress,createTime)" + "VALUES ('" + username + "','"
-				+ projName + "','" + ProjInfo.statusEnum.init.ordinal() + "',0,0," + System.currentTimeMillis() + ");";
+				+ "(username,projName,status,runtime,progress,createTime,type)" + "VALUES ('" + username + "','"
+				+ projName + "','" + ProjInfo.statusEnum.init.ordinal() + "',0,0," + System.currentTimeMillis() 
+				+  ",'" + type + "');";
 		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
 			status = statement.executeUpdate(sql) > 0 ? DBConstants.SUCCESS : DBConstants.SQL_EXCUTION_ERROR;
@@ -211,4 +214,53 @@ public class ProjDao {
 		}
 		return status;
 	}
+	
+	
+	/** find projs of a user by given int filed
+	 * @param username
+	 * @param fieldName
+	 * @param value
+	 * @return list of projs
+	 */
+	public List<ProjInfo> findProjsByInt(String username, String fieldName, int value) {
+		String sql = "SELECT * FROM " + DBConstants.PROJ_TABLE + " WHERE " + "username='" + username + "' "
+				+ "AND " + fieldName + "=" + value + ";";
+		try {
+			ResultSet set = statement.executeQuery(sql);
+			List<ProjInfo> list = new ArrayList<>();
+			while (set.next()) {
+				list.add(ProjInfo.fromSQLResult(set));
+			}
+			return list;
+		} catch (SQLException e) {
+			logger.error("error occured when listing proj " + sql + "\n" + e.toString());
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/** find projs of a user by given string filed
+	 * @param username
+	 * @param fieldName
+	 * @param value
+	 * @return list of projs
+	 */
+	public List<ProjInfo> findProjsByString(String username, String fieldName, String value) {
+		String sql = "SELECT * FROM " + DBConstants.PROJ_TABLE + " WHERE " + "username='" + username + "' "
+				+ "AND " + fieldName + "='" + value + "';";
+		try {
+			ResultSet set = statement.executeQuery(sql);
+			List<ProjInfo> list = new ArrayList<>();
+			while (set.next()) {
+				list.add(ProjInfo.fromSQLResult(set));
+			}
+			return list;
+		} catch (SQLException e) {
+			logger.error("error occured when listing proj " + sql + "\n" + e.toString());
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 
 /**
  * Created by THU73 on 17/7/14.
+ * use user/login instead
  */
 public class Login extends HttpServlet {
 

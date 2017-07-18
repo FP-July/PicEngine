@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 /**
  * Created by THU73 on 17/7/17.
+ * use proj/FindFinishedProj instead
  */
 public class Finished extends HttpServlet {
     @Override

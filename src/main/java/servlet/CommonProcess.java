@@ -2,12 +2,18 @@ package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import bean.Task;
 import dao.DBConstants;
+import model.ProjInfo;
 import sessionManager.SessionManager;
 
 public class CommonProcess {
@@ -18,7 +24,7 @@ public class CommonProcess {
 	 */
 	public static void dataBaseFailure(HttpServletResponse response, Exception e) {
 		try {
-			response.sendError(ServletConstants.CODE_DB_INIT_FAILURE, e.toString());
+			response.sendError(ServletConstants.DB_INIT_FAILURE, e.toString());
 			return;
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -53,7 +59,7 @@ public class CommonProcess {
 		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
 		if(userSession == null) {
 			try {
-				resp.sendError(ServletConstants.CODE_NO_COOKIE);
+				resp.sendError(ServletConstants.NO_COOKIE);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -61,12 +67,31 @@ public class CommonProcess {
 		}
 		if(!SessionManager.testSession(userSession[0], userSession[1])) {
 			try {
-				resp.sendError(ServletConstants.CODE_SESSION_EXPIRE);
+				resp.sendError(ServletConstants.SESSION_EXPIRE);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return false;
 		}
 		return true;
+	}
+	
+	/** convert projInfo to task and send to client
+	 * @param req
+	 * @param res
+	 * @param infos
+	 * @throws IOException
+	 */
+	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos) throws IOException {
+		List<Task> taskList = new ArrayList<>();
+		for(ProjInfo info : infos) 
+			taskList.add(info.convertToTask());
+		HttpSession session = req.getSession();
+		session.setAttribute("taskList", taskList);
+		try {
+			req.getRequestDispatcher("views/finished.jsp").forward(req, res);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 /**
  * Created by THU73 on 17/7/17.
+ * use user/register instead
  */
 public class Register extends HttpServlet {
     @Override

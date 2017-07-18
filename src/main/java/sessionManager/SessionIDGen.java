@@ -9,16 +9,7 @@ public class SessionIDGen {
 	 * @return sessionID
 	 */
 	public static String gen(String username) {
-		String result = "";
-		try {
-			username += System.currentTimeMillis();
-			MessageDigest mDigest = MessageDigest.getInstance("MD5");
-			byte[] input = username.getBytes();
-			byte[] buff = mDigest.digest(input);
-			result = new String(buff);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+		String result = username + System.currentTimeMillis();
 		return result;
 	}
 }

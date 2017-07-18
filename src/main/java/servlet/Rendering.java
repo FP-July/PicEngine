@@ -13,6 +13,7 @@ import java.util.Date;
 
 /**
  * Created by THU73 on 17/7/17.
+ * use proj/FindOngoingProj instead
  */
 public class Rendering extends HttpServlet {
 
