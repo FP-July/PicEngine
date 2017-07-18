@@ -29,21 +29,12 @@ public class Rendering extends HttpServlet {
         req.getRequestDispatcher("views/rendering.jsp").forward(req, res);
     }
 
-    ArrayList<Task> getRenderingTasks(String username) {
+    public static ArrayList<Task> getRenderingTasks(String username) {
 
         // return the on-going tasks of this user
         ArrayList<Task> taskList = new ArrayList<Task>();
 
-        Task task = new Task();
-        task.setId(1234);
-        task.setName("图形学大作业");
-        task.setState(Task.ongoing);
-        task.setType(Task.picture);
-        task.setDate(new Date(117, 6, 25));
 
-        task.setMinutes(50);
-        task.setPercent(75);
-        taskList.add(task);
         return taskList;
     }
 }

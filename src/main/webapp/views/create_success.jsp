@@ -1,10 +1,8 @@
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="bean.Task" %>
 <%--
   Created by IntelliJ IDEA.
   User: THU73
-  Date: 17/7/17
-  Time: 23:49
+  Date: 17/7/19
+  Time: 00:26
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -13,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=session.getAttribute("username")%> - 已完成</title>
+    <title><%=session.getAttribute("username")%> - 创建新任务</title>
 
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap-responsive.min.css">
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
@@ -38,13 +36,13 @@
                     <li>
                         <a href="javascript:void(0);" onclick="visit('info')">主页</a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="javascript:void(0);" onclick="visit('create')">新建任务</a>
                     </li>
                     <li>
                         <a href="javascript:void(0);" onclick="visit('rendering')">正在进行</a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="javascript:void(0);" onclick="visit('finished')">已完成</a>
                     </li>
                 </ul>
@@ -68,101 +66,12 @@
         </div>
         <div class="span8">
             <h2>
-                已经完成的任务
+                提交任务成功！
             </h2>
-            <%
-                ArrayList<Task> taskList = (ArrayList<Task>) session.getAttribute("taskList");
-                if (taskList.size() == 0) {
-            %>
+            <hr>
             <h4>
-                当前没有已完成的任务。
+                2秒后将显示任务进度。
             </h4>
-            <%
-            } else {
-            %>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>
-                        编号
-                    </th>
-                    <th>
-                        任务名称
-                    </th>
-                    <th>
-                        任务种类
-                    </th>
-                    <th>
-                        提交时间
-                    </th>
-                    <th>
-                        状态
-                    </th>
-                    <th>
-                        用时
-                    </th>
-                    <th>
-                        操作
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <%
-                    for (int i = 0; i < taskList.size(); ++i) {
-                        Task task = taskList.get(i);
-                        String color = "";
-                        if (task.getState() == Task.FAILED) {
-                            color = "error";
-                        } else if (task.getState() == Task.FINISHED) {
-                            color = "success";
-                        } else {
-                %>
-                <h2>
-                    返回的"已完成"任务中只能是失败或已完成！
-                </h2>
-                <%
-                    }
-                    int minutes = task.getMinutes();
-                    int hours = minutes / 60;
-                    minutes = minutes % 60;
-                %>
-                <tr class="<%=color%>">
-                    <td>
-                        <%=task.getId()%>
-                    </td>
-                    <td>
-                        <%=task.getName()%>
-                    </td>
-                    <td>
-                        <%=task.getType()%>
-                    </td>
-                    <td>
-                        <%=task.getDate()%>
-                    </td>
-                    <td>
-                        <%=task.getState()%>
-                    </td>
-                    <td>
-                        <%=hours%> 时 <%=minutes%> 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-info">详细信息</button>
-                        <%
-                            if (task.getState() == Task.FINISHED) {
-                        %>
-                        <button class="btn btn-small btn-primary">下载</button>
-                        <%
-                            }
-                        %>
-                    </td>
-                </tr>
-                <%
-                        }
-                    }
-                %>
-
-                </tbody>
-            </table>
         </div>
         <div class="span2">
         </div>
@@ -191,6 +100,13 @@
 <script src="../vendor/jQuery/jquery-1.11.3.min.js"></script>
 <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="../vendor/cookie/jquery.cookie.js"></script>
+<script src="../vendor/bootstrap-file/bootstrap-file.js"></script>
 <script src="../js/navbar.js"></script>
+<script>
+    $(document).ready(function () {
+        var t = setTimeout("visit('rendering');", 1500);
+    });
+
+</script>
 </body>
 </html>

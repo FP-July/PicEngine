@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by THU73 on 17/7/17.
@@ -28,8 +30,9 @@ public class Finished extends HttpServlet {
 
     ArrayList<Task> getFinishedTasks(String username) {
 
+        ArrayList<Task> taskList = new ArrayList<Task>();
         // return the on-going tasks of this user
 
-        return new ArrayList<Task>();
+        return taskList;
     }
 }
