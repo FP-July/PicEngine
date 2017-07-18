@@ -27,26 +27,26 @@ DaoManager daoManager;
 		
 		daoManager.getUserDao().deleteUser(username);
 		
-		boolean success = false; 
-		success = daoManager.getUserDao().createUser(username, password);
-		assertTrue(success);
+		int status = DBConstants.SQL_EXCUTION_ERROR; 
+		status = daoManager.getUserDao().createUser(username, password);
+		assertTrue(status == DBConstants.SUCCESS);
 		
-		success = daoManager.getUserDao().userExist(username);
-		assertTrue(success);
+		status = daoManager.getUserDao().userExist(username);
+		assertTrue(status == DBConstants.USER_ALREADY_EXIST);
 	}
 	
 	@Test
 	public void testDelete() {
 		String username = "user2", password = "123456";
 		
-		boolean success = false; 
-		success = daoManager.getUserDao().createUser(username, password);
-		assertTrue(success);
+		int status = DBConstants.SQL_EXCUTION_ERROR; 
+		status = daoManager.getUserDao().createUser(username, password);
+		assertTrue(status == DBConstants.SUCCESS);
 		
 		daoManager.getUserDao().deleteUser(username);
 		
-		success = daoManager.getUserDao().userExist(username);
-		assertTrue(!success);
+		status = daoManager.getUserDao().userExist(username);
+		assertTrue(status == DBConstants.NO_SUCH_USER);
 	}
 
 	@Test
@@ -55,14 +55,14 @@ DaoManager daoManager;
 		
 		daoManager.getUserDao().deleteUser(username);
 		
-		boolean success = false; 
-		success = daoManager.getUserDao().createUser(username, password);
-		assertTrue(success);
+		int status = DBConstants.SQL_EXCUTION_ERROR; 
+		status = daoManager.getUserDao().createUser(username, password);
+		assertTrue(status == DBConstants.SUCCESS);
 		
-		success = daoManager.getUserDao().logIn(username, password + "1");
-		assertFalse(success);
-		success = daoManager.getUserDao().logIn(username, password);
-		assertTrue(success);
+		status = daoManager.getUserDao().logIn(username, password + "1");
+		assertTrue(status == DBConstants.WRONG_PW);
+		status = daoManager.getUserDao().logIn(username, password);
+		assertTrue(status == DBConstants.SUCCESS);
 	}
 
 	@Test
@@ -71,17 +71,17 @@ DaoManager daoManager;
 		
 		daoManager.getUserDao().deleteUser(username);
 		
-		boolean success = false; 
-		success = daoManager.getUserDao().createUser(username, password);
-		assertTrue(success);
+		int status = DBConstants.SQL_EXCUTION_ERROR; 
+		status = daoManager.getUserDao().createUser(username, password);
+		assertTrue(status == DBConstants.SUCCESS);
 		
 		String newPW = "654321";
-		success = daoManager.getUserDao().modifyPassword(username, password, newPW);
-		assertTrue(success);
+		status = daoManager.getUserDao().modifyPassword(username, password, newPW);
+		assertTrue(status == DBConstants.SUCCESS);
 		
-		success = daoManager.getUserDao().logIn(username, password);
-		assertFalse(success);
-		success = daoManager.getUserDao().logIn(username, newPW);
-		assertTrue(success);
+		status = daoManager.getUserDao().logIn(username, password);
+		assertTrue(status == DBConstants.WRONG_PW);
+		status = daoManager.getUserDao().logIn(username, newPW);
+		assertTrue(status == DBConstants.SUCCESS);
 	}
 }

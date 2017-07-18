@@ -1,4 +1,4 @@
-package servlet;
+package servlet.user;
 
 import java.io.IOException;
 
@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import servlet.CommonProcess;
+import servlet.ServletConstants;
 import sessionManager.SessionManager;
 
 public class Logout extends HttpServlet {

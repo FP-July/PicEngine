@@ -1,4 +1,4 @@
-package servlet;
+package servlet.user;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -6,7 +6,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dao.DBConstants;
 import dao.DaoManager;
+import servlet.CommonProcess;
+import servlet.ServletConstants;
 import sessionManager.SessionIDGen;
 import sessionManager.SessionManager;
 
@@ -27,8 +30,8 @@ public class Login extends HttpServlet {
     		String username = req.getParameter("username");
     		String password = req.getParameter("password");
    
-    		boolean success = daoManager.getUserDao().logIn(username, password);
-    		if(success) {
+    		int status = daoManager.getUserDao().logIn(username, password);
+    		if(status == DBConstants.SUCCESS) {
     			String sessionID = SessionIDGen.gen(username);
     			Cookie cookie = new Cookie("sessionID", sessionID);
     			resp.addCookie(cookie);
@@ -39,7 +42,7 @@ public class Login extends HttpServlet {
     			//TODO send the user to home page
     			resp.sendRedirect("link to the home page");
     		}	else {
-    			resp.sendError(ServletConstants.CODE_LOGIN_FAIL);
+    			resp.sendError(status);
     		}
 		} catch (Exception e) {
 			e.printStackTrace();

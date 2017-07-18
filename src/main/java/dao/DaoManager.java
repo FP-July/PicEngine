@@ -16,6 +16,7 @@ public class DaoManager {
 	private Statement statement;
 	
 	private UserDao userDao;
+	private ProjDao projDao;
 
 	public static DaoManager getInstance() throws ClassNotFoundException, SQLException {
 		if (instance == null) {
@@ -29,6 +30,7 @@ public class DaoManager {
 		connect2DB();
 		createTables();
 		setUserDao(new UserDao(statement));
+		setProjDao(new ProjDao(statement));
 	}
 	
 	private void connect2DB() throws SQLException, ClassNotFoundException {
@@ -54,6 +56,14 @@ public class DaoManager {
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
+	}
+
+	public ProjDao getProjDao() {
+		return projDao;
+	}
+
+	public void setProjDao(ProjDao projDao) {
+		this.projDao = projDao;
 	}
 
 }

@@ -18,29 +18,29 @@ public class UserDao {
 	/** create a user
 	 * @param userName
 	 * @param password
-	 * @return true if create successfully
+	 * @return status code
 	 */
-	public boolean createUser(String userName, String password) {
-		if(userExist(userName))
-			return false;
+	public int createUser(String userName, String password) {
+		if(userExist(userName) != DBConstants.NO_SUCH_USER)
+			return DBConstants.USER_ALREADY_EXIST;
 		
 		String sql = "INSERT INTO " + DBConstants.USER_TABLE + "(username,password,permission)" +
 					"VALUES ('" + userName + "','" + password + "','" + DBConstants.DB_PREVILIGE.user + "');";
-		boolean success = false;
+		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
-			success = statement.executeUpdate(sql) > 0;
+			status = statement.executeUpdate(sql) > 0 ? DBConstants.SUCCESS : status;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			logger.error("error occured when executing " + sql);
+			logger.error("error occured when executing " + sql + "\n" + e.toString());
 		}
-		return success;
+		return status;
 	}
 	
 	/** test if a user exists
 	 * @param userName
-	 * @return true if user exists
+	 * @return status code
 	 */
-	public boolean userExist(String userName) {
+	public int userExist(String userName) {
 		String sql = "SELECT * FROM " + DBConstants.USER_TABLE +
 				" where username='" + userName + "';";
 		ResultSet resultSet;
@@ -49,43 +49,45 @@ public class UserDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when executing " + sql + "\n" + e.toString());
-			return false;
+			return DBConstants.SQL_EXCUTION_ERROR;
 		}
 		
-		boolean found = false;
+		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
-			found = resultSet.next();
+			status = resultSet.next() ? DBConstants.USER_ALREADY_EXIST : DBConstants.NO_SUCH_USER;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when itering result " + sql + "\n" + e.toString());
 		}
 		
-		return found;
+		return status;
 	}
 
 	/** delete a user
 	 * @param userName
-	 * @return true if success, false if failed or no such user
+	 * @return status code
 	 */
-	public boolean deleteUser(String userName) {
+	public int deleteUser(String userName) {
 		String sql = "DELETE FROM " + DBConstants.USER_TABLE +
 				" WHERE username=" + "'" + userName + "';";
-		boolean success = false;
+		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
-			success = statement.executeUpdate(sql) > 0;
+			status = statement.executeUpdate(sql) > 0 ? DBConstants.SUCCESS : status;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when executing " + sql + "\n" + e.toString());
 		}
-		return success;
+		return status;
 	}
 
 	/**  check given username and password exist
 	 * @param userName
 	 * @param password
-	 * @return true if username and password pair exist
+	 * @return status code
 	 */
-	public boolean logIn(String userName, String password) {
+	public int logIn(String userName, String password) {
+		if(userExist(userName) != DBConstants.USER_ALREADY_EXIST)
+			return DBConstants.NO_SUCH_USER;
 		String sql = "SELECT * FROM " + DBConstants.USER_TABLE +
 				" where username='" + userName + "' AND password='" + password + "';";
 		ResultSet resultSet;
@@ -94,32 +96,40 @@ public class UserDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when executing " + sql + "\n" + e.toString());
-			return false;
+			return DBConstants.SQL_EXCUTION_ERROR;
 		}
 		
-		boolean found = false;
+		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
-			found = resultSet.next();
+			status = resultSet.next() ? DBConstants.SUCCESS : DBConstants.WRONG_PW;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when itering result " + sql + "\n" + e.toString());
 		}
 		
-		return found;
+		return status;
 	}
 
 	
-	public boolean modifyPassword(String userName, String oldPW, String newPW) {
+	/** modify password
+	 * @param userName
+	 * @param oldPW
+	 * @param newPW
+	 * @return status code
+	 */
+	public int modifyPassword(String userName, String oldPW, String newPW) {
+		if(userExist(userName) != DBConstants.USER_ALREADY_EXIST)
+			return DBConstants.NO_SUCH_USER;
 		String sql = "UPDATE " + DBConstants.USER_TABLE +
 				" SET password='" + newPW + "'" +
 				" where username='" + userName + "' AND password='" + oldPW + "';";
-		boolean success = false;
+		int status = DBConstants.SQL_EXCUTION_ERROR;
 		try {
-			success = statement.executeUpdate(sql) > 0;
+			status = statement.executeUpdate(sql) > 0 ? DBConstants.SUCCESS : DBConstants.WRONG_PW;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			logger.error("error occured when executing " + sql + "\n" + e.toString());
 		}
-		return success;
+		return status;
 	}
 }
