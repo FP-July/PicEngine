@@ -25,3 +25,11 @@ hs_err_pid*
 .idea/
 .DS_Store
 PicEngine.iml
+/target/
+
+\.project
+
+\.classpath
+
+\.settings/
+/bin/
