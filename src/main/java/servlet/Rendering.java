@@ -28,7 +28,7 @@ public class Rendering extends HttpServlet {
         req.getRequestDispatcher("views/rendering.jsp").forward(req, res);
     }
 
-    ArrayList<Task> getRenderingTasks(String username) {
+    public static ArrayList<Task> getRenderingTasks(String username) {
 
         // return the on-going tasks of this user
         ArrayList<Task> taskList = new ArrayList<Task>();
@@ -36,12 +36,21 @@ public class Rendering extends HttpServlet {
         Task task = new Task();
         task.setId(1234);
         task.setName("图形学大作业");
-        task.setState(Task.ongoing);
-        task.setType(Task.picture);
+        task.setState(Task.ONGOING);
+        task.setType(Task.PICTURE);
         task.setDate(new Date(117, 6, 25));
-
         task.setMinutes(50);
         task.setPercent(75);
+        taskList.add(task);
+
+        task = new Task();
+        task.setId(5678);
+        task.setName("宣传片剪辑");
+        task.setState(Task.ONGOING);
+        task.setType(Task.VIDEO);
+        task.setDate(new Date(117, 5, 30));
+        task.setMinutes(700);
+        task.setPercent(30);
         taskList.add(task);
         return taskList;
     }

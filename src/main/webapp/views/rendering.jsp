@@ -30,10 +30,14 @@
 <div class="navbar">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span
-                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a> <a
-                href="#" class="brand">Distributed Rendering Engine - <%=session.getAttribute("username")%>
-        </a>
+            <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a href="#myModal" role="button" data-toggle="modal" class="brand">
+                Distributed Rendering Engine - <%=session.getAttribute("username")%>
+            </a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav">
                     <li>
@@ -114,7 +118,7 @@
                         String color = null;
                         int percent = task.getPercent();
                         if (percent < 10) {
-                            color = "danger";
+                            color = "error";
                         } else if (percent < 40) {
                             color = "warning";
                         } else if (percent < 70) {
@@ -161,6 +165,25 @@
         </div>
         <div class="span2">
         </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">相关信息</h3>
+    </div>
+    <div class="modal-body">
+        <h4>小组名单</h4>
+        <p>计45 江天</p>
+        <p>计45 王龙涛</p>
+        <p>计45 张琛昱</p>
+        <hr>
+        <h4>Final Project for Distributed Data Processing</h4>
+        <p>Distributed Image Rendering Engine</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
     </div>
 </div>
 

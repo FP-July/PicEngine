@@ -17,3 +17,4 @@ visit = function (target) {
     document.body.appendChild(form);
     form.submit();
 }
+

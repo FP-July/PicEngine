@@ -7,10 +7,11 @@ import java.util.Date;
  */
 public class Task {
 
-    public static final String picture = "图像渲染";
-    public static final String video = "视频渲染";
-    public static final String ongoing = "正在进行";
-    public static final String finished = "已完成";
+    public static final String PICTURE = "图像渲染";
+    public static final String VIDEO = "视频渲染";
+    public static final String ONGOING = "正在进行";
+    public static final String FINISHED = "已完成";
+    public static final String FAILED = "失败";
 
     private int id;
     private String name;
