@@ -25,3 +25,13 @@ hs_err_pid*
 .idea/
 .DS_Store
 PicEngine.iml
+/bin/
+/build/
+
+# Eclipse settings file
+.classpath
+.project
+.settings/
+
+# lib jar package
+target/

@@ -1,0 +1,128 @@
+package raytracing;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import raytracing.model.PhyObject;
+
+public class RayTracing {
+	
+	public static List<PhyObject> scene = new ArrayList<PhyObject>();
+//	public static Scene scene = new Scene();
+	
+	public final int MAX_RAY_DEPTH = 5;
+
+	public void render() {
+	    int width = 640, height = 480; 
+	    Vec3d[] image = new Vec3d[width * height], pixel = image; 
+	    double invWidth = 1.0 / width, invHeight = 1.0 / height; 
+	    double fov = 30, aspectratio = 1.0 * width / height; 
+	    double angle = Math.tan(Math.PI * 0.5 * fov / 180); 
+	    // Trace rays
+	    for (int y = 0; y < height; ++y) { 
+	        for (int x = 0; x < width; ++x) { 
+	            double xx = (2 * ((x + 0.5) * invWidth) - 1) * angle * aspectratio; 
+	            double yy = (1 - 2 * ((y + 0.5) * invHeight)) * angle; 
+	            Vec3d raydir = new Vec3d(xx, yy, -1.0); 
+	            raydir.normalize(); 
+	            pixel[height * y + x] = trace(new Vec3d(0.0), raydir, 0); 
+	        } 
+	    } 
+	}
+	
+	public Vec3d trace(Vec3d rayorig, Vec3d raydir, int depth) {
+		double tnear = Double.MAX_VALUE; 
+	    PhyObject obj = null; 
+	    // find intersection of this ray with the sphere in the scene
+	    for (PhyObject sc : scene) { 
+	        List<Double> pHits = new ArrayList<Double>();
+	        if (sc.intersect(rayorig, raydir, pHits)) { 
+	        	for (Double phit : pHits) {
+	        		if (phit < 0) continue;
+	        		if (phit < tnear) {
+	        			tnear = phit;
+	        			obj = sc;
+	        			break;
+	        		}
+	        	}
+	        } 
+	    } 
+	    // if there's no intersection return black or background color
+	    if (obj == null) return new Vec3d(2.0); 
+	    
+	    Vec3d surfaceColor = new Vec3d(0.0); // color of the ray/surfaceof the object intersected by the ray 
+	    Vec3d phit = rayorig.add(raydir.mul(tnear)); // point of intersection 
+	    Vec3d nhit = obj.getNormal(phit); // normal at the intersection point 
+	    nhit.normalize(); // normalize normal direction 
+	    
+	    // If the normal and the view direction are not opposite to each other
+	    // reverse the normal direction. That also means we are inside the sphere so set
+	    // the inside bool to true. Finally reverse the sign of IdotN which we want
+	    // positive.
+	    double bias = 1e-4; // add some bias to the point from which we will be tracing 
+	    boolean inside = false; 
+	    if (raydir.dot(nhit) > 0) {
+	    	nhit = nhit.inv();
+	    	inside = true; 
+	    }
+	    if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0) && depth < MAX_RAY_DEPTH) { 
+	        double facingratio = -raydir.dot(nhit); 
+	        // change the mix value to tweak the effect
+	        double fresneleffect = mix(Math.pow(1 - facingratio, 3), 1, 0.1); 
+	        // compute reflection direction (not need to normalize because all vectors
+	        // are already normalized)
+	        Vec3d refldir = raydir.sub(nhit.mul(2.0).mul(raydir.dot(nhit))); 
+	        refldir.normalize(); 
+	        Vec3d reflection = trace(phit.add(nhit.mul(bias)), refldir, depth + 1); 
+	        //Vec3f reflection = trace(phit, refldir, spheres, depth + 1); little change in the final effect
+	        Vec3d refraction = new Vec3d(0.0); 
+	        // if the sphere is also transparent compute refraction ray (transmission)
+	        if (obj.getTransparency(phit) != 0) { 
+	            double ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface? 
+	            double cosi = -nhit.dot(raydir); 
+	            double k = 1 - eta * eta * (1 - cosi * cosi); 
+	            Vec3d refrdir = raydir.mul(eta).add(nhit.mul((eta *  cosi - Math.sqrt(k)))); 
+	            refrdir.normalize(); 
+	            refraction = trace(phit.sub(nhit.mul(bias)), refrdir, depth + 1); 
+	        } 
+	        // the result is a mix of reflection and refraction (if the sphere is transparent)
+	        surfaceColor = 
+	        	reflection.mul(fresneleffect).add(
+	        	refraction.mul(
+	            	(1 - fresneleffect) * obj.getTransparency(phit))
+	        	).mul(obj.getSurfaceColor(phit)); 
+	    } 
+	    else { 
+	        // it's a diffuse object, no need to raytrace any further
+	        for (PhyObject sc : scene) { 
+	            if (sc.isLight()) { 
+	                double transmission = 1.0; 
+	                Vec3d lightDirection = sc.getLightDirection(phit); 
+	                lightDirection.normalize(); 
+	                for (PhyObject block : scene) { 
+	                    if (block != sc) { 
+	                    	List<Double> phits = new ArrayList<Double>();
+	                        if (block.intersect(phit.add(nhit.mul(bias)), lightDirection, phits)) { 
+	                            transmission = 0.0; 
+	                            break; 
+	                        } 
+	                    } 
+	                } 
+	                surfaceColor.addToThis(
+	                	obj.getSurfaceColor(phit).mul(
+	                	transmission).mul( 
+	                	Math.max(0.0, nhit.dot(lightDirection))
+	                	).mul(obj.getEmissionColor(phit))
+	                ); 
+	            } 
+	        } 
+	    } 
+	 
+	    return surfaceColor.add(obj.getEmissionColor(phit)); 
+
+	}
+	
+	private double mix(double a, double b, double mix) {
+		return b * mix + a * (1 - mix);
+	}
+}
