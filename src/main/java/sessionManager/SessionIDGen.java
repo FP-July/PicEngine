@@ -1,8 +1,5 @@
 package sessionManager;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class SessionIDGen {
 	/** use username + currentTime and MD5 to generate sessionID 
 	 * @param username

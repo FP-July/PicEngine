@@ -1,6 +1,5 @@
 package servlet;
 
-import bean.Task;
 import bean.UserInfo;
 
 import javax.servlet.ServletException;
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by THU73 on 17/7/17.
@@ -17,7 +15,12 @@ import java.util.ArrayList;
  */
 public class Info extends HttpServlet {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");

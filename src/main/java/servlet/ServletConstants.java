@@ -14,6 +14,9 @@ public class ServletConstants {
 	
 	public static final int HADOOP_FS_CRASH = 706;
 	public static final int UPLOAD_FAIL = 707;
+	
+	public static final int TASK_ALREADY_RUNNING = 708;
+	public static final int TASK_ALREADY_FINISHED = 709;
 	// response string
 	public static final String STR_SUCCESS = "success";
 	public static final String STR_NO_COOKIE = "no cookie";
@@ -24,6 +27,9 @@ public class ServletConstants {
 	
 	public static final String STR_HADOOP_FS_CRASH = "cannot init hadoop filesystem";
 	public static final String STR_UPLOAD_FAIL = "file cannot be uploaded to HDFS";
+	
+	public static final String STR_TASK_ALREADY_RUNNING = "the task has already run";
+	public static final String STR_TASK_ALREADY_FINISHED = "the task has already finished";
 	// session lifetime
 	public static final long SESSION_EXPANSION = 1000 * 60 * 15; 
 	
@@ -44,6 +50,8 @@ public class ServletConstants {
 			return STR_HADOOP_FS_CRASH;
 		case UPLOAD_FAIL:
 			return STR_UPLOAD_FAIL;
+		case TASK_ALREADY_RUNNING:
+			return STR_TASK_ALREADY_RUNNING;
 		default:
 			return DBConstants.codeToString(status);
 		}

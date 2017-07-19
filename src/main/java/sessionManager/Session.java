@@ -1,7 +1,5 @@
 package sessionManager;
 
-import javax.servlet.http.Cookie;
-
 public class Session {
 	public Session(String sessionID2, long expireTime2) {
 		this.setSessionID(sessionID2);

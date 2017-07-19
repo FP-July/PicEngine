@@ -1,7 +1,6 @@
 package servlet.proj;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -16,13 +15,7 @@ import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 
-public class FindProj extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Override
+public class RunProj extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
 		if(!cookieValid)
@@ -44,20 +37,34 @@ public class FindProj extends HttpServlet {
 			ProjDao projDao = daoManager.getProjDao();
 			ProjInfo info = projDao.findProj(username, projName);
 			if(info == null) {
-				resp.sendError(DBConstants.NO_SUCH_PROJ);
+				resp.sendError(DBConstants.NO_SUCH_PROJ, DBConstants.codeToString(DBConstants.NO_SUCH_PROJ));
 				return;
 			}
-			sendProjToClient(resp, info);
+			if(info.status == ProjInfo.statusEnum.ongoing.ordinal()) {	
+				resp.sendError(ServletConstants.TASK_ALREADY_RUNNING, ServletConstants.STR_TASK_ALREADY_RUNNING);
+				return;
+			}
+			if(info.status == ProjInfo.statusEnum.finished.ordinal()) {
+				resp.sendError(ServletConstants.TASK_ALREADY_FINISHED, ServletConstants.STR_TASK_ALREADY_FINISHED);
+				return;
+			}
+			int status = runProj(username, projName);
+			
+			if(status == ServletConstants.SUCCESS) {
+				// TODO send client success
+				resp.sendRedirect("...");
+			} else {
+				resp.sendError(status, ServletConstants.codeToString(status));
+			}
+			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);
 		}
 	}
 	
-	private void sendProjToClient(HttpServletResponse response, ProjInfo info) throws IOException {
-		PrintWriter writer = response.getWriter();
-		writer.write(info.toJSON().toString());
-		writer.flush();
-		writer.close();
+	private int runProj(String username, String projName) {
+		// TODO implement this
+		return ServletConstants.SUCCESS;
 	}
 }

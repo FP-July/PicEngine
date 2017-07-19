@@ -1,7 +1,6 @@
 package servlet.proj;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -9,12 +8,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 
 public class DeleteProj extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
@@ -22,13 +27,13 @@ public class DeleteProj extends HttpServlet {
 			return;
 		
 		String username = req.getParameter("username"),
-				projName = req.getParameter("projName");
+				projName = req.getParameter("taskName");
 		if(username == null || projName == null) {
 			String argLack = "";
 			if(username == null)
-				argLack += "username ";
+				argLack += "taskname ";
 			if(projName == null)
-				argLack += "projName ";
+				argLack += "taskName ";
 			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
 		
@@ -36,10 +41,13 @@ public class DeleteProj extends HttpServlet {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
 			int status = projDao.deleteProj(username, projName);
-			PrintWriter writer = resp.getWriter();
-			writer.write(status + "\n");
-			writer.flush();
-			writer.close();
+			if(status == DBConstants.SUCCESS) {
+				//TODO send client a success msg
+				resp.sendRedirect("...");
+			} else {
+				//TODO add error pages
+				resp.sendError(status, ServletConstants.codeToString(status));
+			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);

@@ -1,17 +1,10 @@
 package servlet.proj;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.channels.FileChannel;
-import java.security.interfaces.RSAKey;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +20,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -40,6 +32,10 @@ import servlet.ServletConstants;
 
 public class CreateProj extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// 上传文件存储目录
 	private static final String UPLOAD_DIRECTORY = "hdfs://localhost:9000/userfiles";
 	private static final String USER_SRC_FOLDER = "src";
@@ -88,7 +84,6 @@ public class CreateProj extends HttpServlet {
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
-		String filePath = null;
 		List<FileItem> fileItems = new ArrayList<>();
 		HashMap<String, String> parameters = new HashMap<String, String>();
 		try {

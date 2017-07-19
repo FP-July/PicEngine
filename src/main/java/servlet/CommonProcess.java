@@ -1,7 +1,6 @@
 package servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bean.Task;
-import dao.DBConstants;
 import model.ProjInfo;
 import sessionManager.SessionManager;
 
@@ -56,8 +54,8 @@ public class CommonProcess {
 	 * @return true if the request's cookie is valid
 	 */
 	public static boolean checkSession(HttpServletRequest req, HttpServletResponse resp){
-		return true;
-		/*String[] userSession = CommonProcess.cookies2Session(req.getCookies());
+		//return true;
+		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
 		if(userSession == null) {
 			try {
 				resp.sendError(ServletConstants.NO_COOKIE, "no cookie");
@@ -74,7 +72,7 @@ public class CommonProcess {
 			}
 			return false;
 		}
-		return true;*/
+		return true;
 	}
 	
 	/** convert projInfo to task and send to client

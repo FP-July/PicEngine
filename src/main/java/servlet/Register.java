@@ -12,7 +12,12 @@ import java.io.IOException;
  * use user/register instead
  */
 public class Register extends HttpServlet {
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");

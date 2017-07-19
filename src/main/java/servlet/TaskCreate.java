@@ -1,6 +1,5 @@
 package servlet;
 
-import bean.Task;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -14,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +22,12 @@ import java.util.List;
  */
 public class TaskCreate extends HttpServlet {
 
-    // 上传文件存储目录
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// 上传文件存储目录
     private static final String UPLOAD_DIRECTORY = "upload";
 
     // 上传配置
@@ -74,7 +77,6 @@ public class TaskCreate extends HttpServlet {
         HashMap<String, String> parameters = new HashMap<String, String>();
         try {
             // 解析请求的内容提取文件数据
-            @SuppressWarnings("unchecked")
             List<FileItem> formItems = upload.parseRequest(req);
 
             if (formItems != null && formItems.size() > 0) {

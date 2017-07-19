@@ -13,6 +13,11 @@ import sessionManager.SessionManager;
 
 public class Logout extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
@@ -22,8 +27,7 @@ public class Logout extends HttpServlet {
 		}
 		
 		SessionManager.abortSession(userSession[0]);
-		//TODO send the user to the login page
-		resp.sendRedirect("link to the login in page");
+		req.getRequestDispatcher("index.jsp").forward(req, resp);
 	}
 
 }
