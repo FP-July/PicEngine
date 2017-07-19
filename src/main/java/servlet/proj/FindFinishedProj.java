@@ -39,12 +39,14 @@ public class FindFinishedProj extends HttpServlet{
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			List<ProjInfo> infos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
-			if(infos == null) {
+			List<ProjInfo> finishedInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
+			List<ProjInfo> errorInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.error.ordinal());
+			if(finishedInfos == null || errorInfos == null) {
 				resp.sendError(DBConstants.NO_SUCH_PROJ);
 				return;
 			}
-			CommonProcess.sendProjsToClient(req, resp, infos, "views/finished.jsp");
+			finishedInfos.addAll(errorInfos);
+			CommonProcess.sendProjsToClient(req, resp, finishedInfos, "views/finished.jsp");
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);

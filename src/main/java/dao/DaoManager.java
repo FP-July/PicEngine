@@ -68,7 +68,17 @@ public class DaoManager {
 			return null;
 		}
 		renderingCount = projInfos.size();
-		
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		renderingCount += projInfos.size();	
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ready.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		renderingCount += projInfos.size();	
+	
 		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
 		if (projInfos == null) {
 			return null;

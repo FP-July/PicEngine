@@ -38,12 +38,16 @@ public class FindOngoingProj extends HttpServlet {
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			List<ProjInfo> infos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ongoing.ordinal());
-			if(infos == null) {
+			List<ProjInfo> ongoingInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ongoing.ordinal());
+			List<ProjInfo> initInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
+			List<ProjInfo> readyInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ready.ordinal());
+			if(ongoingInfos == null || initInfos == null || readyInfos == null) {
 				resp.sendError(DBConstants.NO_SUCH_PROJ);
 				return;
 			}
-			CommonProcess.sendProjsToClient(req, resp, infos, "views/rendering.jsp");
+			ongoingInfos.addAll(initInfos);
+			ongoingInfos.addAll(readyInfos);
+			CommonProcess.sendProjsToClient(req, resp, ongoingInfos, "views/rendering.jsp");
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(resp, e);

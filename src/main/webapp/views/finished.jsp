@@ -111,9 +111,9 @@
                     for (int i = 0; i < taskList.size(); ++i) {
                         Task task = taskList.get(i);
                         String color = "";
-                        if (task.getState() == Task.FAILED) {
+                        if (task.getState() == Task.error) {
                             color = "error";
-                        } else if (task.getState() == Task.FINISHED) {
+                        } else if (task.getState() == Task.error) {
                             color = "success";
                         } else {
                 %>
@@ -148,7 +148,7 @@
                     <td>
                         <button class="btn btn-small btn-info">详细信息</button>
                         <%
-                            if (task.getState() == Task.FINISHED) {
+                            if (task.getState() == Task.finished) {
                         %>
                         <button class="btn btn-small btn-primary">下载</button>
                         <%
