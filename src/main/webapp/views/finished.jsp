@@ -113,7 +113,7 @@
                         String color = "";
                         if (task.getState() == Task.error) {
                             color = "error";
-                        } else if (task.getState() == Task.error) {
+                        } else if (task.getState() == Task.finished) {
                             color = "success";
                         } else {
                 %>

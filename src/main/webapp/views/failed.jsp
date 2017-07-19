@@ -13,8 +13,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录失败</title>
 
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
     <style type="text/css">
         body {
             padding-top: 40px;
@@ -67,8 +67,8 @@
 </div> <!-- /container -->
 
 
-<script src="vendor/jQuery/jquery-1.11.3.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="../vendor/jQuery/jquery-1.11.3.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 </body>
 <script>
     $(document).ready(function () {
