@@ -83,7 +83,14 @@ public class Vec3d {
 		int g = (int) (Math.min(1, y) * 255);
 		int b = (int) (Math.min(1, z) * 255);
 		Color color = new Color(r, g, b);
+//		if (r != 255)
+//		System.out.println(color.toString());
 		return color.getRGB();
+	}
+	
+	public boolean similiar(Vec3d v) {
+		double bias = 0.5;
+		return ((Math.abs(x - v.x) < bias) && (Math.abs(y - v.y) < bias) && (Math.abs(z - v.z) < bias));
 	}
 	
 	private Double length2() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <project name="PicEngine" basedir="." default="compile">
 	
-	<property name="src.dir" value="src"/>
+	<property name="src.dir" value="src/main/java"/>
 	<property name="bin.dir" value="build/classes"/>
 	<property name="jar.dir" value="build/jar"/>
 	<property name="mvn.dir" value="target/dependency"/>

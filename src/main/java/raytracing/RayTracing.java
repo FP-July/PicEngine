@@ -1,9 +1,15 @@
 package raytracing;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import raytracing.model.PhyObject;
+import raytracing.model.Sphere;
 
 public class RayTracing {
 	
@@ -11,12 +17,27 @@ public class RayTracing {
 //	public static Scene scene = new Scene();
 	
 	public final int MAX_RAY_DEPTH = 5;
+	
+	public static void main(String[] args) {
+		// position, radius, surface color, reflectivity, transparency, emission color
+		RayTracing.scene.add(new Sphere(new Vec3d( 0.0,      2.0, -10.0),     2.0, new Vec3d(0.40, 0.57, 0.74), 0.0, 0.3, new Vec3d(0.0))); 
+	    RayTracing.scene.add(new Sphere(new Vec3d( 0.0,      0.0, -20.0),     4.0, new Vec3d(1.00, 0.32, 0.36), 1.0, 0.5, new Vec3d(0.0))); 
+	    RayTracing.scene.add(new Sphere(new Vec3d( 5.0,     -1.0, -15.0),     2.0, new Vec3d(0.90, 0.76, 0.46), 1.0, 0.7, new Vec3d(0.0))); 
+	    RayTracing.scene.add(new Sphere(new Vec3d( 5.0,      0.0, -25.0),     3.0, new Vec3d(0.65, 0.77, 0.97), 1.0, 0.0, new Vec3d(0.0))); 
+	    RayTracing.scene.add(new Sphere(new Vec3d(-5.5,      0.0, -15.0),     3.0, new Vec3d(0.90, 0.90, 0.90), 1.0, 0.3, new Vec3d(0.0))); 
+	    // light
+	    
+	    Sphere light = new Sphere(new Vec3d( 0.0, -20.0, -10040.0), 10000.0, new Vec3d(0.20, 0.20, 0.20), 0.0, 0.0, new Vec3d(1.0));
+	    RayTracing.scene.add(light); 
+	    RayTracing rt = new RayTracing();
+	    rt.render();
+	}
 
 	public void render() {
 	    int width = 640, height = 480; 
-	    Vec3d[] image = new Vec3d[width * height], pixel = image; 
+	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	    double invWidth = 1.0 / width, invHeight = 1.0 / height; 
-	    double fov = 30, aspectratio = 1.0 * width / height; 
+	    double fov = -30, aspectratio = 1.0 * width / height; 
 	    double angle = Math.tan(Math.PI * 0.5 * fov / 180); 
 	    // Trace rays
 	    for (int y = 0; y < height; ++y) { 
@@ -25,9 +46,18 @@ public class RayTracing {
 	            double yy = (1 - 2 * ((y + 0.5) * invHeight)) * angle; 
 	            Vec3d raydir = new Vec3d(xx, yy, -1.0); 
 	            raydir.normalize(); 
-	            pixel[height * y + x] = trace(new Vec3d(0.0), raydir, 0); 
+	            Vec3d rgb = trace(new Vec3d(0.0), raydir, 0); 
+	            image.setRGB(x, y, rgb.getRGB());
 	        } 
 	    } 
+	    
+	    
+	    try {
+			ImageIO.write(image, "bmp", new File("image.bmp"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public Vec3d trace(Vec3d rayorig, Vec3d raydir, int depth) {
@@ -45,10 +75,16 @@ public class RayTracing {
 	        			break;
 	        		}
 	        	}
-	        } 
+	        } else {
+//	        	System.out.println(raydir.serialize());
+	        }
 	    } 
 	    // if there's no intersection return black or background color
-	    if (obj == null) return new Vec3d(2.0); 
+	    if (obj == null) {
+	    	return new Vec3d(0.2); 
+	    }
+
+//	    System.out.println(obj.isLight());
 	    
 	    Vec3d surfaceColor = new Vec3d(0.0); // color of the ray/surfaceof the object intersected by the ray 
 	    Vec3d phit = rayorig.add(raydir.mul(tnear)); // point of intersection 
@@ -93,6 +129,7 @@ public class RayTracing {
 	        	).mul(obj.getSurfaceColor(phit)); 
 	    } 
 	    else { 
+	    	
 	        // it's a diffuse object, no need to raytrace any further
 	        for (PhyObject sc : scene) { 
 	            if (sc.isLight()) { 
@@ -117,7 +154,10 @@ public class RayTracing {
 	            } 
 	        } 
 	    } 
-	 
+
+//    	if (obj.isLight() && depth == 1) {
+//    		System.out.println(surfaceColor.serialize());
+//    	} 
 	    return surfaceColor.add(obj.getEmissionColor(phit)); 
 
 	}

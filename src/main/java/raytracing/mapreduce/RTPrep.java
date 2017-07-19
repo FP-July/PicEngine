@@ -8,30 +8,31 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import raytracing.EmptyInputFormat;
 
 public class RTPrep {
 
-	public class RTPrepMapper
-		extends Mapper<Text, Text, Text, Text> {
+	public static class RTPrepMapper
+		extends Mapper<Object, Object, Text, Text> {
 		
+		@Override
+		public void map(Object key, Object value, Context context)
+			throws IOException, InterruptedException {
+			context.write(new Text("1"), new Text("1"));
+		}
 	}
 	
-	public class RTPrepReducer
+	public static class RTPrepReducer
 		extends Reducer<Text, Text, Text, Text> {
 		
 		public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
 			for (int i = 0; i < RayTracer.height; ++i) {
 				for (int j = 0; j < RayTracer.width; ++j) {
-					context.write(new Text("loc"), new Text(i + "," + j));
+					context.write(new Text("loc"), new Text(j + "," + i));
 				}
 			}
 		}
@@ -56,6 +57,6 @@ public class RTPrep {
 		
 //		FileInputFormat.addInputPath(job, new Path(srcPath));
 		FileOutputFormat.setOutputPath(job, new Path(outPath));
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
+		job.waitForCompletion(true);
 	}
 }

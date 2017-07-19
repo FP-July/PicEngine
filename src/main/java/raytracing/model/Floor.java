@@ -4,7 +4,7 @@ import java.util.List;
 
 import raytracing.Vec3d;
 
-public class Sphere extends PhyObject {
+public class Floor extends PhyObject {
 	
 	public Vec3d center;
 	public Vec3d emissionLoc;
@@ -12,7 +12,7 @@ public class Sphere extends PhyObject {
 	public Vec3d surfaceColor, emissionColor;
 	public Double transparency = 0.0, reflection = 0.0;
 	
-	public Sphere(Vec3d c,
+	public Floor(Vec3d c,
 				  Double r,
 				  Vec3d sc,
 				  Double refl,
@@ -64,5 +64,4 @@ public class Sphere extends PhyObject {
 	public Vec3d getNormal(Vec3d pHit) {
 		return pHit.sub(center);
 	}
-	
 }

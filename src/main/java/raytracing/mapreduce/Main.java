@@ -4,19 +4,17 @@ import java.io.IOException;
 
 import org.apache.commons.cli.Option;
 
+import main.JobRegister;
 import main.MainDriver;
 import main.Registry;
 
-public class Main {
-	static {
-//		Registry.registerJobAlias("rtprep", "raytracing.mapreduce.RTPrep");
-		Registry.registerJobAlias("raytracing", "raytracing.mapreduce.Main");
-	}
+public class Main extends JobRegister {
 
-	public static void main(String[] args) {
+	public void execute(String[] args) {
 		try {
-			RTPrep.rtPrep("./loc.txt");
-			RayTracer.rayTracing("./loc.txt");
+			String path = "./finalPro/loc";
+			RTPrep.rtPrep(path);
+			RayTracer.rayTracing(path);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
