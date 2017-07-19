@@ -35,3 +35,6 @@ PicEngine.iml
 
 # lib jar package
 target/
+
+# output
+*.bmp
