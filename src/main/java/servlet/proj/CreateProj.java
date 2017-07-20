@@ -132,27 +132,34 @@ public class CreateProj extends HttpServlet {
 			res.sendError(ServletConstants.LACK_ARG, argLack);
 			return;
 		}
+		session.setAttribute("username", username);
 		//System.out.println("[create] " + username + " " + taskName + " " + taskType + " " + fileItems.size() + " files");
 		try {
-			DaoManager daoManager = DaoManager.getInstance();
-			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.createProj(taskName, username, taskType);
-			if (status == DBConstants.SUCCESS) {
-				session.setAttribute("username", username);
-				status = uploadToHDFS(username, taskName, fileItems, projDao);
-				if(status == ServletConstants.SUCCESS)
-					req.getRequestDispatcher("views/create_success.jsp").forward(req, res);
-				else
-					res.sendError(status, ServletConstants.codeToString(status));
-			} else {
-				res.sendError(status, DBConstants.codeToString(status));
-			}
+			int status = createTask(taskName, username, taskType, fileItems);
+			if(status == ServletConstants.SUCCESS)
+				req.getRequestDispatcher("views/create_success.jsp").forward(req, res);
+			else
+				res.sendError(status, ServletConstants.codeToString(status));
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(res, e);
 		}
 	}
 
+	private int createTask(String taskName, String username, String taskType, List<FileItem> fileItems) throws ClassNotFoundException, SQLException {
+		DaoManager daoManager = DaoManager.getInstance();
+		ProjDao projDao = daoManager.getProjDao();
+		int status = projDao.createProj(taskName, username, taskType);
+		if (status == DBConstants.SUCCESS) {
+			if(fileItems != null) {
+				status = uploadToHDFS(username, taskName, fileItems, projDao);
+			}
+			return status;
+		} else {
+			return status;
+		}
+	}
+	
 	/**
 	 * upload user file onto HDFS
 	 * 

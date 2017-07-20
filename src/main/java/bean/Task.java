@@ -9,6 +9,7 @@ public class Task {
 
     public static final String picture = "图像渲染";
     public static final String video = "视频渲染";
+    public static final String debug = "debug";
     
     public static final String init = "初始化";
     public static final String ready = "就绪";
