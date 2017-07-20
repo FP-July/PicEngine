@@ -51,7 +51,7 @@ public class TaskTest {
 		taskRunner.runTask(username, taskName, taskID, taskType);
 		// give some time to run
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -76,7 +76,7 @@ public class TaskTest {
 		taskRunner.runTask(username, taskName, taskID, taskType);
 		// give some time to run
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

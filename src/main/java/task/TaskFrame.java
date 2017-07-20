@@ -156,7 +156,7 @@ public class TaskFrame implements ITask {
 		conf.addResource(new Path(rootPath + "core-site.xml"));
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
-
+		conf.set("mapred.jar", "TaskFrame.jar");
 		// --------------------------------------
 
 		Job job = new Job(conf, "word count");
