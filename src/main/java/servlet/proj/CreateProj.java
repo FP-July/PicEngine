@@ -29,6 +29,7 @@ import dao.ProjDao;
 import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
+import task.TaskUtils;
 
 public class CreateProj extends HttpServlet {
 
@@ -37,7 +38,8 @@ public class CreateProj extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	// 上传文件存储目录
-	private static final String UPLOAD_DIRECTORY = "hdfs://localhost:9000/userfiles";
+	private static final URI HDFS_URI = TaskUtils.HDFS_URI;
+	private static final String UPLOAD_DIRECTORY = "/userfiles";
 	private static final String USER_SRC_FOLDER = "src";
 
 	// 上传配置
@@ -178,7 +180,7 @@ public class CreateProj extends HttpServlet {
 		conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
 
 		try {
-			fSystem = FileSystem.get(URI.create(UPLOAD_DIRECTORY), conf);
+			fSystem = FileSystem.get(HDFS_URI, conf);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return ServletConstants.HADOOP_FS_CRASH;

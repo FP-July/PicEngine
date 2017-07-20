@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import bean.Task;
 import model.ProjInfo;
-import sessionManager.SessionManager;
+import session.SessionManager;
 
 public class CommonProcess {
 	

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import servlet.CommonProcess;
 import servlet.ServletConstants;
-import sessionManager.SessionManager;
+import session.SessionManager;
 
 public class Logout extends HttpServlet {
 

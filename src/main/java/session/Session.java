@@ -1,4 +1,4 @@
-package sessionManager;
+package session;
 
 public class Session {
 	public Session(String sessionID2, long expireTime2) {
