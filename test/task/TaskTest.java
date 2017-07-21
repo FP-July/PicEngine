@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -59,6 +60,14 @@ public class TaskTest {
 		assertTrue(projInfo.status == ProjInfo.statusEnum.finished.ordinal());
 		float[] progress = TaskUtils.getProgress(username, taskName);
 		assertTrue(progress[0] == 1.0f && progress[1] == 1.0f);
+		try {
+			List<String> logs = TaskUtils.getLogs(username, taskName);
+			for(String log : logs)
+				System.out.println(log);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 	
 	@Test

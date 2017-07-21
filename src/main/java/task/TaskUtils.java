@@ -1,14 +1,20 @@
 package task;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +33,8 @@ public class TaskUtils {
 	public static final String SRC_FOLDER = "src";
 	public static final String RST_FOLDER = "result";
 	public static final String PROGRESS_FILE = "PROGRESS";
-	public static final String HADOOP_LOG_FILE = "hadoop_log";
+	public static final String MAPREDUCE_LOG_FILE = "hadoop_log";
+	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";
 	
 	public static final URI HDFS_URI = URI.create("hdfs://localhost:9000/");
 	
@@ -47,9 +54,17 @@ public class TaskUtils {
 		return HADOOP_CONF_PATH;
 	}
 	public static String getHadoopLogPath(String workingDir) {
-		return workingDir + HADOOP_LOG_FILE;
+		return workingDir + MAPREDUCE_LOG_FILE;
 	}
 	
+	/** get the progress of a task, in the form of two floats
+	 *  [0] is map progress and [1] is reduce progress
+	 *  if the task has finished, both will be 1.0f
+	 *  else if the task is not running, both will be -1.0f or null if error occurs
+	 * @param username
+	 * @param taskName
+	 * @return {mapProgress, reduceProgress}
+	 */
 	public static float[] getProgress(String username, String taskName) {
 		DaoManager daoManager = null;
 		try {
@@ -91,5 +106,36 @@ public class TaskUtils {
 			logger.error("failed to get fs when getting progress, for {}",e.toString());
 		}
 		return null;
+	}
+
+	/** search the log dir, find the log file corresponding to username and taskName
+	 *  and return its content
+	 * @param username
+	 * @param taskName
+	 * @return a list of logs
+	 * @throws IOException
+	 */
+	public static List<String> getLogs(String username, String taskName) throws IOException {
+		String logName = username + "_" + taskName + "-";
+		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
+		// TODO specify log path to speed up
+		RemoteIterator<LocatedFileStatus> iterator = fSystem.listFiles(new Path(HADOOP_LOG_DIR), true);
+		
+		List<String> list = new ArrayList<>();
+		while(iterator.hasNext()) {
+			LocatedFileStatus fileStatus = iterator.next();
+			Path path = fileStatus.getPath();
+			if(path.getName().contains(logName)) {
+				FSDataInputStream iStream = fSystem.open(path);
+				BufferedReader bReader = new BufferedReader(new InputStreamReader(iStream));
+				String line;
+				while((line = bReader.readLine()) != null) {
+					if(line.length() > 0)
+						list.add(line);
+				}
+				break;
+			}
+		}
+		return list;
 	}
 }

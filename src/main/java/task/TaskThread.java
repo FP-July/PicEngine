@@ -23,6 +23,10 @@ import dao.DaoManager;
 import dao.ProjDao;
 import model.ProjInfo;
 
+/** this thread is created for running a specific task
+ * @author jt
+ *
+ */
 public class TaskThread extends Thread {
 
 	Logger logger = LoggerFactory.getLogger(TaskThread.class);
@@ -33,7 +37,7 @@ public class TaskThread extends Thread {
 	private String taskID;
 	private String[] args;
 	
-	private static final int PROGRESS_UPDATE_INTERVAL = 1 * 1000;  // in ms
+	private static final int PROGRESS_UPDATE_INTERVAL = 5 * 1000;  // in ms
 	private Timer progressTimer = new Timer();
 	private TimerTask progressTask = new TimerTask() {
 		

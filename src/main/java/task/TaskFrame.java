@@ -140,17 +140,16 @@ public class TaskFrame implements ITask {
 			dString.length();
 		}
 		// ------------------------------------
-		String inputPath = otherArgs[0];
-		String outputPath = otherArgs[1];
-		String logPath = otherArgs[2];
+		String username = otherArgs[0];
+		String taskName = otherArgs[1];
+		String taskID = otherArgs[2];
+		String workingDir = TaskUtils.getWorkingDir(username, taskID);
+		String inputPath = TaskUtils.getSrcDir(workingDir);
+		String outputPath = TaskUtils.getResultDir(workingDir);
+		String logFile = TaskUtils.getHadoopLogPath(workingDir);
 		String rootPath = otherArgs[3];
-		FileSystem fs = FileSystem.get(new Configuration());
-		FSDataOutputStream oStream = fs.create(new Path(logPath), true);
-
-		// TODO fix this to make jobs have separate log
-		/*WriterAppender writerAppender = new WriterAppender(new SimpleLayout(), oStream);
-		BasicConfigurator.configure(writerAppender);*/
-
+		
+		FileSystem fs = FileSystem.get(conf);
 		if (fs.exists(new Path(outputPath)))
 			fs.delete(new Path(outputPath), true);
 
@@ -159,17 +158,18 @@ public class TaskFrame implements ITask {
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
 		conf.set("mapreduce.job.jar", "TaskFrame.jar");
+		job = new Job(conf, username + "_" + taskName);
 		// --------------------------------------
 
-		job = new Job(conf, "word count");
+		
 		job.setJarByClass(TaskFrame.class);
 		job.setMapperClass(TokenizerMapper.class);
 		job.setCombinerClass(IntSumReducer.class);
 		job.setReducerClass(IntSumReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
-		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
-		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+		FileInputFormat.addInputPath(job, new Path(inputPath));
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 		MultipleOutputs.addNamedOutput(new JobConf(conf), "wordCounts", TextOutputFormat.class, Text.class,
 				IntWritable.class);
 
