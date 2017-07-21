@@ -14,6 +14,7 @@ import dao.ProjDao;
 import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
+import task.TaskRunner;
 
 public class RunProj extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -48,7 +49,7 @@ public class RunProj extends HttpServlet {
 				resp.sendError(ServletConstants.TASK_ALREADY_FINISHED, ServletConstants.STR_TASK_ALREADY_FINISHED);
 				return;
 			}
-			int status = runProj(username, projName);
+			int status = runProj(info);
 			
 			if(status == ServletConstants.SUCCESS) {
 				// TODO send client success
@@ -63,8 +64,8 @@ public class RunProj extends HttpServlet {
 		}
 	}
 	
-	private int runProj(String username, String projName) {
-		// TODO implement this
-		return ServletConstants.SUCCESS;
+	private int runProj(ProjInfo info) {
+		TaskRunner taskRunner = TaskRunner.getInstance();
+		return taskRunner.runTask(info);
 	}
 }

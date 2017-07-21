@@ -26,6 +26,10 @@ public class TaskRunner {
 		return instance;
 	}
 	
+	public int runTask(ProjInfo info) {
+		return runTask(info.username, info.projName, String.valueOf(info.projID), info.type);
+	}
+	
 	public int runTask(String username, String taskName, String taskID, String taskType) {
 	
 		String[] args = new String[] {username, taskName, taskID, TaskUtils.getHadoopConfPath()};
