@@ -138,4 +138,28 @@ public class TaskUtils {
 		}
 		return list;
 	}
+
+	/** check the status of a task by looking for _temporary and _SUCCESS
+	 *  notice : the task to be checked is assumed started, so if neither of above are
+	 *  found, the task will be marked error
+	 * @param username
+	 * @param taskID
+	 * @return new status
+	 * @throws IOException 
+	 * @throws IllegalArgumentException 
+	 */
+	public static int checkStatus(String username, String taskID) throws IllegalArgumentException, IOException {
+		String workingDir = getWorkingDir(username, taskID);
+		String resultDir = getResultDir(workingDir);
+		String tempDir = resultDir + File.separator + "_temporary";
+		String successFile = resultDir + File.separator + "_SUCCESS";
+		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
+		if(fSystem.exists(new Path(tempDir))) {
+			return ProjInfo.statusEnum.ongoing.ordinal();
+		} else if(fSystem.exists(new Path(successFile))) {
+			return ProjInfo.statusEnum.finished.ordinal();
+		} else {
+			return ProjInfo.statusEnum.error.ordinal();
+		}
+	}
 }

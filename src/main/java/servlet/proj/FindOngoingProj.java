@@ -14,6 +14,7 @@ import dao.ProjDao;
 import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
+import task.TaskUtils;
 
 public class FindOngoingProj extends HttpServlet {
 	/**
@@ -40,6 +41,15 @@ public class FindOngoingProj extends HttpServlet {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
 			List<ProjInfo> ongoingInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ongoing.ordinal());
+			// get progress for ongoing tasks
+			for(ProjInfo info : ongoingInfos) {
+				float[] progress = TaskUtils.getProgress(username, info.projName);
+				if(progress != null) {
+					info.progress = (int)((progress[0] + progress[1]) / 2);
+				} else {
+					info.progress = -1;
+				}
+			}
 			List<ProjInfo> initInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
 			List<ProjInfo> readyInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ready.ordinal());
 			if(ongoingInfos == null || initInfos == null || readyInfos == null) {

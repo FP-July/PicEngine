@@ -37,7 +37,7 @@ public class TaskTest {
 	}
 	
 	@Test
-	public void testSuccess() throws IOException {
+	public void testSuccess() throws IOException, InterruptedException {
 		String username = "admin";
 		String taskName = "runTest";
 		String taskType = Task.debug;
@@ -50,12 +50,12 @@ public class TaskTest {
 		
 		TaskRunner taskRunner = TaskRunner.getInstance();
 		taskRunner.runTask(username, taskName, taskID, taskType);
+		
 		// give some time to run
-		try {
-			Thread.sleep(60000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Thread.sleep(30000);
+		assertTrue(TaskUtils.checkStatus(username, taskID) == ProjInfo.statusEnum.ongoing.ordinal());
+		Thread.sleep(30000);
+		
 		ProjInfo projInfo = projDao.findProj(username, taskName);
 		assertTrue(projInfo.status == ProjInfo.statusEnum.finished.ordinal());
 		float[] progress = TaskUtils.getProgress(username, taskName);
