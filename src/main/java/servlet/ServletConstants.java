@@ -17,6 +17,7 @@ public class ServletConstants {
 	
 	public static final int TASK_ALREADY_RUNNING = 708;
 	public static final int TASK_ALREADY_FINISHED = 709;
+	public static final int TASK_RUN_FAIL = 710;
 	// response string
 	public static final String STR_SUCCESS = "success";
 	public static final String STR_NO_COOKIE = "no cookie";
@@ -30,6 +31,7 @@ public class ServletConstants {
 	
 	public static final String STR_TASK_ALREADY_RUNNING = "the task has already run";
 	public static final String STR_TASK_ALREADY_FINISHED = "the task has already finished";
+	public static final String STR_TASK_RUN_FAIL = "failed to run ths task for unknown reason";
 	// session lifetime
 	public static final long SESSION_EXPANSION = 1000 * 60 * 15; 
 	
@@ -52,6 +54,8 @@ public class ServletConstants {
 			return STR_UPLOAD_FAIL;
 		case TASK_ALREADY_RUNNING:
 			return STR_TASK_ALREADY_RUNNING;
+		case TASK_RUN_FAIL:
+			return STR_TASK_RUN_FAIL;
 		default:
 			return DBConstants.codeToString(status);
 		}

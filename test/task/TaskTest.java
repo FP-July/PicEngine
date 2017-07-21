@@ -51,12 +51,14 @@ public class TaskTest {
 		taskRunner.runTask(username, taskName, taskID, taskType);
 		// give some time to run
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(60000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		ProjInfo projInfo = projDao.findProj(username, taskName);
 		assertTrue(projInfo.status == ProjInfo.statusEnum.finished.ordinal());
+		float[] progress = TaskUtils.getProgress(username, taskName);
+		assertTrue(progress[0] == 1.0f && progress[1] == 1.0f);
 	}
 	
 	@Test

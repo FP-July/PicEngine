@@ -35,6 +35,7 @@ public class TaskFrame implements ITask {
 
 	private static String WORK_DIR = "/user/jt/";
 	private static final float STOP_PERC = 0.01f; // percentage of stop words
+	private static Job job;
 
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
@@ -146,8 +147,9 @@ public class TaskFrame implements ITask {
 		FileSystem fs = FileSystem.get(new Configuration());
 		FSDataOutputStream oStream = fs.create(new Path(logPath), true);
 
-		WriterAppender writerAppender = new WriterAppender(new SimpleLayout(), oStream);
-		BasicConfigurator.configure(writerAppender);
+		// TODO fix this to make jobs have separate log
+		/*WriterAppender writerAppender = new WriterAppender(new SimpleLayout(), oStream);
+		BasicConfigurator.configure(writerAppender);*/
 
 		if (fs.exists(new Path(outputPath)))
 			fs.delete(new Path(outputPath), true);
@@ -156,10 +158,10 @@ public class TaskFrame implements ITask {
 		conf.addResource(new Path(rootPath + "core-site.xml"));
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
-		conf.set("mapred.jar", "TaskFrame.jar");
+		conf.set("mapreduce.job.jar", "TaskFrame.jar");
 		// --------------------------------------
 
-		Job job = new Job(conf, "word count");
+		job = new Job(conf, "word count");
 		job.setJarByClass(TaskFrame.class);
 		job.setMapperClass(TokenizerMapper.class);
 		job.setCombinerClass(IntSumReducer.class);
@@ -173,12 +175,15 @@ public class TaskFrame implements ITask {
 
 		int exitCode = job.waitForCompletion(true) ? 0 : 1;
 
-		collectWordCount(otherArgs[1], conf);
-
 	}
 
 	@Override
 	public void run(String[] args) throws ClassNotFoundException, IOException, InterruptedException {
 		main(args);
+	}
+
+	@Override
+	public Job getJob() {
+		return job;
 	}
 }

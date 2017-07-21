@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import bean.Task;
 import model.ProjInfo;
 import session.SessionManager;
+import task.TaskUtils;
 
 public class CommonProcess {
 	
@@ -83,8 +84,9 @@ public class CommonProcess {
 	 */
 	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos, String targetPage) throws IOException {
 		List<Task> taskList = new ArrayList<>();
-		for(ProjInfo info : infos) 
+		for(ProjInfo info : infos) {
 			taskList.add(info.convertToTask());
+		}
 		HttpSession session = req.getSession();
 		session.setAttribute("taskList", taskList);
 		try {
