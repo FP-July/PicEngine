@@ -18,6 +18,9 @@ public class ServletConstants {
 	public static final int TASK_ALREADY_RUNNING = 708;
 	public static final int TASK_ALREADY_FINISHED = 709;
 	public static final int TASK_RUN_FAIL = 710;
+	
+	public static final int NO_SUCH_FILE = 711;
+	public static final int NOT_A_FILE = 712;
 	// response string
 	public static final String STR_SUCCESS = "success";
 	public static final String STR_NO_COOKIE = "no cookie";
@@ -32,6 +35,9 @@ public class ServletConstants {
 	public static final String STR_TASK_ALREADY_RUNNING = "the task has already run";
 	public static final String STR_TASK_ALREADY_FINISHED = "the task has already finished";
 	public static final String STR_TASK_RUN_FAIL = "failed to run ths task for unknown reason";
+	
+	public static final String STR_NO_SUCH_FILE = "the file does not exist";
+	public static final String STR_NOT_A_FILE = "the file is a directory";
 	// session lifetime
 	public static final long SESSION_EXPANSION = 1000 * 60 * 15; 
 	
@@ -56,6 +62,10 @@ public class ServletConstants {
 			return STR_TASK_ALREADY_RUNNING;
 		case TASK_RUN_FAIL:
 			return STR_TASK_RUN_FAIL;
+		case NO_SUCH_FILE:
+			return STR_NO_SUCH_FILE;
+		case NOT_A_FILE:
+			return STR_NOT_A_FILE;
 		default:
 			return DBConstants.codeToString(status);
 		}
