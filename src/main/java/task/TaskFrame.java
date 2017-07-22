@@ -146,7 +146,7 @@ public class TaskFrame implements ITask {
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
 		String inputPath = TaskUtils.getSrcDir(workingDir);
 		String outputPath = TaskUtils.getResultDir(workingDir);
-		String logDir = TaskUtils.getHadoopLogPath(workingDir);
+		String logDir = TaskUtils.getMRLogPath(workingDir);
 		String rootPath = otherArgs[3];
 		
 		FileSystem fs = FileSystem.get(conf);
@@ -161,7 +161,7 @@ public class TaskFrame implements ITask {
 		conf.set("mapreduce.job.jar", "TaskFrame.jar");
 		conf.set("username", username);
 		conf.set("taskID", taskID);
-		job = new Job(conf, username + "_" + taskName);
+		job = new Job(conf, username + "_" + taskID);
 		// --------------------------------------
 
 		

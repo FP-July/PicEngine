@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.log4j.pattern.LogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,9 @@ public class TaskUtils {
 	public static final String SRC_FOLDER = "src";
 	public static final String RST_FOLDER = "result";
 	public static final String PROGRESS_FILE = "PROGRESS";
-	public static final String MAPREDUCE_LOG_FILE = "MR_logs";
-	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";
+	public static final String MAPREDUCE_LOG_FILE = "MR_log";  // this is for custom(our) log
+	public static final String HADOOP_LOG_FILE = "Hadoop_log"; // this is for hadoop-generated log 
+	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";  // where hadoop-generated logs naturally placed
 	
 	public static final URI HDFS_URI = URI.create("hdfs://localhost:9000/");
 	
@@ -53,7 +55,12 @@ public class TaskUtils {
 	public static String getHadoopConfPath() {
 		return HADOOP_CONF_PATH;
 	}
+	
 	public static String getHadoopLogPath(String workingDir) {
+		return workingDir + HADOOP_LOG_FILE;
+	}
+	
+	public static String getMRLogPath(String workingDir) {
 		return workingDir + MAPREDUCE_LOG_FILE;
 	}
 	
@@ -108,6 +115,23 @@ public class TaskUtils {
 		return null;
 	}
 
+	
+	public static List<String> getLogs(String username, String taskName) throws IOException {
+		ProjDao projDao = null;
+		try {
+			projDao = DaoManager.getInstance().getProjDao();
+		} catch (ClassNotFoundException | SQLException e) {
+			logger.error("fail to get dao, reason: {}", e.toString());
+			e.printStackTrace();
+			return null;
+		}
+		ProjInfo info = projDao.findProj(username, taskName);
+		if(info == null) {
+			logger.warn("find no info about {} of {}", taskName, username);
+			return null;
+		}
+		return getLogs(username, info.projID);
+	}
 	/** search the log dir, find the log file corresponding to username and taskName
 	 *  and return its content
 	 * @param username
@@ -115,8 +139,8 @@ public class TaskUtils {
 	 * @return a list of logs
 	 * @throws IOException
 	 */
-	public static List<String> getLogs(String username, String taskName) throws IOException {
-		String logName = username + "_" + taskName + "-";
+	public static List<String> getLogs(String username, int taskID) throws IOException {
+		String logName = username + "_" + taskID + "-";
 		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
 		// TODO specify log path to speed up
 		RemoteIterator<LocatedFileStatus> iterator = fSystem.listFiles(new Path(HADOOP_LOG_DIR), true);
@@ -163,6 +187,11 @@ public class TaskUtils {
 		}
 	}
 	
+	/** clean user files and log files of a task
+	 * @param username
+	 * @param taskName
+	 * @param taskID
+	 */
 	public static void cleanTaskFile(String username, String taskName, String taskID) {
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
 		try {
