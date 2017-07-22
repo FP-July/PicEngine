@@ -8,11 +8,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.tools.classfile.InnerClasses_attribute.Info;
+
 import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
+import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
+import task.TaskUtils;
 
 public class DeleteProj extends HttpServlet {
 	/**
@@ -27,12 +31,12 @@ public class DeleteProj extends HttpServlet {
 			return;
 		
 		String username = req.getParameter("username"),
-				projName = req.getParameter("taskName");
-		if(username == null || projName == null) {
+				taskName = req.getParameter("taskName");
+		if(username == null || taskName == null) {
 			String argLack = "";
 			if(username == null)
 				argLack += "taskname ";
-			if(projName == null)
+			if(taskName == null)
 				argLack += "taskName ";
 			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
@@ -40,8 +44,14 @@ public class DeleteProj extends HttpServlet {
 		try {
 			DaoManager daoManager = DaoManager.getInstance();
 			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.deleteProj(username, projName);
+			ProjInfo projInfo = projDao.findProj(username, taskName);
+			if(projInfo == null) {
+				resp.sendError(DBConstants.NO_SUCH_PROJ);
+				return;
+			}
+			int status = projDao.deleteProj(username, taskName);
 			if(status == DBConstants.SUCCESS) {
+				TaskUtils.cleanTaskFile(username, taskName, String.valueOf(projInfo.projID));
 				//TODO send client a success msg
 				resp.sendRedirect("...");
 			} else {

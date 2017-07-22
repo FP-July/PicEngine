@@ -146,7 +146,7 @@ public class TaskFrame implements ITask {
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
 		String inputPath = TaskUtils.getSrcDir(workingDir);
 		String outputPath = TaskUtils.getResultDir(workingDir);
-		String logFile = TaskUtils.getHadoopLogPath(workingDir);
+		String logDir = TaskUtils.getHadoopLogPath(workingDir);
 		String rootPath = otherArgs[3];
 		
 		FileSystem fs = FileSystem.get(conf);
@@ -157,7 +157,10 @@ public class TaskFrame implements ITask {
 		conf.addResource(new Path(rootPath + "core-site.xml"));
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
+		
 		conf.set("mapreduce.job.jar", "TaskFrame.jar");
+		conf.set("username", username);
+		conf.set("taskID", taskID);
 		job = new Job(conf, username + "_" + taskName);
 		// --------------------------------------
 

@@ -52,22 +52,22 @@ public class TaskTest {
 		taskRunner.runTask(username, taskName, taskID, taskType);
 		
 		// give some time to run
-		Thread.sleep(30000);
+		Thread.sleep(10000);
 		assertTrue(TaskUtils.checkStatus(username, taskID) == ProjInfo.statusEnum.ongoing.ordinal());
-		Thread.sleep(30000);
+		Thread.sleep(10000);
 		
 		ProjInfo projInfo = projDao.findProj(username, taskName);
 		assertTrue(projInfo.status == ProjInfo.statusEnum.finished.ordinal());
 		float[] progress = TaskUtils.getProgress(username, taskName);
 		assertTrue(progress[0] == 1.0f && progress[1] == 1.0f);
-		try {
+		/*try {
 			List<String> logs = TaskUtils.getLogs(username, taskName);
 			for(String log : logs)
 				System.out.println(log);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
-		}
+		}*/
 	}
 	
 	@Test

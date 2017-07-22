@@ -28,12 +28,12 @@ public class TaskUtils {
 	
 	private static Logger logger = LoggerFactory.getLogger(TaskUtils.class);
 	
-	public static final String HADOOP_CONF_PATH = "hadoopPath/";
+	public static final String HADOOP_CONF_PATH = "/hadoop_conf/";
 	public static final String USER_FOLDER = "/userfiles";
 	public static final String SRC_FOLDER = "src";
 	public static final String RST_FOLDER = "result";
 	public static final String PROGRESS_FILE = "PROGRESS";
-	public static final String MAPREDUCE_LOG_FILE = "hadoop_log";
+	public static final String MAPREDUCE_LOG_FILE = "MR_logs";
 	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";
 	
 	public static final URI HDFS_URI = URI.create("hdfs://localhost:9000/");
@@ -160,6 +160,38 @@ public class TaskUtils {
 			return ProjInfo.statusEnum.finished.ordinal();
 		} else {
 			return ProjInfo.statusEnum.error.ordinal();
+		}
+	}
+	
+	public static void cleanTaskFile(String username, String taskName, String taskID) {
+		String workingDir = TaskUtils.getWorkingDir(username, taskID);
+		try {
+			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
+			// clean user files
+			Path workingPath = new Path(workingDir);
+			if(fSystem.exists(workingPath))
+				fSystem.delete(workingPath, true);
+			
+			// clean logs
+			// TODO specify log path to speed up
+			String logName = username + "_" + taskName + "-";
+			RemoteIterator<LocatedFileStatus> iterator = fSystem.listFiles(new Path(HADOOP_LOG_DIR), true);
+			List<String> list = new ArrayList<>();
+			while(iterator.hasNext()) {
+				LocatedFileStatus fileStatus = iterator.next();
+				Path path = fileStatus.getPath();
+				// clean log
+				if(path.getName().contains(logName)) {
+					fSystem.delete(path, true);
+					// clean config
+					String confPrefix = path.getName().split("-")[0];
+					String confName = confPrefix + "_conf.xml";
+					Path confPath = new Path(confName);
+					fSystem.delete(confPath, true);
+				}
+			}	
+		} catch (IOException e) {
+			logger.error("failed to get fs when getting progress, for {}",e.toString());
 		}
 	}
 }
