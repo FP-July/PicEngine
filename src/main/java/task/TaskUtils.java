@@ -132,6 +132,43 @@ public class TaskUtils {
 		}
 		return getLogs(username, info.projID);
 	}
+	
+	public static List<String> getLogs(String username, int taskID) throws IOException {
+		List<String> list = localGetLogs(username, taskID);
+		if(list != null) {
+			return list;
+		} else {
+			list = remoteGetLogs(username, taskID);
+			return list;
+		}
+	}
+	
+	/** seek hadoop log in user folder
+	 * @param username
+	 * @param taskID
+	 * @return a list of hadoop logs, null if the log does not exist
+	 * @throws IOException
+	 */
+	private static List<String> localGetLogs(String username, int taskID) throws IOException {
+		String workingDir = getWorkingDir(username, String.valueOf(taskID));
+		String hadoop_log = getHadoopLogPath(workingDir);
+		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
+		Path logPath = new Path(hadoop_log);
+		
+		List<String> list = new ArrayList<>();
+		if(fSystem.exists(logPath)) {
+			FSDataInputStream iStream = fSystem.open(logPath);
+			BufferedReader bReader = new BufferedReader(new InputStreamReader(iStream));
+			String line;
+			while((line = bReader.readLine()) != null) {
+				if(line.length() > 0)
+					list.add(line);
+			}
+			return list;
+		}
+		return null;
+	}
+	
 	/** search the log dir, find the log file corresponding to username and taskName
 	 *  and return its content
 	 * @param username
@@ -139,7 +176,7 @@ public class TaskUtils {
 	 * @return a list of logs
 	 * @throws IOException
 	 */
-	public static List<String> getLogs(String username, int taskID) throws IOException {
+	private static List<String> remoteGetLogs(String username, int taskID) throws IOException {
 		String logName = username + "_" + taskID + "-";
 		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
 		// TODO specify log path to speed up
@@ -201,26 +238,9 @@ public class TaskUtils {
 			if(fSystem.exists(workingPath))
 				fSystem.delete(workingPath, true);
 			
-			// clean logs
-			// TODO specify log path to speed up
-			String logName = username + "_" + taskName + "-";
-			RemoteIterator<LocatedFileStatus> iterator = fSystem.listFiles(new Path(HADOOP_LOG_DIR), true);
-			List<String> list = new ArrayList<>();
-			while(iterator.hasNext()) {
-				LocatedFileStatus fileStatus = iterator.next();
-				Path path = fileStatus.getPath();
-				// clean log
-				if(path.getName().contains(logName)) {
-					fSystem.delete(path, true);
-					// clean config
-					String confPrefix = path.getName().split("-")[0];
-					String confName = confPrefix + "_conf.xml";
-					Path confPath = new Path(confName);
-					fSystem.delete(confPath, true);
-				}
-			}	
 		} catch (IOException e) {
 			logger.error("failed to get fs when getting progress, for {}",e.toString());
 		}
 	}
+	
 }

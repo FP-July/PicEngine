@@ -46,10 +46,11 @@ public class LogTransferThread extends Thread {
 						String workingDir = TaskUtils.getWorkingDir(username, taskID);
 						String logFile = TaskUtils.getHadoopLogPath(workingDir);
 						Path newPath = new Path(logFile);
-						fSystem.mkdirs(newPath.getParent());
+						fSystem.delete(newPath, false);
 						boolean renameResult = fSystem.rename(path, newPath);
 						if(!renameResult) {
 							logger.warn("rename {} to {} failed", path.toString(), newPath.toString());
+							fSystem.delete(path, false);
 						}
 					}
 					else if(fSystem.isFile(path)) {
