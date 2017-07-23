@@ -7,6 +7,13 @@ import raytracing.Vec3d;
 
 public class Sphere extends Primitive {
 	
+	public static enum Property {
+		center,
+		radius,
+		surfaceColor,
+		emissionColor
+	};
+	
 	public Vec3d center;
 	public Vec3d emissionLoc;
 	public Double radius, radius2;

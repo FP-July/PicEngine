@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -24,16 +25,16 @@ import raytracing.Camera;
 import raytracing.Ray;
 import raytracing.RayTracing;
 import raytracing.Vec3d;
+import raytracing.hadoop.PixelInputFormat;
+import raytracing.hadoop.PixelInputFormat.PixelRecordReader;
 import raytracing.model.Plane;
 import raytracing.model.Sphere;
 import utils.StaticValue;
 
 public class RayTracer extends JobRegister {
-	
-	public static int width = 640, height = 480;
 
 	public static class RayTracerMapper
-		extends Mapper<Text, Text, Text, Text> {
+		extends Mapper<IntWritable, IntWritable, Text, Text> {
 		
 		RayTracing rayTracing = new RayTracing();
 	    Camera camera = null;
@@ -56,17 +57,16 @@ public class RayTracer extends JobRegister {
 		    Vec3d eye    = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_EYE.name(),    new Vec3d(-1.0, 0.0, 0.0).serialize()));
 		    Vec3d center = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_CENTER.name(), new Vec3d().serialize()));
 		    Vec3d up     = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_UP.name(),     new Vec3d(0.0, 0.0, 1.0).serialize()));
-		    Double fov   = Double.parseDouble( conf.get(Camera.Property.CAMERA_FOV.name(),    "" + 60.0));
-		    Integer rows = Integer.parseInt(   conf.get(Camera.Property.CAMERA_HEIGHT.name(), "" + 480));
-		    Integer cols = Integer.parseInt(   conf.get(Camera.Property.CAMERA_WIDTH.name(),  "" + 640));
+		    Double fov   = Double.parseDouble( conf.get(Camera.Property.CAMERA_FOV.name(),    "60.0"));
+		    Integer rows = Integer.parseInt(   conf.get(Camera.Property.CAMERA_HEIGHT.name(), "480"));
+		    Integer cols = Integer.parseInt(   conf.get(Camera.Property.CAMERA_WIDTH.name(),  "640"));
 		    camera = new Camera(eye, center, up, fov, rows, cols);
 		}
 		
-		public void map(Text key, Text value, Context context) 
+		public void map(IntWritable key, IntWritable value, Context context) 
 			throws IOException, InterruptedException {
-			String[] vas = value.toString().trim().split(",");
-			Integer x = Integer.parseInt(vas[0]);
-			Integer y = Integer.parseInt(vas[1]);
+			Integer x = key.get();
+			Integer y = value.get();
 			Ray ray = camera.getRay(x, y);
 	        Vec3d rgb = new Vec3d();
             
@@ -81,33 +81,36 @@ public class RayTracer extends JobRegister {
             double invTimes = 1.0 / (times * times);
             rgb.mulToThis(new Vec3d(invTimes));
             
-	        context.write(new Text("rgb"), new Text(value.toString() + "\t" + rgb.serialize()));
+	        context.write(new Text(key.get() + "," + value.get()), new Text(rgb.serialize()));
 		}
 	}
 	
 	public static class RayTracerReducer
 		extends Reducer<Text, Text, Text, Text> {
+
+		public int width = 0, height = 0;
+		private BufferedImage image;
 		
-		private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		@Override
+		protected void setup(Reducer<Text, Text, Text, Text>.Context context) 
+			throws IOException, InterruptedException {
+			Configuration conf = context.getConfiguration();
+		    height = Integer.parseInt(   conf.get(Camera.Property.CAMERA_HEIGHT.name(), "480"));
+		    width  = Integer.parseInt(   conf.get(Camera.Property.CAMERA_WIDTH.name(),  "640"));
+			image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		}
 		
 		public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
-			Iterator<Text> it = values.iterator();
-			while (it.hasNext()) {
-				Text value = it.next();
-				if (value == null || value.toString().equals("")) continue;
-				
-				try{
-					String[] kv = value.toString().split("\t");
-					String[] loc = kv[0].split(",");
-					Integer x = Integer.parseInt(loc[0]);
-					Integer y = Integer.parseInt(loc[1]);
-					Vec3d rgb = Vec3d.deSerialize(kv[1]);
-					image.setRGB(x, y, rgb.getRGB());
-				} catch (Exception e) {
-					Integer.parseInt(value.toString());
-				}
-			}
+			String[] coord = key.toString().split(",");
+			
+			Text text = values.iterator().next();
+			if (text == null || text.toString().equals("")) return ;
+			
+			int x = Integer.parseInt(coord[0]);
+			int y = Integer.parseInt(coord[1]);
+			Vec3d rgb = Vec3d.deSerialize(text.toString());
+			image.setRGB(x, y, rgb.getRGB());
 		}
 		
 		public void cleanup(Context context) 
@@ -129,13 +132,14 @@ public class RayTracer extends JobRegister {
 		}
 		
 		String jobId = args[0];
-		String outPath = StaticValue.BASR_OUT_PATH + "image" + jobId + ".bmp";
+		String outPath = StaticValue.BASR_OUT_PATH + "/image" + jobId + ".bmp";
 
 		Configuration conf = new Configuration();
 		conf.set("IMAGE_OUT_PATH", outPath);
+		System.out.println(conf.get("IMAGE_OUT_PATH"));
 		
 		try {
-			RayTracer.rayTracing(conf, outPath);
+			RayTracer.rayTracing(conf);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,21 +152,21 @@ public class RayTracer extends JobRegister {
 		}
 	}
 	
-	public static void rayTracing(Configuration conf, String outPath) 
+	public static void rayTracing(Configuration conf) 
 		throws IOException, InterruptedException, ClassNotFoundException {
 		
-		Job job = Job.getInstance(conf, "raytraceing");
+		Job job = Job.getInstance(conf, "raytracing");
 		job.setJarByClass(RayTracer.class);
 		job.setMapperClass(RayTracerMapper.class);
 		job.setReducerClass(RayTracerReducer.class);
 		
-		job.setInputFormatClass(KeyValueTextInputFormat.class);
+		job.setInputFormatClass(PixelInputFormat.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
 		job.setOutputFormatClass(NullOutputFormat.class);
 		
-		String srcPath = StaticValue.LOC_PATH + "/" + width + "_" + height;
-		FileInputFormat.addInputPath(job, new Path(srcPath));
+//		String srcPath = StaticValue.LOC_PATH + "/" + width + "_" + height;
+//		FileInputFormat.addInputPath(job, new Path(srcPath));
 		job.waitForCompletion(true);
 	}
 }

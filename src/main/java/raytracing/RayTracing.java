@@ -6,11 +6,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
 
 import raytracing.model.Plane;
 import raytracing.model.Primitive;
 import raytracing.model.Sphere;
+import raytracing.track.RotationWithInHorizontalPlane;
+import utils.DirectoryChecker;
 
 public class RayTracing {
 	
@@ -38,21 +45,21 @@ public class RayTracing {
 	    int width = 640, height = 480; 
 	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	    Camera camera = new Camera(new Vec3d(-1.0, 0.0, 0.0), new Vec3d(), new Vec3d(0.0, 0.0, 1.0), 60.0, height, width);
-	    // Trace rays
-	    Primitive lastScene = null;
-	    for (int y = 0; y < height; ++y) { 
-	    	System.out.println("rows : " + y);
-	        for (int x = 0; x < width; ++x) { 
-	        	Ray ray = camera.getRay(x, y);
-//	            Vec3d rgb = new Vec3d();
-//	            Primitive se = trace(ray, rgb, 0); 
-	            
-//	            if (se != lastScene) {
+	    
+	    RotationWithInHorizontalPlane rhp = RotationWithInHorizontalPlane.getInstance(camera, 25.0, -180, 60);
+	    camera = rhp.skipToFrame(30);
+	    
+	    DirectoryChecker.dirCheck("image", true);
+	    int i = 30;
+	    do {
+	    	camera.viewFrame(i);
+	    	
+		    for (int y = 0; y < height; ++y) { 
+//		    	System.out.println("rows : " + y);
+		        for (int x = 0; x < width; ++x) { 
 	            	Vec3d rgb = new Vec3d();
-//	                lastScene = se;
-	                
 	                ArrayList<Ray> rays = new ArrayList<Ray>();
-	                int times = 10;
+	                int times = 3;
 	                camera.getSuperSamplingRays(x, y, times, rays);
 	                for (Ray ssray : rays) {
 	                	Vec3d p = new Vec3d();
@@ -61,19 +68,30 @@ public class RayTracing {
 	                }
 	                double invTimes = 1.0 / (times * times);
 	                rgb.mulToThis(new Vec3d(invTimes));
-//	            }
-	            
-	            image.setRGB(x, y, rgb.getRGB());
-	        } 
-	    } 
+		            
+		            image.setRGB(x, y, rgb.getRGB());
+		        } 
+		    } 
+
+		    JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+		    jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		    jpegParams.setCompressionQuality(1f);
+		    
+		    try {
+			    final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+			    // specifies where the jpg image has to be written
+				writer.setOutput(new FileImageOutputStream(
+				   new File("image/image" + i + ".jpg")));
+			
+				// writes the file with given compression level 
+				// from your JPEGImageWriteParam instance
+				writer.write(null, new IIOImage(image, null, null), jpegParams);
+		    } catch (IOException e) {
+		    	e.printStackTrace();
+		    }
+		    i ++;
+	    } while ((camera = rhp.getNextCameraFrame()) != null);
 	    
-	    
-	    try {
-			ImageIO.write(image, "bmp", new File("image.bmp"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public Primitive trace(Ray ray, Vec3d color, int depth) {

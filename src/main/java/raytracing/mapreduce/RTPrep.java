@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import main.JobRegister;
-import raytracing.EmptyInputFormat;
+import raytracing.hadoop.EmptyInputFormat;
 import utils.StaticValue;
 
 public class RTPrep extends JobRegister {

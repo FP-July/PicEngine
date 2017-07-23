@@ -19,8 +19,6 @@ import org.apache.log4j.pattern.LogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.tools.doclint.Checker.Flag;
-
 import dao.DaoManager;
 import dao.ProjDao;
 import model.ProjInfo;

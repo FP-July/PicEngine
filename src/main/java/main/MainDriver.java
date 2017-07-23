@@ -14,8 +14,8 @@ public class MainDriver {
 
 	public static void main(String[] args) {
 		String job = Registry.getJob("raytracing");
-		if (args.length > 1) {
-			job = Registry.getJob(args[1]);
+		if (args.length > 0) {
+			job = Registry.getJob(args[0]);
 		} else {
 			printUsage();
 			System.exit(0);

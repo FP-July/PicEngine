@@ -15,7 +15,7 @@ public class Main extends JobRegister {
 		try {
 			String path = "./finalPro/loc";
 			RTPrep.rtPrep(path);
-			RayTracer.rayTracing(path, StaticValue.IMAGE_OUT_PATH);
+//			RayTracer.rayTracing(path, StaticValue.IMAGE_OUT_PATH);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

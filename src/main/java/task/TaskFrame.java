@@ -27,9 +27,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.WriterAppender;
 
 public class TaskFrame implements ITask {
 
@@ -154,8 +151,7 @@ public class TaskFrame implements ITask {
 			fs.delete(new Path(outputPath), true);
 
 		conf.addResource(new Path(rootPath + "yarn-site.xml"));
-		conf.addResource(new Path(rootPath + "core-site.xml"));
-		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
+ 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
 		
 		conf.set("mapreduce.job.jar", "TaskFrame.jar");

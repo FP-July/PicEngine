@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.regex.Pattern;
 
 public class Vec3d {
-	public Double x, y, z;
+	public double x, y, z;
 	
 	public Vec3d() {
 		x = 0.0; y = 0.0; z = 0.0;
@@ -104,6 +104,13 @@ public class Vec3d {
 	public boolean similiar(Vec3d v) {
 		double bias = 0.5;
 		return ((Math.abs(x - v.x) < bias) && (Math.abs(y - v.y) < bias) && (Math.abs(z - v.z) < bias));
+	}
+	
+	public boolean isParallel(Vec3d v) {
+		Vec3d cro = cross(v);
+		Vec3d zero = new Vec3d();
+		if (cro.equals(zero)) return true;
+		return false;
 	}
 	
 	@Override
