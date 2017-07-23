@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.tools.classfile.InnerClasses_attribute.Info;
-
 import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;

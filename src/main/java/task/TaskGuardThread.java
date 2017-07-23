@@ -26,7 +26,7 @@ public class TaskGuardThread extends Thread {
 		while(true) {
 			ensureAllRunning();
 			try {
-				this.sleep(CHECK_INTERVAL);
+				Thread.sleep(CHECK_INTERVAL);
 			} catch (InterruptedException e) {
 				logger.error("unexpected interruption {}", e.toString());
 				e.printStackTrace();

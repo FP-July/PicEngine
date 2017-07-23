@@ -2,7 +2,6 @@ package servlet.proj;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,10 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.DBConstants;
-import dao.DaoManager;
-import dao.ProjDao;
-import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 import task.TaskUtils;
