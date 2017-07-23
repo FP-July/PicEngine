@@ -8,27 +8,28 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import raytracing.model.PhyObject;
+import raytracing.model.Plane;
+import raytracing.model.Primitive;
 import raytracing.model.Sphere;
 
 public class RayTracing {
 	
-	public static List<PhyObject> scene = new ArrayList<PhyObject>();
-//	public static Scene scene = new Scene();
+	public static List<Primitive> scene = new ArrayList<Primitive>();
 	
 	public final int MAX_RAY_DEPTH = 5;
 	
 	public static void main(String[] args) {
 		// position, radius, surface color, reflectivity, transparency, emission color
-		RayTracing.scene.add(new Sphere(new Vec3d( 0.0,      2.0, -10.0),     2.0, new Vec3d(0.40, 0.57, 0.74), 0.0, 0.3, new Vec3d(0.0))); 
-	    RayTracing.scene.add(new Sphere(new Vec3d( 0.0,      0.0, -20.0),     4.0, new Vec3d(1.00, 0.32, 0.36), 1.0, 0.5, new Vec3d(0.0))); 
-	    RayTracing.scene.add(new Sphere(new Vec3d( 5.0,     -1.0, -15.0),     2.0, new Vec3d(0.90, 0.76, 0.46), 1.0, 0.7, new Vec3d(0.0))); 
-	    RayTracing.scene.add(new Sphere(new Vec3d( 5.0,      0.0, -25.0),     3.0, new Vec3d(0.65, 0.77, 0.97), 1.0, 0.0, new Vec3d(0.0))); 
-	    RayTracing.scene.add(new Sphere(new Vec3d(-5.5,      0.0, -15.0),     3.0, new Vec3d(0.90, 0.90, 0.90), 1.0, 0.3, new Vec3d(0.0))); 
-	    // light
+		RayTracing.scene.add(new Sphere(new Vec3d(10.0, -4.0, 0.0),     2.0, new Vec3d(0.40, 0.57, 0.74), 0.0, 0.3, new Vec3d())); 
+	    RayTracing.scene.add(new Sphere(new Vec3d(20.0, 5.0, 0.0),     4.0, new Vec3d(1.00, 0.32, 0.36), 1.0, 0.5, new Vec3d())); 
+	    RayTracing.scene.add(new Sphere(new Vec3d(15.0, -1.0, -2.0),     2.0, new Vec3d(0.90, 0.76, 0.46), 1.0, 0.7, new Vec3d())); 
+	    RayTracing.scene.add(new Sphere(new Vec3d(25.0, 0.0, 10.0),     3.0, new Vec3d(0.65, 0.77, 0.57), 1.0, 0.0, new Vec3d())); 
+	    RayTracing.scene.add(new Sphere(new Vec3d(15.0, 2.0, 0.0),     3.0, new Vec3d(0.90, 0.90, 0.90), 1.0, 0.3, new Vec3d()));
 	    
-	    Sphere light = new Sphere(new Vec3d( 0.0, -20.0, -10040.0), 10000.0, new Vec3d(0.20, 0.20, 0.20), 0.0, 0.0, new Vec3d(1.0));
-	    RayTracing.scene.add(light); 
+//	    RayTracing.scene.add(new Sphere(new Vec3d(30.0, -30.0, 10.0), 2.0, new Vec3d(0.20, 0.20, 0.20), 0.3, 0.0, new Vec3d(1.0)));
+	    RayTracing.scene.add(new Sphere(new Vec3d(-1000.0, 0.0, 11000.0), 10000.0, new Vec3d(0.20, 0.20, 0.20), 0.3, 0.0, new Vec3d(1.0)));
+	    
+	    RayTracing.scene.add(new Plane(new Vec3d(0.0, 0.0, -4.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(0.3, 0.3, 0.3), new Vec3d()));
 	    RayTracing rt = new RayTracing();
 	    rt.render();
 	}
@@ -36,17 +37,32 @@ public class RayTracing {
 	public void render() {
 	    int width = 640, height = 480; 
 	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-	    double invWidth = 1.0 / width, invHeight = 1.0 / height; 
-	    double fov = -30, aspectratio = 1.0 * width / height; 
-	    double angle = Math.tan(Math.PI * 0.5 * fov / 180); 
+	    Camera camera = new Camera(new Vec3d(-1.0, 0.0, 0.0), new Vec3d(), new Vec3d(0.0, 0.0, 1.0), 60.0, height, width);
 	    // Trace rays
+	    Primitive lastScene = null;
 	    for (int y = 0; y < height; ++y) { 
+	    	System.out.println("rows : " + y);
 	        for (int x = 0; x < width; ++x) { 
-	            double xx = (2 * ((x + 0.5) * invWidth) - 1) * angle * aspectratio; 
-	            double yy = (1 - 2 * ((y + 0.5) * invHeight)) * angle; 
-	            Vec3d raydir = new Vec3d(xx, yy, -1.0); 
-	            raydir.normalize(); 
-	            Vec3d rgb = trace(new Vec3d(0.0), raydir, 0); 
+	        	Ray ray = camera.getRay(x, y);
+//	            Vec3d rgb = new Vec3d();
+//	            Primitive se = trace(ray, rgb, 0); 
+	            
+//	            if (se != lastScene) {
+	            	Vec3d rgb = new Vec3d();
+//	                lastScene = se;
+	                
+	                ArrayList<Ray> rays = new ArrayList<Ray>();
+	                int times = 10;
+	                camera.getSuperSamplingRays(x, y, times, rays);
+	                for (Ray ssray : rays) {
+	                	Vec3d p = new Vec3d();
+	                	trace(ssray, p, 0);
+	                	rgb.addToThis(p);
+	                }
+	                double invTimes = 1.0 / (times * times);
+	                rgb.mulToThis(new Vec3d(invTimes));
+//	            }
+	            
 	            image.setRGB(x, y, rgb.getRGB());
 	        } 
 	    } 
@@ -60,13 +76,13 @@ public class RayTracing {
 		}
 	}
 	
-	public Vec3d trace(Vec3d rayorig, Vec3d raydir, int depth) {
+	public Primitive trace(Ray ray, Vec3d color, int depth) {
 		double tnear = Double.MAX_VALUE; 
-	    PhyObject obj = null; 
+	    Primitive obj = null; 
 	    // find intersection of this ray with the sphere in the scene
-	    for (PhyObject sc : scene) { 
+	    for (Primitive sc : scene) { 
 	        List<Double> pHits = new ArrayList<Double>();
-	        if (sc.intersect(rayorig, raydir, pHits)) { 
+	        if (sc.intersect(ray, pHits)) { 
 	        	for (Double phit : pHits) {
 	        		if (phit < 0) continue;
 	        		if (phit < tnear) {
@@ -79,15 +95,12 @@ public class RayTracing {
 //	        	System.out.println(raydir.serialize());
 	        }
 	    } 
-	    // if there's no intersection return black or background color
-	    if (obj == null) {
-	    	return new Vec3d(0.2); 
-	    }
-
-//	    System.out.println(obj.isLight());
 	    
-	    Vec3d surfaceColor = new Vec3d(0.0); // color of the ray/surfaceof the object intersected by the ray 
-	    Vec3d phit = rayorig.add(raydir.mul(tnear)); // point of intersection 
+	    // if there's no intersection return black or background color
+	    if (obj == null) return obj; 
+
+	    Vec3d phit = ray.cross(tnear); // point of intersection 
+	    Vec3d surfaceColor = new Vec3d(); // color of the ray/surfaceof the object intersected by the ray 
 	    Vec3d nhit = obj.getNormal(phit); // normal at the intersection point 
 	    nhit.normalize(); // normalize normal direction 
 	    
@@ -97,29 +110,30 @@ public class RayTracing {
 	    // positive.
 	    double bias = 1e-4; // add some bias to the point from which we will be tracing 
 	    boolean inside = false; 
-	    if (raydir.dot(nhit) > 0) {
+	    if (ray.raydir.dot(nhit) > 0) {
 	    	nhit = nhit.inv();
 	    	inside = true; 
 	    }
 	    if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0) && depth < MAX_RAY_DEPTH) { 
-	        double facingratio = -raydir.dot(nhit); 
+	        double facingratio = -ray.raydir.dot(nhit); 
 	        // change the mix value to tweak the effect
 	        double fresneleffect = mix(Math.pow(1 - facingratio, 3), 1, 0.1); 
 	        // compute reflection direction (not need to normalize because all vectors
 	        // are already normalized)
-	        Vec3d refldir = raydir.sub(nhit.mul(2.0).mul(raydir.dot(nhit))); 
+	        Vec3d refldir = ray.raydir.sub(nhit.mul(2.0).mul(ray.raydir.dot(nhit))); 
 	        refldir.normalize(); 
-	        Vec3d reflection = trace(phit.add(nhit.mul(bias)), refldir, depth + 1); 
-	        //Vec3f reflection = trace(phit, refldir, spheres, depth + 1); little change in the final effect
-	        Vec3d refraction = new Vec3d(0.0); 
+	        Vec3d reflection = new Vec3d();
+	        trace(new Ray(phit.add(nhit.mul(bias)), refldir), reflection, depth + 1); // little change in the final effect
+	        
+	        Vec3d refraction = new Vec3d(); 
 	        // if the sphere is also transparent compute refraction ray (transmission)
 	        if (obj.getTransparency(phit) != 0) { 
 	            double ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface? 
-	            double cosi = -nhit.dot(raydir); 
+	            double cosi = -nhit.dot(ray.raydir); 
 	            double k = 1 - eta * eta * (1 - cosi * cosi); 
-	            Vec3d refrdir = raydir.mul(eta).add(nhit.mul((eta *  cosi - Math.sqrt(k)))); 
+	            Vec3d refrdir = ray.raydir.mul(eta).add(nhit.mul((eta *  cosi - Math.sqrt(k)))); 
 	            refrdir.normalize(); 
-	            refraction = trace(phit.sub(nhit.mul(bias)), refrdir, depth + 1); 
+	            trace(new Ray(phit.sub(nhit.mul(bias)), refrdir), refraction, depth + 1); 
 	        } 
 	        // the result is a mix of reflection and refraction (if the sphere is transparent)
 	        surfaceColor = 
@@ -131,15 +145,15 @@ public class RayTracing {
 	    else { 
 	    	
 	        // it's a diffuse object, no need to raytrace any further
-	        for (PhyObject sc : scene) { 
+	        for (Primitive sc : scene) { 
 	            if (sc.isLight()) { 
 	                double transmission = 1.0; 
 	                Vec3d lightDirection = sc.getLightDirection(phit); 
 	                lightDirection.normalize(); 
-	                for (PhyObject block : scene) { 
+	                for (Primitive block : scene) { 
 	                    if (block != sc) { 
 	                    	List<Double> phits = new ArrayList<Double>();
-	                        if (block.intersect(phit.add(nhit.mul(bias)), lightDirection, phits)) { 
+	                        if (block.intersect(new Ray(phit.add(nhit.mul(bias)), lightDirection.inv()), phits)) { 
 	                            transmission = 0.0; 
 	                            break; 
 	                        } 
@@ -148,17 +162,16 @@ public class RayTracing {
 	                surfaceColor.addToThis(
 	                	obj.getSurfaceColor(phit).mul(
 	                	transmission).mul( 
-	                	Math.max(0.0, nhit.dot(lightDirection))
-	                	).mul(obj.getEmissionColor(phit))
+	                	Math.max(0.0, nhit.dot(lightDirection.inv()))
+	                	).mul(sc.getEmissionColor(phit))
 	                ); 
 	            } 
 	        } 
 	    } 
+	    
+	    color.set(surfaceColor.add(obj.getEmissionColor(phit)));
 
-//    	if (obj.isLight() && depth == 1) {
-//    		System.out.println(surfaceColor.serialize());
-//    	} 
-	    return surfaceColor.add(obj.getEmissionColor(phit)); 
+	    return obj;
 
 	}
 	

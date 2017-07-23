@@ -10,8 +10,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			RTPrep.rtPrep(StaticValue.LOC_PATH);
-			RayTracer.rayTracing(StaticValue.LOC_PATH);
+//			RTPrep.rtPrep(StaticValue.LOC_PATH);
+			RayTracer.rayTracing(StaticValue.LOC_PATH, StaticValue.IMAGE_OUT_PATH);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

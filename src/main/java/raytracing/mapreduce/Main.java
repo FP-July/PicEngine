@@ -7,6 +7,7 @@ import org.apache.commons.cli.Option;
 import main.JobRegister;
 import main.MainDriver;
 import main.Registry;
+import utils.StaticValue;
 
 public class Main extends JobRegister {
 
@@ -14,7 +15,7 @@ public class Main extends JobRegister {
 		try {
 			String path = "./finalPro/loc";
 			RTPrep.rtPrep(path);
-			RayTracer.rayTracing(path);
+			RayTracer.rayTracing(path, StaticValue.IMAGE_OUT_PATH);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

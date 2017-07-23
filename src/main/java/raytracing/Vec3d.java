@@ -20,6 +20,11 @@ public class Vec3d {
 		z = new Double(_z);
 	}
 	
+	public void set(Vec3d v) {
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+	}
 	public Vec3d normalize() {
 		Double nor = length();
 		if (nor > 0) {
@@ -27,6 +32,14 @@ public class Vec3d {
 			x *= invNor; y *= invNor; z *= invNor;
 		}
 		return this;
+	}
+	
+	public Vec3d cross(Vec3d v) {
+		Vec3d cro = new Vec3d();
+		cro.x = y * v.z - z * v.y;
+		cro.y = z * v.x - x * v.z;
+		cro.z = x * v.y - y * v.x;
+		return cro.normalize();
 	}
 	
 	public Vec3d mul(Double d) {
@@ -93,10 +106,19 @@ public class Vec3d {
 		return ((Math.abs(x - v.x) < bias) && (Math.abs(y - v.y) < bias) && (Math.abs(z - v.z) < bias));
 	}
 	
-	private Double length2() {
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Vec3d) {
+			Vec3d v = (Vec3d) obj;
+			return (x == v.x) && (y == v.y) && (z == v.z);
+		}
+		return false;
+	}
+	
+	public Double length2() {
 		return x*x + y*y + z*z;
 	}
-	private Double length() {
+	public Double length() {
 		return Math.sqrt(length2());
 	}
 }

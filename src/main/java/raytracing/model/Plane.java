@@ -5,24 +5,27 @@ import java.util.List;
 import raytracing.Ray;
 import raytracing.Vec3d;
 
-public class Sphere extends Primitive {
+/**
+ * 平面模型,为漫反射属性。
+ * @author wanglt
+ * Jul 22, 2017
+ */
+public class Plane extends Primitive {
+	
+	//  [x, y, z, 1] * [A, B, C, D]^T = 0
 	
 	public Vec3d center;
-	public Vec3d emissionLoc;
-	public Double radius, radius2;
+	public Vec3d norm;
 	public Vec3d surfaceColor, emissionColor;
-	public Double transparency = 0.0, reflection = 0.0;
 	
-	public Sphere(Vec3d c,
-				  Double r,
+	public Plane(Vec3d center,
+				  Vec3d norm,
 				  Vec3d sc,
-				  Double refl,
-				  Double transp,
 				  Vec3d ec) {
-		center = c; emissionLoc = c;
-		radius = r; radius2 = r*r;
-		surfaceColor = sc; emissionColor = ec;
-		transparency = transp; reflection = refl;
+		this.center = center; 
+		this.norm = norm;
+		this.surfaceColor = sc; 
+		this.emissionColor = ec;
 	}
 
 	public boolean isLight() {
@@ -36,10 +39,10 @@ public class Sphere extends Primitive {
 		return surfaceColor;
 	}
 	public Double getTransparency(Vec3d pHit) {
-		return transparency;
+		return 0.0;
 	}
 	public Double getReflection(Vec3d pHit) {
-		return reflection;
+		return 0.0;
 	}
 	public Vec3d getEmissionColor(Vec3d point) {
 		return emissionColor;
@@ -48,29 +51,27 @@ public class Sphere extends Primitive {
 		return point.sub(center);
 	}
 	
+	/**
+	 * 光线源节点在平面上的情况不考虑，当做没有交点。
+	 */
 	@Override
 	public boolean intersect(Ray ray, List<Double> pHits) {
-		Vec3d l = center.sub(ray.rayorig);
-		Double tca = l.dot(ray.raydir);
-		if (tca < 0) return false;
-		Double d2 = l.dot(l) - tca * tca;
-		if (d2 > radius2) return false;
-		Double thc = Math.sqrt(radius2 - d2);
-		if (tca > thc) {
-			pHits.add(tca - thc);
-		}
-		pHits.add(tca + thc);
+		Double l_n = ray.raydir.dot(norm);
+		// 直线与平面平行，没有交点，不考虑直线在平面上的情况。
+		if (l_n == 0.0) return false;
+		Double t = center.sub(ray.rayorig).dot(norm) / l_n;
+		if (t <= 0) return false;
+		pHits.add(t);
 		return true;
 	}
 	
 	@Override
 	public Vec3d getNormal(Vec3d pHit) {
-		return pHit.sub(center);
+		return norm;
 	}
 	
 	@Override
 	public String toString() {
-		return "Sphere";
+		return "Plane";
 	}
-	
 }

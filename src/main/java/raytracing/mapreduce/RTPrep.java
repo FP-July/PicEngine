@@ -30,9 +30,9 @@ public class RTPrep {
 		
 		public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
-			for (int i = 0; i < RayTracer.height; ++i) {
-				for (int j = 0; j < RayTracer.width; ++j) {
-					context.write(new Text("loc"), new Text(j + "," + i));
+			for (int y = 0; y < RayTracer.height; ++y) {
+				for (int x = 0; x < RayTracer.width; ++x) {
+					context.write(new Text("loc"), new Text(x + "," + y));
 				}
 			}
 		}

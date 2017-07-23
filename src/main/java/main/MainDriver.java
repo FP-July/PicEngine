@@ -8,9 +8,14 @@ public class MainDriver {
 	}
 
 	public static void main(String[] args) {
+		String job = Registry.getJob("raytracing");
+		if (args.length > 1) {
+			job = Registry.getJob(args[1]);
+		}
+		
 		try {
-			System.out.println(Registry.getJob("raytracing"));
-			Object t = Class.forName(Registry.getJob("raytracing")).newInstance();
+			System.out.println(job);
+			Object t = Class.forName(job).newInstance();
 			JobRegister jr = null;
 			if (t instanceof JobRegister) {
 				jr = (JobRegister) t;
