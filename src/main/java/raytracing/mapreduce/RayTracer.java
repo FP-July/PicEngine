@@ -19,6 +19,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 
+import main.JobRegister;
 import raytracing.Camera;
 import raytracing.Ray;
 import raytracing.RayTracing;
@@ -27,7 +28,7 @@ import raytracing.model.Plane;
 import raytracing.model.Sphere;
 import utils.StaticValue;
 
-public class RayTracer {
+public class RayTracer extends JobRegister {
 	
 	public static int width = 640, height = 480;
 
@@ -35,7 +36,7 @@ public class RayTracer {
 		extends Mapper<Text, Text, Text, Text> {
 		
 		RayTracing rayTracing = new RayTracing();
-	    Camera camera = new Camera(new Vec3d(-1.0, 0.0, 0.0), new Vec3d(), new Vec3d(0.0, 0.0, 1.0), 60.0, height, width);
+	    Camera camera = null;
 		
 		public void setup(Context context) 
 			throws IOException, InterruptedException {
@@ -51,6 +52,14 @@ public class RayTracer {
 		    
 		    RayTracing.scene.add(new Plane(new Vec3d(0.0, 0.0, -4.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(0.3, 0.3, 0.3), new Vec3d()));
 		    
+		    Configuration conf = context.getConfiguration();
+		    Vec3d eye    = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_EYE.name(),    new Vec3d(-1.0, 0.0, 0.0).serialize()));
+		    Vec3d center = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_CENTER.name(), new Vec3d().serialize()));
+		    Vec3d up     = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_UP.name(),     new Vec3d(0.0, 0.0, 1.0).serialize()));
+		    Double fov   = Double.parseDouble( conf.get(Camera.Property.CAMERA_FOV.name(),    "" + 60.0));
+		    Integer rows = Integer.parseInt(   conf.get(Camera.Property.CAMERA_HEIGHT.name(), "" + 480));
+		    Integer cols = Integer.parseInt(   conf.get(Camera.Property.CAMERA_WIDTH.name(),  "" + 640));
+		    camera = new Camera(eye, center, up, fov, rows, cols);
 		}
 		
 		public void map(Text key, Text value, Context context) 
@@ -113,10 +122,34 @@ public class RayTracer {
 		}
 	}
 	
-	public static void rayTracing(String srcPath, String outPath) 
-		throws IOException, InterruptedException, ClassNotFoundException {
+	public void execute(String[] args) {
+		if (args.length == 0) {
+			System.out.println("RayTracer with jobId.");
+			System.exit(0);
+		}
+		
+		String jobId = args[0];
+		String outPath = StaticValue.BASR_OUT_PATH + "image" + jobId + ".bmp";
+
 		Configuration conf = new Configuration();
 		conf.set("IMAGE_OUT_PATH", outPath);
+		
+		try {
+			RayTracer.rayTracing(conf, outPath);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static void rayTracing(Configuration conf, String outPath) 
+		throws IOException, InterruptedException, ClassNotFoundException {
 		
 		Job job = Job.getInstance(conf, "raytraceing");
 		job.setJarByClass(RayTracer.class);
@@ -127,11 +160,9 @@ public class RayTracer {
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
 		job.setOutputFormatClass(NullOutputFormat.class);
-//		job.setOutputKeyClass(Text.class);
-//		job.setOutputValueClass(Text.class);
 		
+		String srcPath = StaticValue.LOC_PATH + "/" + width + "_" + height;
 		FileInputFormat.addInputPath(job, new Path(srcPath));
-//		FileOutputFormat.setOutputPath(job, new Path(outPath));
 		job.waitForCompletion(true);
 	}
 }

@@ -11,9 +11,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import main.JobRegister;
 import raytracing.EmptyInputFormat;
+import utils.StaticValue;
 
-public class RTPrep {
+public class RTPrep extends JobRegister {
+	
+	public static int height = 480, width = 640;
 
 	public static class RTPrepMapper
 		extends Mapper<Object, Object, Text, Text> {
@@ -30,11 +34,26 @@ public class RTPrep {
 		
 		public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
-			for (int y = 0; y < RayTracer.height; ++y) {
-				for (int x = 0; x < RayTracer.width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
 					context.write(new Text("loc"), new Text(x + "," + y));
 				}
 			}
+		}
+	}
+	
+	public void execute(String[] args) {
+		try {
+			RTPrep.rtPrep(StaticValue.LOC_PATH + "/" + width + "_" + height);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

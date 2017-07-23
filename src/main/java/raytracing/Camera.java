@@ -14,13 +14,19 @@ import java.util.ArrayList;
  * @version Jul 23, 2017
  */
 public class Camera {
+	
+	public static enum Property {
+		CAMERA_EYE,
+		CAMERA_CENTER,
+		CAMERA_UP,
+		CAMERA_FOV,
+		CAMERA_HEIGHT,
+		CAMERA_WIDTH
+	};
 
 	private Vec3d eye;
-	
 	private Vec3d vx, vy, vz;
-	
 	private Double windowDistance, windowHeight, windowWidth;
-	
 	private Integer rows, cols;
 	
 	public Camera(	Vec3d eye, 
