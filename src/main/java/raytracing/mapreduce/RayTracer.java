@@ -1,14 +1,25 @@
 package raytracing.mapreduce;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.imageio.IIOException;
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -27,8 +38,11 @@ import raytracing.RayTracing;
 import raytracing.Vec3d;
 import raytracing.hadoop.PixelInputFormat;
 import raytracing.hadoop.PixelInputFormat.PixelRecordReader;
+import raytracing.load.CameraLoader;
+import raytracing.load.ModelLoader;
 import raytracing.model.Plane;
 import raytracing.model.Sphere;
+import raytracing.trace.CameraTrace;
 import utils.StaticValue;
 
 public class RayTracer extends JobRegister {
@@ -41,19 +55,11 @@ public class RayTracer extends JobRegister {
 		
 		public void setup(Context context) 
 			throws IOException, InterruptedException {
-			// position, radius, surface color, reflectivity, transparency, emission color
-			RayTracing.scene.add(new Sphere(new Vec3d(10.0, -4.0, 0.0),     2.0, new Vec3d(0.40, 0.57, 0.74), 0.0, 0.3, new Vec3d())); 
-		    RayTracing.scene.add(new Sphere(new Vec3d(20.0, 5.0, 0.0),     4.0, new Vec3d(1.00, 0.32, 0.36), 1.0, 0.5, new Vec3d())); 
-		    RayTracing.scene.add(new Sphere(new Vec3d(15.0, -1.0, -2.0),     2.0, new Vec3d(0.90, 0.76, 0.46), 1.0, 0.7, new Vec3d())); 
-		    RayTracing.scene.add(new Sphere(new Vec3d(25.0, 0.0, 10.0),     3.0, new Vec3d(0.65, 0.77, 0.57), 1.0, 0.0, new Vec3d())); 
-		    RayTracing.scene.add(new Sphere(new Vec3d(15.0, 2.0, 0.0),     3.0, new Vec3d(0.90, 0.90, 0.90), 1.0, 0.3, new Vec3d()));
-		    
-//		    RayTracing.scene.add(new Sphere(new Vec3d(30.0, -30.0, 10.0), 2.0, new Vec3d(0.20, 0.20, 0.20), 0.3, 0.0, new Vec3d(1.0)));
-		    RayTracing.scene.add(new Sphere(new Vec3d(-1000.0, 0.0, 11000.0), 10000.0, new Vec3d(0.20, 0.20, 0.20), 0.3, 0.0, new Vec3d(1.0)));
-		    
-		    RayTracing.scene.add(new Plane(new Vec3d(0.0, 0.0, -4.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(0.3, 0.3, 0.3), new Vec3d()));
-		    
 		    Configuration conf = context.getConfiguration();
+		    String modelPath = conf.get("MODEL_PATH");
+		    ModelLoader ml = new ModelLoader(modelPath, false);
+		    ml.parse(rayTracing.scene);
+		    
 		    Vec3d eye    = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_EYE.name(),    new Vec3d(-1.0, 0.0, 0.0).serialize()));
 		    Vec3d center = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_CENTER.name(), new Vec3d().serialize()));
 		    Vec3d up     = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_UP.name(),     new Vec3d(0.0, 0.0, 1.0).serialize()));
@@ -71,7 +77,7 @@ public class RayTracer extends JobRegister {
 	        Vec3d rgb = new Vec3d();
             
             ArrayList<Ray> rays = new ArrayList<Ray>();
-            int times = 10;
+            int times = 3;
             camera.getSuperSamplingRays(x, y, times, rays);
             for (Ray ssray : rays) {
             	Vec3d p = new Vec3d();
@@ -119,24 +125,70 @@ public class RayTracer extends JobRegister {
 			FileSystem fs = FileSystem.get(conf);
 			
 			Path path = new Path(conf.get("IMAGE_OUT_PATH"));
-			OutputStream os = fs.create(path, true);
-			ImageIO.write(image, "bmp", os);
-			os.close();
+			OutputStream fos = fs.create(path, true);
+		    
+		    ImageOutputStream stream = null;
+	        try {
+	            stream = ImageIO.createImageOutputStream(fos);
+	        } catch (IOException e) {
+	            throw new IIOException("Can't create output stream!", e);
+	        }
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+		    jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		    jpegParams.setCompressionQuality(1f);
+		    
+		    try {
+			    ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+				writer.setOutput(stream);
+			
+				writer.write(null, new IIOImage(image, null, null), jpegParams);
+				writer.reset();
+		    } catch (IOException e) {
+		    	e.printStackTrace();
+		    }
+			fos.close();
 		}
 	}
 	
 	public void execute(String[] args) {
-		if (args.length == 0) {
-			System.out.println("RayTracer with jobId.");
-			System.exit(0);
-		}
-		
-		String jobId = args[0];
-		String outPath = StaticValue.BASR_OUT_PATH + "/image" + jobId + ".bmp";
 
 		Configuration conf = new Configuration();
-		conf.set("IMAGE_OUT_PATH", outPath);
-		System.out.println(conf.get("IMAGE_OUT_PATH"));
+		conf.set("MODEL_PATH", "tmp.mods");
+		
+		try {
+			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
+			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
+			CameraLoader cl = new CameraLoader("tmp.camera", false);
+			cl.parse(origCamera, cats);
+			
+			Camera camera = origCamera;
+			int i = 0;
+		    render(camera, conf, i);
+		    for (CameraTrace cat : cats) {
+		    	cat.setInitCameraLocation(camera);
+		    	while ((camera = cat.getNextCameraFrame()) != null) {
+				    i ++;
+			    	render(camera, conf, i);
+			    } 
+		    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void render(Camera camera, Configuration conf, int id) {
+		conf.set("IMAGE_OUT_PATH", "image/image" + id + ".jpg");
+		
+		conf.set(Camera.Property.CAMERA_EYE.name(), camera.getEye().serialize());
+		conf.set(Camera.Property.CAMERA_CENTER.name(), camera.getCenter().serialize());
+		conf.set(Camera.Property.CAMERA_UP.name(), camera.getVy().inv().serialize());
+		conf.set(Camera.Property.CAMERA_FOV.name(), camera.getFov().toString());
+		conf.set(Camera.Property.CAMERA_HEIGHT.name(), camera.getRows().toString());
+		conf.set(Camera.Property.CAMERA_WIDTH.name(), camera.getCols().toString());
+		
+		camera.viewFrame(id);
 		
 		try {
 			RayTracer.rayTracing(conf);
@@ -159,6 +211,7 @@ public class RayTracer extends JobRegister {
 		job.setJarByClass(RayTracer.class);
 		job.setMapperClass(RayTracerMapper.class);
 		job.setReducerClass(RayTracerReducer.class);
+		job.setNumReduceTasks(1);
 		
 		job.setInputFormatClass(PixelInputFormat.class);
 		job.setMapOutputKeyClass(Text.class);

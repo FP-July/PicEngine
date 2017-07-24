@@ -57,7 +57,19 @@ public class Camera {
 		
 		windowHeight = windowDistance * angle * 2.0;
 		windowWidth = windowHeight * aspectratio;
-		
+	}
+	public void set(Camera ca) {
+		this.eye = ca.eye;
+		this.center = ca.center;
+		this.vx = ca.vx;
+		this.vy = ca.vy;
+		this.vz = ca.vz;
+		this.windowDistance = ca.windowDistance;
+		this.windowHeight = ca.windowHeight;
+		this.windowWidth = ca.windowWidth;
+		this.fov = ca.fov;
+		this.rows = ca.rows;
+		this.cols = ca.cols;
 	}
 	
 	public void viewFrame(int i) {
@@ -76,9 +88,9 @@ public class Camera {
 	public Vec3d getVx()  { return vx;  }
 	public Vec3d getVy()  { return vy;  }
 	public Vec3d getVz()  { return vz;  }
-	public double getFov() { return fov; }
-	public int getRows() { return rows; }
-	public int getCols() { return cols; }
+	public Double getFov() { return fov; }
+	public Integer getRows() { return rows; }
+	public Integer getCols() { return cols; }
 	
 	public Ray getRay(int col, int row) {
 		return getRay(col, row, 0.5, 0.5);

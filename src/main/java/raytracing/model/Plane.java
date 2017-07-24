@@ -12,7 +12,12 @@ import raytracing.Vec3d;
  */
 public class Plane extends Primitive {
 	
-	//  [x, y, z, 1] * [A, B, C, D]^T = 0
+	public static enum Property {
+		center,
+		norm,
+		surfaceColor,
+		emissionColor
+	}
 	
 	public Vec3d center;
 	public Vec3d norm;
@@ -21,7 +26,11 @@ public class Plane extends Primitive {
 	public Plane(Vec3d center,
 				  Vec3d norm,
 				  Vec3d sc,
-				  Vec3d ec) {
+				  Vec3d ec) throws IllegalArgumentException {
+		if (center == null || norm == null
+			|| sc == null || ec == null) {
+			throw new IllegalArgumentException();
+		}
 		this.center = center; 
 		this.norm = norm;
 		this.surfaceColor = sc; 

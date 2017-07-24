@@ -1,6 +1,9 @@
 package raytracing.model;
 
+import java.util.HashMap;
 import java.util.List;
+
+import org.apache.commons.lang.Validate;
 
 import raytracing.Ray;
 import raytracing.Vec3d;
@@ -11,7 +14,9 @@ public class Sphere extends Primitive {
 		center,
 		radius,
 		surfaceColor,
-		emissionColor
+		emissionColor,
+		transparency,
+		reflection
 	};
 	
 	public Vec3d center;
@@ -25,12 +30,22 @@ public class Sphere extends Primitive {
 				  Vec3d sc,
 				  Double refl,
 				  Double transp,
-				  Vec3d ec) {
+				  Vec3d ec) throws IllegalArgumentException {
+		if (c == null || r == null || sc == null
+			|| refl == null || transp == null || ec == null) {
+			throw new IllegalArgumentException();
+		}
+		
 		center = c; emissionLoc = c;
 		radius = r; radius2 = r*r;
 		surfaceColor = sc; emissionColor = ec;
 		transparency = transp; reflection = refl;
 	}
+	
+	public static Primitive loadProperties(HashMap<String, String> opts) {
+		return null;
+	}
+
 
 	public boolean isLight() {
 		if (emissionColor.x + emissionColor.y + emissionColor.z > 0) {

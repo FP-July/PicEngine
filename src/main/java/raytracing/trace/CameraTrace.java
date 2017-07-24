@@ -1,4 +1,4 @@
-package raytracing.track;
+package raytracing.trace;
 
 import raytracing.Camera;
 

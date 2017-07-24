@@ -1,13 +1,21 @@
-package raytracing.track;
+package raytracing.trace;
 
-import raytracing.track.CameraTrace;
 import raytracing.Camera;
 import raytracing.Ray;
 import raytracing.Vec3d;
+import raytracing.trace.CameraTrace;
 
 public class RotationWithInHorizontalPlane extends CameraTrace {
 	
+	public static enum Property {
+		dis,
+		range,
+		frame
+	}
+	
 	private Vec3d center = null;
+	private double dis = 0.0;
+	
 	private Camera origCamera = null;
 	private double scope = 0.0;
 	private double step = 0.0;
@@ -21,6 +29,9 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 	public RotationWithInHorizontalPlane(Vec3d center) {
 		this.center = center;
 	}
+	public RotationWithInHorizontalPlane(double dis) {
+		this.dis = dis;
+	}
 	
 	/**
 	 * 获取以距离相机眼睛 dis 为中心点的水平面旋转轨迹
@@ -28,14 +39,13 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 	 * @param dis
 	 * @return RotationWithInHorizontalPlane
 	 */
-	public static RotationWithInHorizontalPlane getInstance(Camera ca, double dis, double range, int frame) {
-		if (!ca.getVy().isParallel(new Vec3d(0.0, 0.0, 1.0))) {
-			return null;
+	public static RotationWithInHorizontalPlane getInstance(Camera ca, Double dis, Double range, Integer frame)
+		throws IllegalArgumentException {
+		if (dis == null || range == null || frame == null) {
+			throw new IllegalArgumentException();
 		}
 		
-		Ray ray = new Ray(ca.getEye(), ca.getVz());
-		Vec3d center = ray.cross(dis);
-		RotationWithInHorizontalPlane rhp = new RotationWithInHorizontalPlane(center);
+		RotationWithInHorizontalPlane rhp = new RotationWithInHorizontalPlane(dis);
 		rhp.setInitCameraLocation(ca);
 		rhp.setTraceScope(range);
 		rhp.setFrames(frame);
@@ -44,7 +54,15 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 
 	@Override
 	public boolean setInitCameraLocation(Camera ca) {
+		if (ca == null) return false;
+
 		origCamera = ca;
+		if (center != null) {
+			dis = origCamera.getEye().sub(center).length();
+		} else {
+			center = origCamera.getEye().add(origCamera.getVz().mul(dis));
+		}
+		
 		Vec3d dir = origCamera.getEye().sub(center);
 		
 		if (!dir.isParallel(ca.getVz())) return false;
@@ -103,13 +121,11 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 		double y = Math.sin(rad);
 		Vec3d centerCoord = new Vec3d(cenLength * x, cenLength * y, 0.0);
 		Vec3d eyeCoord = new Vec3d(eyeLength * x, eyeLength * y, 0.0);
-		System.out.println(x + "," + y + ": " + centerCoord.serialize() + "\t" + eyeCoord.serialize());
 		
 		Vec3d cen = convertCoords(centerCoord);
 		Vec3d eye = convertCoords(eyeCoord);
-		System.out.println(cen.serialize() + "\t" + eye.serialize());
 		
-		Camera camera = new Camera(eye, cen, up, origCamera.getFov(), origCamera.getCols(), origCamera.getRows());
+		Camera camera = new Camera(eye, cen, up, origCamera.getFov(), origCamera.getRows(), origCamera.getCols());
 		return camera;
 	}
 	

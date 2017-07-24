@@ -3,15 +3,18 @@ package raytracing.load;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 
-import org.apache.commons.logging.LogFactory;
+import javax.sound.sampled.Line;
+
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
@@ -19,8 +22,9 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import raytracing.model.PrimFactory.MOD;
+import raytracing.model.PrimFactory;
 import raytracing.model.Primitive;
-import raytracing.model.Sphere;
 
 public class ModelLoader {
 	
@@ -28,14 +32,35 @@ public class ModelLoader {
 	
 	private Path modelPath;
 	private BufferedReader br = null;
-
-	public static enum Mod {
-		_camera,
-		_sphere,
-		_plane
+	
+	public static void main(String[] args) throws IOException {
+		ModelLoader ml = new ModelLoader("tmp.mods", true);
+		ArrayList<Primitive> scene = new ArrayList<Primitive>();
+		ml.parse(scene);
+		System.out.println(scene.size());
 	}
 	
-	public ModelLoader(String filePath) throws IOException {
+	public ModelLoader(String filePath, boolean locate) throws IOException {
+		if (locate) initLfs(filePath);
+		else initHdfs(filePath);
+	}
+	
+	private void initLfs(String filePath) throws FileNotFoundException {
+		File file = new File(filePath);
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			for (File f : files) {
+				if (f.getName().endsWith(".mods")) {
+					modelPath = new Path(f.getPath());
+				}
+			}
+		} else {
+			modelPath = new Path(filePath);
+		}
+		br = new BufferedReader(new InputStreamReader(new FileInputStream(modelPath.toString())));
+	}
+	
+	private void initHdfs(String filePath) throws IOException {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 		Path path = new Path(filePath);
@@ -67,50 +92,54 @@ public class ModelLoader {
 	}
 	
 	private int lineCount = 0;
-	public boolean parse() {
-		boolean hasCamera = false;
-
-		HashMap<String, String> opts = new HashMap<String, String>();
+	public void parse(List<Primitive> scene) {
 		try {
-			String line = br.readLine();
-			while (line != null) {
-				if (line.equals("") || line.startsWith("#")) continue;
-
-				if (!line.startsWith("name=")) return error("property should called 'name'");
-				
-				String[] conf = line.trim().split("=");
-				if (conf.length != 2) return error("name must be written");
-				line = conf[1];
-
-				opts.clear();
-				/* 相机配置 */
-				if (line.equals(Mod._camera.name())) {
-					if (hasCamera) return error("multi cameras");
-					
-					line = br.readLine();
-					while (line != null && (line.equals("") || line.startsWith("#"))) {
-						line = br.readLine();
-					}
-					if (line == null) break;
-					while (!line.startsWith("name=")) {
-						String[] prop = line.trim().split("=");
-						if (prop.length != 2) continue;
-						opts.put(prop[0], prop[1]);
-					}
-				} 
-				/* 模型配置 */
-				else {
-					
-				}
+			String line;
+			while ((line = br.readLine()) != null) {
 				lineCount ++;
+				if (line.equals("") || line.startsWith("#")) continue;
+				
+				line = line.trim();
+				if (!line.endsWith(":")) error("mod name init must end with ':'");
+				line = line.substring(0, line.length() - 1);
+				
+				MOD mod = MOD.valueOf(line.trim());
+				if (mod == null) error("mod name error");
+				
+				line = br.readLine(); lineCount ++;
+				while (line != null) {
+					if (line.equals("") || line.startsWith("#")) {
+						line = br.readLine(); lineCount ++;
+						continue;
+					}
+					else break;
+				}
+				
+				HashMap<String, String> opts = new HashMap<String, String>();
+				while (line != null && !line.equals("end")) {
+					if (!line.equals("") && !line.startsWith("#")) {
+						try {
+							Property prop = Property.getProperty(line);
+							opts.put(prop.key, prop.value);
+						} catch (NullPointerException e) {
+							error("property format error");
+						}
+					}
+					line = br.readLine(); lineCount ++;
+				}
+				
+				StringBuffer err = new StringBuffer();
+				Primitive prim = PrimFactory.loadInstanceByProperties(mod, opts, err);
+				if (prim == null) {
+					System.out.println(err.toString());
+					error("mod " + mod.name() + " properties format error");
+				} else {
+					scene.add(prim);
+				}
 			}
 		} catch (IOException e) {
-			return error(e.toString());
+			error(e.toString());
 		}
-		
-		if (!hasCamera) return error("no camera");
-		
-		return true;
 	}
 	
 	private boolean error(String cause) {
