@@ -46,5 +46,5 @@ target/
 *.bmp
 image*
 
-# tmp file
+# tmp
 tmp*
