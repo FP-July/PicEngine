@@ -99,9 +99,7 @@ public class TaskUtils {
 		try {
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataInputStream iStream = fSystem.open(new Path(progressDir));
-			String line = iStream.readLine();
-			if(line.length() > 0)
-				return Float.parseFloat(line);
+			return iStream.readFloat();
 				
 		} catch (Exception e) {
 			logger.error("failed to get fs when getting progress, for {}",e.toString());

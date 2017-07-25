@@ -151,7 +151,7 @@
                         <%
                             if (task.getState().equals(Task.finished)) {
                         %>
-                        <button class="btn btn-small btn-primary">下载</button>
+                        <button class="btn btn-small btn-primary" onclick="downloadResult('<%=task.getUsername()%>','<%=task.getId()%>')">下载</button>
                         <%
                             } else if (task.getState().equals(Task.error)) {
                         %>

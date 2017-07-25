@@ -32,41 +32,32 @@ public class RayTracerDriver implements JobRegister, ITask {
 	private Job job;
 	private int totalJobNum = 1;
 	private int processedJobNum = 0;
-	
+
 	public static enum PARAMS {
-		INPUT_PATH,
-		OUTPUT_PATH,
-		OUTPUT_FILE_NAME,
-		HDFS_URI,
-		MAX_RAY_DEPTH,
-		SUPER_SAMPLING_TIMES
+		INPUT_PATH, OUTPUT_PATH, OUTPUT_FILE_NAME, HDFS_URI, MAX_RAY_DEPTH, SUPER_SAMPLING_TIMES
 	}
-	
+
 	@Override
 	public void execute(String[] args) {
 		Configuration conf = new Configuration();
 		conf.set("mr.job.name", "raytracing");
 
 		String outputPath = "image";
-		
+
 		try {
 			FileSystem fs = FileSystem.get(conf);
 			if (fs.exists(new Path(outputPath)))
 				fs.delete(new Path(outputPath), true);
-			
+
 			/** models settings file input path <*.mods> */
 			conf.set(PARAMS.INPUT_PATH.name(), "tmp.mods");
-			
+
 			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 			/** camera settings file input path <*.camera> */
 			CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.HDFS);
 			cl.parse(origCamera, cats);
-			
-			for (CameraTrace cat : cats) {
-				totalJobNum += cat.getFrames();
-			}
-			
+
 			HashMap<String, String> opts = new HashMap<String, String>();
 			ConfLoader confLoader = new ConfLoader("tmp.conf", null, BasicLoader.ENV.HDFS);
 			confLoader.parse(opts);
@@ -74,36 +65,37 @@ public class RayTracerDriver implements JobRegister, ITask {
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
-			
+
 			boolean _SUCC = false;
 			try {
 				Camera camera = origCamera;
-			    _SUCC = render(camera, conf, processedJobNum);
-			    for (CameraTrace cat : cats) {
-			    	cat.setInitCameraLocation(camera);
-			    	while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
-					    processedJobNum ++;
-				    	_SUCC = render(camera, conf, processedJobNum);
-				    } 
-			    }
+				_SUCC = render(camera, conf, processedJobNum);
+				for (CameraTrace cat : cats) {
+					cat.setInitCameraLocation(camera);
+					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
+						processedJobNum++;
+						_SUCC = render(camera, conf, processedJobNum);
+					}
+				}
 			} catch (Exception e) {
 				_SUCC = false;
 			}
-			
-			if (_SUCC) JobStateFlagCreator.createSuccessFlag(conf);
-			else JobStateFlagCreator.createFailedFlag(conf);
+
+			if (_SUCC)
+				JobStateFlagCreator.createSuccessFlag(conf);
+			else
+				JobStateFlagCreator.createFailedFlag(conf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void render(String[] args) throws IOException {
 		Configuration conf = new Configuration();
 		String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 		if (otherArgs.length != 4) {
 			System.err.println("Usage: raytracer <username> <taskname> <taskID> <rootPath>");
-			return ;
+			return;
 		}
 
 		String username = otherArgs[0];
@@ -114,86 +106,94 @@ public class RayTracerDriver implements JobRegister, ITask {
 		String outputPath = TaskUtils.getResultDir(workingDir);
 		String logDir = TaskUtils.getMRLogPath(workingDir);
 		String rootPath = otherArgs[3];
-		
+
 		FileSystem fs = FileSystem.get(conf);
 		if (fs.exists(new Path(outputPath)))
 			fs.delete(new Path(outputPath), true);
 
 		conf.addResource(new Path(rootPath + "yarn-site.xml"));
- 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
+		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
 		// TODO make this flexible
 		conf.set("mapreduce.job.jar", TaskUtils.MR_JAR_PATH + "RayTracerDriver.jar");
 		conf.set("username", username);
 		conf.set("taskID", taskID);
 		conf.set("mr.job.name", username + "_" + taskID);
-		
+
 		try {
 			/** models settings file input path <*.mods> */
 			conf.set(PARAMS.INPUT_PATH.name(), inputPath);
 			conf.set(PARAMS.HDFS_URI.name(), TaskUtils.HDFS_URI.toString());
-			
+
 			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 			/** camera settings file input path <*.camera> */
-			CameraLoader cl = new CameraLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
+			CameraLoader cl = new CameraLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())),
+					BasicLoader.ENV.HDFS);
 			cl.parse(origCamera, cats);
-			
+
 			HashMap<String, String> opts = new HashMap<String, String>();
-			ConfLoader confLoader = new ConfLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
+			ConfLoader confLoader = new ConfLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())),
+					BasicLoader.ENV.HDFS);
 			confLoader.parse(opts);
+
+			for (CameraTrace cat : cats) {
+				totalJobNum += cat.getFrames();
+			}
 
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
-			
+
 			boolean _SUCC = false;
 			try {
 				Camera camera = origCamera;
-				int i = 0;
-			    _SUCC = render(camera, conf, i);
-			    for (CameraTrace cat : cats) {
-			    	cat.setInitCameraLocation(camera);
-			    	while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
-					    i ++;
-				    	_SUCC = render(camera, conf, i);
-				    } 
-			    }
+				processedJobNum = 0;
+				_SUCC = render(camera, conf, processedJobNum);
+				for (CameraTrace cat : cats) {
+					cat.setInitCameraLocation(camera);
+					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
+						processedJobNum++;
+						_SUCC = render(camera, conf, processedJobNum);
+					}
+				}
 			} catch (Exception e) {
 				_SUCC = false;
 			}
-			
-			if (_SUCC) JobStateFlagCreator.createSuccessFlag(conf);
-			else JobStateFlagCreator.createFailedFlag(conf);
+
+			if (_SUCC)
+				JobStateFlagCreator.createSuccessFlag(conf);
+			else
+				JobStateFlagCreator.createFailedFlag(conf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public boolean render(Camera camera, Configuration conf, int id) 
-		throws IOException, ClassNotFoundException, InterruptedException {
+
+	public boolean render(Camera camera, Configuration conf, int id)
+			throws IOException, ClassNotFoundException, InterruptedException {
 		conf.set(PARAMS.OUTPUT_FILE_NAME.name(), "image" + id + ".jpg");
-		
+
 		conf.set(Camera.Property.CAMERA_EYE.name(), camera.getEye().serialize());
 		conf.set(Camera.Property.CAMERA_CENTER.name(), camera.getCenter().serialize());
 		conf.set(Camera.Property.CAMERA_UP.name(), camera.getUp().serialize());
 		conf.set(Camera.Property.CAMERA_FOV.name(), camera.getFov().toString());
 		conf.set(Camera.Property.CAMERA_HEIGHT.name(), camera.getRows().toString());
 		conf.set(Camera.Property.CAMERA_WIDTH.name(), camera.getCols().toString());
-		
+
 		camera.viewFrame(id);
-		
+
 		job = Job.getInstance(conf, conf.get("mr.job.name", "raytracing"));
 		job.setJarByClass(RayTracerDriver.class);
 		job.setMapperClass(RayTracerMapper.class);
 		job.setReducerClass(RayTracerReducer.class);
 		job.setNumReduceTasks(1);
-		
+
 		job.setInputFormatClass(PixelInputFormat.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
 		job.setOutputFormatClass(NullOutputFormat.class);
-		
+
 		return job.waitForCompletion(true);
 	}
 
@@ -207,15 +207,13 @@ public class RayTracerDriver implements JobRegister, ITask {
 		return job;
 	}
 
-
 	@Override
 	public float getProgress() {
+		float mapProgress = 0.0f;
 		try {
-			return 1.0f * (processedJobNum + job.mapProgress()) / totalJobNum;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			mapProgress = job.mapProgress();
+		} catch (Exception e) {
 		}
-		return 0.0f;
+		return 1.0f * (processedJobNum + mapProgress) / totalJobNum;
 	}
 }

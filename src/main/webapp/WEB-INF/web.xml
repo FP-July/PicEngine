@@ -136,6 +136,17 @@
 		<servlet-name>TaskLog</servlet-name>
 		<url-pattern>/taskLog</url-pattern>
 	</servlet-mapping>
+	
+	<!-- DownloadResult Servlet -->
+	<servlet>
+		<servlet-name>DownloadResult</servlet-name>
+		<servlet-class>servlet.file.DownloadResult</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>DownloadResult</servlet-name>
+		<url-pattern>/downloadResult</url-pattern>
+	</servlet-mapping>
 
 </web-app>
 
