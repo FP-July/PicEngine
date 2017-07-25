@@ -1,118 +1,21 @@
 package raytracing;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.stream.FileImageOutputStream;
-
-import raytracing.load.BasicFunc;
-import raytracing.load.CameraLoader;
-import raytracing.load.ModelLoader;
-import raytracing.model.Plane;
 import raytracing.model.Primitive;
-import raytracing.model.Sphere;
-import raytracing.trace.CameraTrace;
-import raytracing.trace.RotationWithInHorizontalPlane;
-import utils.DirectoryChecker;
 
 public class RayTracing {
 	
-	public static List<Primitive> scene = new ArrayList<Primitive>();
-	public static Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
-	public static ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
+	private List<Primitive> scene = new ArrayList<Primitive>();
 	
-	public final int MAX_RAY_DEPTH = 5;
+	private int MAX_RAY_DEPTH = 5;
 	
-	public static void main(String[] args) throws IOException {
-		// position, radius, surface color, reflectivity, transparency, emission color
-//		RayTracing.scene.add(new Sphere(new Vec3d(10.0, -4.0, 0.0),     2.0, new Vec3d(0.40, 0.57, 0.74), 0.0, 0.3, new Vec3d())); 
-//	    RayTracing.scene.add(new Sphere(new Vec3d(20.0, 5.0, 0.0),     4.0, new Vec3d(1.00, 0.32, 0.36), 1.0, 0.5, new Vec3d())); 
-//	    RayTracing.scene.add(new Sphere(new Vec3d(15.0, -1.0, -2.0),     2.0, new Vec3d(0.90, 0.76, 0.46), 1.0, 0.7, new Vec3d())); 
-//	    RayTracing.scene.add(new Sphere(new Vec3d(25.0, 0.0, 10.0),     3.0, new Vec3d(0.65, 0.77, 0.57), 1.0, 0.0, new Vec3d())); 
-//	    RayTracing.scene.add(new Sphere(new Vec3d(15.0, 2.0, 0.0),     3.0, new Vec3d(0.90, 0.90, 0.90), 1.0, 0.3, new Vec3d()));
-//	    
-//	    RayTracing.scene.add(new Sphere(new Vec3d(-1000.0, 0.0, 11000.0), 10000.0, new Vec3d(0.20, 0.20, 0.20), 0.3, 0.0, new Vec3d(1.0)));
-//	    
-//	    RayTracing.scene.add(new Plane(new Vec3d(0.0, 0.0, -4.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(0.3, 0.3, 0.3), new Vec3d()));
-		ModelLoader ml = new ModelLoader("tmp.mods", true);
-		ml.parse(scene);
-		
-		CameraLoader cl = new CameraLoader("tmp.camera", true);
-		cl.parse(origCamera, cats);
-		
-		RayTracing rt = new RayTracing();
-	    rt.render();
+	public List<Primitive> getScene() {
+		return scene;
 	}
-
-	public void render() {
-	    Camera camera = origCamera;
-	    DirectoryChecker.dirCheck("image", true);
-	    
-	    int i = 0;
-	    render(camera, i);
-	    for (CameraTrace cat : cats) {
-	    	cat.setInitCameraLocation(camera);
-	    	while ((camera = cat.getNextCameraFrame()) != null) {
-			    i ++;
-		    	render(camera, i);
-		    } 
-	    }
-	    
-	}
-	
-	public void render(Camera camera, int id) {
-		camera.viewFrame(id);
-		
-		int width = camera.getCols(), height = camera.getRows();
-	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    	
-	    for (int y = 0; y < height; ++y) { 
-//		    System.out.println("rows : " + y);
-	        for (int x = 0; x < width; ++x) { 
-            	Vec3d rgb = new Vec3d();
-                ArrayList<Ray> rays = new ArrayList<Ray>();
-                int times = 3;
-                camera.getSuperSamplingRays(x, y, times, rays);
-                for (Ray ssray : rays) {
-                	Vec3d p = new Vec3d();
-                	trace(ssray, p, 0);
-                	rgb.addToThis(p);
-                }
-                double invTimes = 1.0 / (times * times);
-                rgb.mulToThis(new Vec3d(invTimes));
-	            
-	            image.setRGB(x, y, rgb.getRGB());
-	        } 
-	    } 
-
-	    JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-	    jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-	    jpegParams.setCompressionQuality(1f);
-	    
-	    try {
-		    ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-		    // specifies where the jpg image has to be written
-		    FileImageOutputStream fios = new FileImageOutputStream(new File("image/image" + id + ".jpg"));
-			writer.setOutput(fios);
-		
-			// writes the file with given compression level 
-			// from your JPEGImageWriteParam instance
-			writer.write(null, new IIOImage(image, null, null), jpegParams);
-			writer.reset();
-			fios.close();
-	    } catch (IOException e) {
-	    	e.printStackTrace();
-	    }
+	public void setMaxRayDepth(String depth) {
+		MAX_RAY_DEPTH = Integer.parseInt(depth);
 	}
 	
 	public Primitive trace(Ray ray, Vec3d color, int depth) {

@@ -12,7 +12,7 @@ public class Property {
 		this.value = value;
 	}
 
-	private static Pattern pat = Pattern.compile("(.*)=(.*)");
+	private static Pattern pat = Pattern.compile("^(.*)=(.*)?$");
 	
 	public static Property getProperty(String conf) 
 		throws NullPointerException {

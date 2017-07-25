@@ -102,10 +102,6 @@ public class CameraLoader {
 		}
 	}
 	
-	private boolean check(String line) {
-		return line != null && (line.equals("") || line.startsWith("#"));
-	}
-	
 	private int lineCount = -1;
 	public boolean parse(Camera ca, ArrayList<CameraTrace> cats) {
 		boolean hasCamera = false;
@@ -142,7 +138,9 @@ public class CameraLoader {
 						if (!line.equals("") && !line.startsWith("#")) {
 							try {
 								Property prop = Property.getProperty(line);
-								opts.put(prop.key, prop.value);
+								if (prop != null) {
+									opts.put(prop.key, prop.value);
+								}
 							} catch (NullPointerException e) {
 								error("property format error");
 							}
@@ -186,7 +184,9 @@ public class CameraLoader {
 							if (!line.equals("") && !line.startsWith("#")) {
 								try {
 									Property prop = Property.getProperty(line);
-									confs.put(prop.key, prop.value);
+									if (prop != null) {
+										confs.put(prop.key, prop.value);
+									}
 								} catch (NullPointerException e) {
 									error("property format error");
 								}

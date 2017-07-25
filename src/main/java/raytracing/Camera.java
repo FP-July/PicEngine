@@ -85,6 +85,7 @@ public class Camera {
 	
 	public Vec3d getEye() { return eye; }
 	public Vec3d getCenter() { return center; }
+	public Vec3d getUp() { return vy.inv(); }
 	public Vec3d getVx()  { return vx;  }
 	public Vec3d getVy()  { return vy;  }
 	public Vec3d getVz()  { return vz;  }
@@ -95,7 +96,7 @@ public class Camera {
 	public Ray getRay(int col, int row) {
 		return getRay(col, row, 0.5, 0.5);
 	}
-	
+
 	public void getSuperSamplingRays(int col, int row, int times, ArrayList<Ray> rays) {
 		double interval = 1.0 / times;
 		double offset = interval / 2;
@@ -109,7 +110,6 @@ public class Camera {
 	public Ray getRay(int col, int row, double pixelAdjustmentX, double pixelAdjustmentY) {
 		double x = (((double)col + pixelAdjustmentX) / cols) * windowWidth - (windowWidth / 2.0);
 		double y = (((double)row + pixelAdjustmentY) / rows) * windowHeight - (windowHeight / 2.0);
-//		System.out.println(x + "," + y);
 
 		Vec3d coord = convertCoords(new Vec3d(x, y, windowDistance));
 		Vec3d raydir = coord.sub(eye).normalize();

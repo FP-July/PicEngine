@@ -120,7 +120,9 @@ public class ModelLoader {
 					if (!line.equals("") && !line.startsWith("#")) {
 						try {
 							Property prop = Property.getProperty(line);
-							opts.put(prop.key, prop.value);
+							if (prop != null) {
+								opts.put(prop.key, prop.value);
+							}
 						} catch (NullPointerException e) {
 							error("property format error");
 						}

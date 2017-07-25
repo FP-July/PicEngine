@@ -1,6 +1,6 @@
 package main;
 
-public abstract class JobRegister {
+public interface JobRegister {
 
 	public abstract void execute(String[] args);
 }

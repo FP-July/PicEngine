@@ -3,8 +3,7 @@ package main;
 public class MainDriver {
 
 	static {
-		Registry.registerJobAlias("rtprep", "raytracing.mapreduce.RTPrep");
-		Registry.registerJobAlias("raytracing", "raytracing.mapreduce.RayTracer");
+		Registry.registerJobAlias("raytracer", "raytracing.mapreduce.RayTracerDriver");
 	}
 	
 	public static void printUsage() {
@@ -13,7 +12,7 @@ public class MainDriver {
 	}
 
 	public static void main(String[] args) {
-		String job = Registry.getJob("raytracing");
+		String job = Registry.getJob("raytracer");
 		if (args.length > 0) {
 			job = Registry.getJob(args[0]);
 		} else {
