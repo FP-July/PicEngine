@@ -25,9 +25,10 @@ public class Task {
     private String state;
     private String fileLocation;
     private Date date;
+    private long finishedTime;
     // these parameters stored in database.
 
-    private int minutes;
+    private long minutes;
     private int percent;
     // these parameters will be queried from hadoop platform,
     // manually set in the servlet function then passed to frontend.
@@ -80,12 +81,12 @@ public class Task {
         this.date = date;
     }
 
-    public int getMinutes() {
+    public long getMinutes() {
         return minutes;
     }
 
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    public void setMinutes(long minutes2) {
+        this.minutes = minutes2;
     }
 
     public int getPercent() {
@@ -102,5 +103,13 @@ public class Task {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public long getFinishedTime() {
+		return finishedTime;
+	}
+
+	public void setFinishedTime(long finishedTime) {
+		this.finishedTime = finishedTime;
 	}
 }

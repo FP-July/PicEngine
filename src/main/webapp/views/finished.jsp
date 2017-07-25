@@ -122,8 +122,8 @@
                 </h2>
                 <%
                     }
-                    int minutes = task.getMinutes();
-                    int hours = minutes / 60;
+                    long minutes = task.getMinutes();
+                    long hours = minutes / 60;
                     minutes = minutes % 60;
                 %>
                 <tr class="<%=color%>">

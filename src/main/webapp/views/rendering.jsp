@@ -126,8 +126,8 @@
                         } else {
                             color = "success";
                         }
-                        int minutes = task.getMinutes();
-                        int hours = minutes / 60;
+                        long minutes = task.getMinutes();
+                        long hours = minutes / 60;
                         minutes = minutes % 60;
                 %>
                 <tr class="<%=color%>">
@@ -158,7 +158,16 @@
                         %>
                     </td>
                     <td>
+                     <% if(task.getState().equals(Task.ongoing)){
+	                    %>
                         <%=hours%> 时 <%=minutes%> 分
+                        <%
+	                    	} else {
+                        %>
+                        	未启动
+                        <%
+	                    	}
+                        %>
                     </td>
                     <td>
                     <button class="btn btn-small btn-danger" onclick="deleteTask('<%=task.getUsername()%>','<%=task.getName()%>')">删除</button>

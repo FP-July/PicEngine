@@ -49,6 +49,7 @@ public class RunProj extends HttpServlet {
 				resp.sendError(ServletConstants.TASK_ALREADY_FINISHED, ServletConstants.STR_TASK_ALREADY_FINISHED);
 				return;
 			}
+			
 			int status = runProj(info);
 			
 			if(status == ServletConstants.SUCCESS) {
