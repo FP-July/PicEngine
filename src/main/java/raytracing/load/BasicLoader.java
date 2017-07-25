@@ -2,7 +2,12 @@ package raytracing.load;
 
 import raytracing.Vec3d;
 
-public class BasicFunc {
+public class BasicLoader {
+	
+	public static enum ENV {
+		NATIVE,
+		HDFS
+	}
 
 	public static Double parseDoubleProperty(String key, String value, StringBuffer err) {
 		if (value == null) {

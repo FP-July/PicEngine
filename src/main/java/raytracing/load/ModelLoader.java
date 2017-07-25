@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,15 +36,21 @@ public class ModelLoader {
 	private BufferedReader br = null;
 	
 	public static void main(String[] args) throws IOException {
-		ModelLoader ml = new ModelLoader("tmp.mods", true);
+		ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.NATIVE);
 		ArrayList<Primitive> scene = new ArrayList<Primitive>();
 		ml.parse(scene);
 		System.out.println(scene.size());
 	}
 	
-	public ModelLoader(String filePath, boolean locate) throws IOException {
-		if (locate) initLfs(filePath);
-		else initHdfs(filePath);
+	public ModelLoader(String filePath, URI hdfs_uri, BasicLoader.ENV env) throws IOException {
+		switch (env) {
+		case NATIVE:
+			initLfs(filePath);
+			break;
+		case HDFS:
+			initHdfs(hdfs_uri, filePath);
+			break;
+		}
 	}
 	
 	private void initLfs(String filePath) throws FileNotFoundException {
@@ -61,9 +68,11 @@ public class ModelLoader {
 		br = new BufferedReader(new InputStreamReader(new FileInputStream(modelPath.toString())));
 	}
 	
-	private void initHdfs(String filePath) throws IOException {
+	private void initHdfs(URI hdfs_uri, String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
+		FileSystem fs;
+		if (hdfs_uri != null) fs= FileSystem.get(hdfs_uri, conf);
+		else fs = FileSystem.get(conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);

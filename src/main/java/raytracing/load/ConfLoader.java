@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -19,11 +18,6 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import raytracing.Camera;
-import raytracing.trace.CameraTrace;
-import raytracing.trace.CameraTraceFactory;
-import task.TaskUtils;
-
 public class ConfLoader {
 	
 	private Logger logger = LoggerFactory.getLogger(ConfLoader.class);
@@ -32,7 +26,7 @@ public class ConfLoader {
 	private BufferedReader br = null;
 	
 	public static void main(String[] args) throws IOException {
-		ConfLoader cl = new ConfLoader("tmp.conf", true);
+		ConfLoader cl = new ConfLoader("tmp.conf", null, BasicLoader.ENV.NATIVE);
 		HashMap<String, String> opts = new HashMap<String, String>();
 		cl.parse(opts);
 		for (Entry<String, String> entry : opts.entrySet()) {
@@ -40,9 +34,15 @@ public class ConfLoader {
 		}
 	}
 	
-	public ConfLoader(String filePath, boolean locate) throws IOException {
-		if (locate) initLfs(filePath);
-		else initHdfs(filePath);
+	public ConfLoader(String filePath, URI hdfs_uri, BasicLoader.ENV env) throws IOException {
+		switch (env) {
+		case NATIVE:
+			initLfs(filePath);
+			break;
+		case HDFS:
+			initHdfs(hdfs_uri, filePath);
+			break;
+		}
 	}
 	
 	private void initLfs(String filePath) throws FileNotFoundException {
@@ -50,7 +50,7 @@ public class ConfLoader {
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
 			for (File f : files) {
-				if (f.getName().endsWith(".mods")) {
+				if (f.getName().endsWith(".conf")) {
 					confPath = new Path(f.getPath());
 				}
 			}
@@ -60,9 +60,11 @@ public class ConfLoader {
 		br = new BufferedReader(new InputStreamReader(new FileInputStream(confPath.toString())));
 	}
 	
-	private void initHdfs(String filePath) throws IOException {
+	private void initHdfs(URI hdfs_uri, String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
+		FileSystem fs;
+		if (hdfs_uri != null) fs= FileSystem.get(hdfs_uri, conf);
+		else fs = FileSystem.get(conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);
