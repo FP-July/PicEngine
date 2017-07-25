@@ -53,7 +53,7 @@ public class RunProj extends HttpServlet {
 			
 			if(status == ServletConstants.SUCCESS) {
 				// TODO send client success
-				resp.sendRedirect("...");
+				CommonProcess.sendMsgToClient(resp, ServletConstants.codeToString(status));
 			} else {
 				resp.sendError(status, ServletConstants.codeToString(status));
 			}

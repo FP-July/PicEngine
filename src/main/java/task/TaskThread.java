@@ -100,7 +100,7 @@ public class TaskThread extends Thread {
 			String progressDir = workingDir + File.separator + TaskUtils.PROGRESS_FILE;
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataOutputStream fOutputStream = fSystem.create(new Path(progressDir), true);
-			fOutputStream.writeChars(String.valueOf(progress));
+			fOutputStream.writeChars(String.valueOf(progress) + "\n");
 			fOutputStream.close();
 		} catch (Exception e) {
 			logger.error("update progress for {} of {} failed, because {}", taskName, username, e.toString());
@@ -116,7 +116,7 @@ public class TaskThread extends Thread {
 			progressTimer.cancel();
 			examineResult();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			logger.error("Task {} of {} failed because {}",
 					taskName, username, e.toString());
 			handleFailure();

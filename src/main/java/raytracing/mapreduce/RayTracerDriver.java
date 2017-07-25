@@ -1,5 +1,6 @@
 package raytracing.mapreduce;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,8 +95,9 @@ public class RayTracerDriver implements JobRegister, ITask {
 		conf.addResource(new Path(rootPath + "yarn-site.xml"));
  		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
-		
-		conf.set("mapreduce.job.jar", "RayTracerDriver.jar");
+		// TODO make this flexible
+		conf.set("mapreduce.job.jar", System.getProperty("catalina.home") + File.separator +
+														"wtpwebapps/PicEngine/" + "RayTracerDriver.jar");
 		conf.set("username", username);
 		conf.set("taskID", taskID);
 		conf.set("mr.job.name", username + "_" + taskID);
@@ -171,6 +173,6 @@ public class RayTracerDriver implements JobRegister, ITask {
 
 	@Override
 	public float getProgress() {
-		return 0;
+		return 0.0f;
 	}
 }

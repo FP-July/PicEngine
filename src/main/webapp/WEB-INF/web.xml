@@ -103,6 +103,39 @@
 		<servlet-name>TaskCreate</servlet-name>
 		<url-pattern>/taskcreate</url-pattern>
 	</servlet-mapping>
+	
+	<!-- TaskRun Servlet -->
+	<servlet>
+		<servlet-name>TaskRun</servlet-name>
+		<servlet-class>servlet.proj.RunProj</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TaskRun</servlet-name>
+		<url-pattern>/taskRun</url-pattern>
+	</servlet-mapping>
+	
+	<!-- TaskDelete Servlet -->
+	<servlet>
+		<servlet-name>TaskDelete</servlet-name>
+		<servlet-class>servlet.proj.DeleteProj</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TaskDelete</servlet-name>
+		<url-pattern>/taskDelete</url-pattern>
+	</servlet-mapping>
+	
+	<!-- TaskLog Servlet -->
+	<servlet>
+		<servlet-name>TaskLog</servlet-name>
+		<servlet-class>servlet.proj.GetLog</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TaskLog</servlet-name>
+		<url-pattern>/taskLog</url-pattern>
+	</servlet-mapping>
 
 </web-app>
 
