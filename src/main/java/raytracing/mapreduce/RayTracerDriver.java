@@ -183,10 +183,11 @@ public class RayTracerDriver implements JobRegister, ITask {
 				JobStateFlagCreator.createSuccessFlag(conf);
 			} else {
 				JobStateFlagCreator.createFailedFlag(conf);
+				throw new InterruptedException();
 			}
 		} catch (Exception e) {
 			JobStateFlagCreator.createFailedFlag(conf);
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
