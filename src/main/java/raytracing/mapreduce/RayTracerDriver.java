@@ -127,7 +127,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 			/** camera settings file input path <*.camera> */
-			CameraLoader cl = new CameraLoader("tmp.camera", URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
+			CameraLoader cl = new CameraLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
 			cl.parse(origCamera, cats);
 			
 			HashMap<String, String> opts = new HashMap<String, String>();
@@ -182,9 +182,11 @@ public class RayTracerDriver implements JobRegister, ITask {
 				JobStateFlagCreator.createSuccessFlag(conf);
 			} else {
 				JobStateFlagCreator.createFailedFlag(conf);
+				throw new InterruptedException();
 			}
 		} catch (Exception e) {
 			JobStateFlagCreator.createFailedFlag(conf);
+			throw e;
 		}
 	}
 
