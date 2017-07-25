@@ -18,6 +18,7 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 	
 	private Camera origCamera = null;
 	private double scope = 0.0;
+	private int frame;
 	private double step = 0.0;
 	private double angle = 0.0;
 	
@@ -88,7 +89,13 @@ public class RotationWithInHorizontalPlane extends CameraTrace {
 
 	@Override
 	public void setFrames(int frame) {
+		this.frame = frame;
 		step = scope / frame;
+	}
+	
+	@Override
+	public int getFrames() {
+		return frame;
 	}
 	
 	@Override

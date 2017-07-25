@@ -9,6 +9,7 @@ public abstract class CameraTrace {
 	public abstract void setTraceScope(double range);
 	
 	public abstract void setFrames(int frame);
+	public abstract int getFrames();
 	
 	/**
 	 * 0 < num < frame
