@@ -1,6 +1,7 @@
 package raytracing.mapreduce;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
@@ -11,6 +12,7 @@ import raytracing.Camera;
 import raytracing.Ray;
 import raytracing.RayTracing;
 import raytracing.Vec3d;
+import raytracing.load.BasicLoader;
 import raytracing.load.ModelLoader;
 import raytracing.mapreduce.RayTracerDriver.PARAMS;
 
@@ -24,7 +26,10 @@ public class RayTracerMapper
 		throws IOException, InterruptedException {
 	    Configuration conf = context.getConfiguration();
 	    String modelPath = conf.get(PARAMS.INPUT_PATH.name());
-	    ModelLoader ml = new ModelLoader(modelPath, false);
+	    URI hdfs_uri = null;
+	    String hdfs = conf.get(PARAMS.HDFS_URI.name());
+	    if (hdfs != null) hdfs_uri = URI.create(hdfs);
+	    ModelLoader ml = new ModelLoader(modelPath, hdfs_uri, BasicLoader.ENV.HDFS);
 	    ml.parse(rayTracing.getScene());
 	    
 	    rayTracing.setMaxRayDepth(conf.get(PARAMS.MAX_RAY_DEPTH.name()));

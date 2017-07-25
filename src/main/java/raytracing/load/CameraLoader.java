@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -20,12 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import raytracing.Camera;
 import raytracing.Vec3d;
-import raytracing.model.PrimFactory;
-import raytracing.model.Primitive;
 import raytracing.trace.CameraTrace;
 import raytracing.trace.CameraTraceFactory;
-import task.TaskUtils;
-import raytracing.model.PrimFactory.MOD;
 
 public class CameraLoader {
 	
@@ -40,7 +37,7 @@ public class CameraLoader {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		CameraLoader cl = new CameraLoader("tmp.camera", true);
+		CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.NATIVE);
 		HashMap<String, String> opts = new HashMap<String, String>();
 		Camera ca = null;
 		ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
@@ -51,9 +48,15 @@ public class CameraLoader {
 		System.out.println(cats.size());
 	}
 	
-	public CameraLoader(String filePath, boolean locate) throws IOException {
-		if (locate) initLfs(filePath);
-		else initHdfs(filePath);
+	public CameraLoader(String filePath, URI hdfs_uri, BasicLoader.ENV env) throws IOException {
+		switch (env) {
+		case NATIVE:
+			initLfs(filePath);
+			break;
+		case HDFS:
+			initHdfs(hdfs_uri, filePath);
+			break;
+		}
 	}
 	
 	private void initLfs(String filePath) throws FileNotFoundException {
@@ -61,7 +64,7 @@ public class CameraLoader {
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
 			for (File f : files) {
-				if (f.getName().endsWith(".mods")) {
+				if (f.getName().endsWith(".camera")) {
 					cameraPath = new Path(f.getPath());
 				}
 			}
@@ -71,9 +74,11 @@ public class CameraLoader {
 		br = new BufferedReader(new InputStreamReader(new FileInputStream(cameraPath.toString())));
 	}
 	
-	private void initHdfs(String filePath) throws IOException {
+	private void initHdfs(URI hdfs_uri, String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
+		FileSystem fs;
+		if (hdfs_uri != null) fs= FileSystem.get(hdfs_uri, conf);
+		else fs = FileSystem.get(conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);
@@ -150,12 +155,12 @@ public class CameraLoader {
 					}
 					
 					StringBuffer err = new StringBuffer();
-					Vec3d eye = BasicFunc.parseVectorProperty(Camera.Property.CAMERA_EYE.name(), opts.get(Camera.Property.CAMERA_EYE.name()), err);
-					Vec3d center = BasicFunc.parseVectorProperty(Camera.Property.CAMERA_CENTER.name(), opts.get(Camera.Property.CAMERA_CENTER.name()), err);
-					Vec3d up = BasicFunc.parseVectorProperty(Camera.Property.CAMERA_UP.name(), opts.get(Camera.Property.CAMERA_UP.name()), err);
-					Double fov = BasicFunc.parseDoubleProperty(Camera.Property.CAMERA_FOV.name(), opts.get(Camera.Property.CAMERA_FOV.name()), err);
-					Integer rows = BasicFunc.parseIntegerProperty(Camera.Property.CAMERA_HEIGHT.name(), opts.get(Camera.Property.CAMERA_HEIGHT.name()), err);
-					Integer cols = BasicFunc.parseIntegerProperty(Camera.Property.CAMERA_WIDTH.name(), opts.get(Camera.Property.CAMERA_WIDTH.name()), err);
+					Vec3d eye = BasicLoader.parseVectorProperty(Camera.Property.CAMERA_EYE.name(), opts.get(Camera.Property.CAMERA_EYE.name()), err);
+					Vec3d center = BasicLoader.parseVectorProperty(Camera.Property.CAMERA_CENTER.name(), opts.get(Camera.Property.CAMERA_CENTER.name()), err);
+					Vec3d up = BasicLoader.parseVectorProperty(Camera.Property.CAMERA_UP.name(), opts.get(Camera.Property.CAMERA_UP.name()), err);
+					Double fov = BasicLoader.parseDoubleProperty(Camera.Property.CAMERA_FOV.name(), opts.get(Camera.Property.CAMERA_FOV.name()), err);
+					Integer rows = BasicLoader.parseIntegerProperty(Camera.Property.CAMERA_HEIGHT.name(), opts.get(Camera.Property.CAMERA_HEIGHT.name()), err);
+					Integer cols = BasicLoader.parseIntegerProperty(Camera.Property.CAMERA_WIDTH.name(), opts.get(Camera.Property.CAMERA_WIDTH.name()), err);
 					ca.set(new Camera(eye, center, up, fov, rows, cols));
 					break;
 				/* 相机轨迹配置 */

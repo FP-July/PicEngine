@@ -15,6 +15,7 @@ import javax.imageio.stream.FileImageOutputStream;
 
 import org.apache.hadoop.util.hash.Hash;
 
+import raytracing.load.BasicLoader;
 import raytracing.load.CameraLoader;
 import raytracing.load.ConfLoader;
 import raytracing.load.ModelLoader;
@@ -27,16 +28,16 @@ public class Main {
 	private static int superSamplingTimes = 3;
 	
 	public static void main(String[] args) throws IOException {
-		ModelLoader ml = new ModelLoader("tmp.mods", true);
+		ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.NATIVE);
 		ml.parse(rayTracing.getScene());
 		
-		CameraLoader cl = new CameraLoader("tmp.camera", true);
+		CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.NATIVE);
 		Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 		ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 		cl.parse(origCamera, cats);
 
 		HashMap<String, String> opts = new HashMap<String, String>();
-		ConfLoader confLoader = new ConfLoader("tmp.conf", true);
+		ConfLoader confLoader = new ConfLoader("tmp.conf", null, BasicLoader.ENV.NATIVE);
 		confLoader.parse(opts);
 		
 		rayTracing.setMaxRayDepth(opts.getOrDefault("MAX_RAY_DEPTH", "5"));
