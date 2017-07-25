@@ -40,7 +40,7 @@ public class TaskTest {
 	public void testSuccess() throws IOException, InterruptedException {
 		String username = "admin";
 		String taskName = "runTest";
-		String taskType = Task.debug;
+		String taskType = Task.picture;
 		projDao.createProj(taskName, username, Task.video);
 		String taskID = String.valueOf(projDao.findProj(username, taskName).projID);
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
