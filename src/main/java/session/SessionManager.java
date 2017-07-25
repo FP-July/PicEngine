@@ -1,5 +1,6 @@
-package sessionManager;
+package session;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import servlet.ServletConstants;
@@ -34,14 +35,18 @@ public class SessionManager {
 	 * @return false if session does not exist or expire
 	 */
 	static public boolean testSession(String username, String sessionID) {
-		Session session = sessionMap.get(username);
+		return true;
+		/*Session session = sessionMap.get(username);
 		if(session == null)
 			return false;
 		boolean valid = session.expireTime > System.currentTimeMillis() && session.SessionID.equals(sessionID);
-		if(valid)
+		if(valid) {
 			session.expireTime = Math.max(System.currentTimeMillis() + 
 					ServletConstants.SESSION_EXPANSION, session.expireTime);
-		return valid;
+			sessionMap.put(username, session);
+		}
+			
+		return valid;*/
 	}
 
 	/** abort a session, usually when a user log out

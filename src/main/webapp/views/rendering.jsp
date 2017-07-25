@@ -144,15 +144,31 @@
                         <%=task.getDate()%>
                     </td>
                     <td>
+	                    <% if(task.getType().equals(Task.ongoing)){
+	                    %>
                         <div class="progress progress-striped active">
                             <div class="bar bar-<%=color%>" style="width: <%=task.getPercent()%>%;"></div>
                         </div>
+                        <%
+	                    	} else {
+                        %>
+                        	未启动
+                        <%
+	                    	}
+                        %>
                     </td>
                     <td>
                         <%=hours%> 时 <%=minutes%> 分
                     </td>
                     <td>
-                        <button class="btn btn-small btn-danger">删除</button>
+                    <button class="btn btn-small btn-danger" onclick="deleteTask('<%=task.getUsername()%>','<%=task.getName()%>')">删除</button>
+                   		 <%
+                   		 if(task.getState().equals(Task.init)) {
+                   		 %>
+						 <button class="btn btn-small btn-primary" onclick="runTask('<%=task.getUsername()%>','<%=task.getName()%>')">运行</button>
+						 <%
+                   		 	}
+						 %>
                     </td>
                 </tr>
                 <%
@@ -191,5 +207,6 @@
 <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="../vendor/cookie/jquery.cookie.js"></script>
 <script src="../js/navbar.js"></script>
+<script src="../js/taskOperations.js"></script>
 </body>
 </html>

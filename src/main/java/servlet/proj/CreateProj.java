@@ -29,6 +29,7 @@ import dao.ProjDao;
 import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
+import task.TaskUtils;
 
 public class CreateProj extends HttpServlet {
 
@@ -37,7 +38,8 @@ public class CreateProj extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	// 上传文件存储目录
-	private static final String UPLOAD_DIRECTORY = "hdfs://localhost:9000/userfiles";
+	private static final URI HDFS_URI = TaskUtils.HDFS_URI;
+	private static final String UPLOAD_DIRECTORY = "/userfiles";
 	private static final String USER_SRC_FOLDER = "src";
 
 	// 上传配置
@@ -130,27 +132,34 @@ public class CreateProj extends HttpServlet {
 			res.sendError(ServletConstants.LACK_ARG, argLack);
 			return;
 		}
+		session.setAttribute("username", username);
 		//System.out.println("[create] " + username + " " + taskName + " " + taskType + " " + fileItems.size() + " files");
 		try {
-			DaoManager daoManager = DaoManager.getInstance();
-			ProjDao projDao = daoManager.getProjDao();
-			int status = projDao.createProj(taskName, username, taskType);
-			if (status == DBConstants.SUCCESS) {
-				session.setAttribute("username", username);
-				status = uploadToHDFS(username, taskName, fileItems, projDao);
-				if(status == ServletConstants.SUCCESS)
-					req.getRequestDispatcher("views/create_success.jsp").forward(req, res);
-				else
-					res.sendError(status, ServletConstants.codeToString(status));
-			} else {
-				res.sendError(status, DBConstants.codeToString(status));
-			}
+			int status = createTask(taskName, username, taskType, fileItems);
+			if(status == ServletConstants.SUCCESS)
+				req.getRequestDispatcher("views/create_success.jsp").forward(req, res);
+			else
+				res.sendError(status, ServletConstants.codeToString(status));
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			CommonProcess.dataBaseFailure(res, e);
 		}
 	}
 
+	private int createTask(String taskName, String username, String taskType, List<FileItem> fileItems) throws ClassNotFoundException, SQLException {
+		DaoManager daoManager = DaoManager.getInstance();
+		ProjDao projDao = daoManager.getProjDao();
+		int status = projDao.createProj(taskName, username, taskType);
+		if (status == DBConstants.SUCCESS) {
+			if(fileItems != null) {
+				status = uploadToHDFS(username, taskName, fileItems, projDao);
+			}
+			return status;
+		} else {
+			return status;
+		}
+	}
+	
 	/**
 	 * upload user file onto HDFS
 	 * 
@@ -178,7 +187,7 @@ public class CreateProj extends HttpServlet {
 		conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
 
 		try {
-			fSystem = FileSystem.get(URI.create(UPLOAD_DIRECTORY), conf);
+			fSystem = FileSystem.get(HDFS_URI, conf);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return ServletConstants.HADOOP_FS_CRASH;

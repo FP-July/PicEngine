@@ -27,8 +27,23 @@ PicEngine.iml
 /target/
 
 \.project
-
 \.classpath
-
 \.settings/
+
 /bin/
+/build/
+
+# Eclipse settings file
+.classpath
+.project
+.settings/
+
+# lib jar package
+target/
+
+# output
+*.bmp
+image*
+
+# tmp
+tmp*

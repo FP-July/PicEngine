@@ -1,0 +1,87 @@
+# id : 1, Sphere
+_sphere_init:
+
+center = 10.0, -4.0, 0.0
+radius = 2.0
+# r, g, b
+surfaceColor = 0.40, 0.57, 0.74
+emissionColor = 0.0, 0.0, 0.0
+
+reflection = 0.0
+transparency = 0.3
+end
+
+# id : 2, Sphere
+_sphere_init:
+
+center = 22.0, 5.0, 0.0
+radius = 4.0
+# r, g, b
+surfaceColor = 1.00, 0.32, 0.36
+emissionColor = 0.0, 0.0, 0.0
+
+reflection = 1.0
+transparency = 0.5
+end
+
+# id : 3, Sphere
+_sphere_init:
+
+center = 15.0, -3.0, -2.0
+radius = 2.0
+# r, g, b
+surfaceColor = 0.90, 0.76, 0.46
+emissionColor = 0.0, 0.0, 0.0
+
+reflection = 1.0
+transparency = 0.7
+end
+
+# id : 4, Sphere
+_sphere_init:
+
+center = 25.0, 0.0, 10.0
+radius = 3.0
+# r, g, b
+surfaceColor = 0.65, 0.77, 0.57
+emissionColor = 0.0, 0.0, 0.0
+
+reflection = 1.0
+transparency = 0.0
+end
+
+# id : 5, Sphere
+_sphere_init:
+
+center = 15.0, 2.0, 0.0
+radius = 3
+# r, g, b
+surfaceColor = 0.90, 0.90, 0.90
+emissionColor = 0.0, 0.0, 0.0
+
+reflection = 1.0
+transparency = 0.3
+end
+
+# id : 6, Sphere, This is a light
+_sphere_init:
+
+center = -1000.0, 0.0, 11000.0
+radius = 10000.0
+# r, g, b
+surfaceColor = 0.20, 0.20, 0.20
+emissionColor = 1.0, 1.0, 1.0
+
+reflection = 0.3
+transparency = 0.0
+end
+
+# id : 7, Plane
+_plane_init:
+
+center = 0.0, 0.0, -4.0
+norm = 0.0, 0.0, 1.0
+# r, g, b
+surfaceColor = 0.3, 0.3, 0.3
+emissionColor = 0.0, 0.0, 0.0
+end

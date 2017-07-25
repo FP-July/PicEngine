@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import javax.servlet.http.HttpSession;
 
 import bean.Task;
 import model.ProjInfo;
-import sessionManager.SessionManager;
+import session.SessionManager;
+import task.TaskUtils;
 
 public class CommonProcess {
 	
@@ -83,8 +85,9 @@ public class CommonProcess {
 	 */
 	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos, String targetPage) throws IOException {
 		List<Task> taskList = new ArrayList<>();
-		for(ProjInfo info : infos) 
+		for(ProjInfo info : infos) {
 			taskList.add(info.convertToTask());
+		}
 		HttpSession session = req.getSession();
 		session.setAttribute("taskList", taskList);
 		try {
@@ -92,5 +95,12 @@ public class CommonProcess {
 		} catch (ServletException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void sendMsgToClient(HttpServletResponse response, String msg) throws IOException {
+		PrintWriter pWriter = response.getWriter();
+		pWriter.write(msg);
+		pWriter.flush();
+		pWriter.close();
 	}
 }

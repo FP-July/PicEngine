@@ -9,6 +9,7 @@ public class Task {
 
     public static final String picture = "图像渲染";
     public static final String video = "视频渲染";
+    public static final String debug = "debug";
     
     public static final String init = "初始化";
     public static final String ready = "就绪";
@@ -19,6 +20,7 @@ public class Task {
 
     private int id;
     private String name;
+    private String username;
     private String type;
     private String state;
     private String fileLocation;
@@ -93,4 +95,12 @@ public class Task {
     public void setPercent(int percent) {
         this.percent = percent;
     }
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 }

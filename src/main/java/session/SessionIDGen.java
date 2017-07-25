@@ -1,4 +1,4 @@
-package sessionManager;
+package session;
 
 public class SessionIDGen {
 	/** use username + currentTime and MD5 to generate sessionID 

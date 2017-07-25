@@ -12,8 +12,8 @@ import dao.DBConstants;
 import dao.DaoManager;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
-import sessionManager.SessionIDGen;
-import sessionManager.SessionManager;
+import session.SessionIDGen;
+import session.SessionManager;
 
 import java.io.IOException;
 

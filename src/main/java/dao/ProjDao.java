@@ -260,5 +260,50 @@ public class ProjDao {
 		return null;
 	}
 	
+	/** find projs of all users by given int filed
+	 * @param username
+	 * @param fieldName
+	 * @param value
+	 * @return list of projs
+	 */
+	public List<ProjInfo> findAllProjsByInt(String fieldName, int value) {
+		String sql = "SELECT * FROM " + DBConstants.PROJ_TABLE + " WHERE "
+				 + fieldName + "=" + value + ";";
+		try {
+			ResultSet set = statement.executeQuery(sql);
+			List<ProjInfo> list = new ArrayList<>();
+			while (set.next()) {
+				list.add(ProjInfo.fromSQLResult(set));
+			}
+			return list;
+		} catch (SQLException e) {
+			logger.error("error occured when listing proj " + sql + "\n" + e.toString());
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/** find projs of all users by given string filed
+	 * @param username
+	 * @param fieldName
+	 * @param value
+	 * @return list of projs
+	 */
+	public List<ProjInfo> findAllProjsByString(String fieldName, String value) {
+		String sql = "SELECT * FROM " + DBConstants.PROJ_TABLE + " WHERE "
+					+ fieldName + "='" + value + "';";
+		try {
+			ResultSet set = statement.executeQuery(sql);
+			List<ProjInfo> list = new ArrayList<>();
+			while (set.next()) {
+				list.add(ProjInfo.fromSQLResult(set));
+			}
+			return list;
+		} catch (SQLException e) {
+			logger.error("error occured when listing proj " + sql + "\n" + e.toString());
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 }

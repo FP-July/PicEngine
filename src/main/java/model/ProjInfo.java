@@ -85,6 +85,7 @@ public class ProjInfo {
 		task.setName(projName);
 		task.setPercent(progress);
 		task.setMinutes(runtime);
+		task.setUsername(username);
 		
 		return task;
 	}

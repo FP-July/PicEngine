@@ -49,9 +49,7 @@ public class DaoManager {
 	
 	private void createTables() throws SQLException {
 		for(String sql : DBConstants.tableCreateSQL) {
-			boolean success = statement.execute(sql);
-			if(!success)
-				logger.error("sql " + sql + " fails to excute");
+			statement.execute(sql);
 		}
 	}
 	
