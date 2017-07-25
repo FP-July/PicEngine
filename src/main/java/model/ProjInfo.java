@@ -22,9 +22,10 @@ public class ProjInfo {
 	public String projName;
 	public String type;
 	public int status;
-	public int runtime;
+	public long runtime;
 	public int progress;
 	public long createTime;
+	public long finishedTime;
 	
 	public static ProjInfo fromSQLResult(ResultSet set) {
 		try {
@@ -35,10 +36,11 @@ public class ProjInfo {
 			info.username = set.getString("username");
 			info.projName = set.getString("projName");
 			info.status = set.getInt("status");
-			info.runtime = set.getInt("runtime");
+			info.runtime = set.getLong("runtime");
 			info.progress = set.getInt("progress");
 			info.createTime = set.getLong("createTime");
 			info.type = set.getString("type");
+			info.finishedTime = set.getLong("finishedTime");
 			return info;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -55,6 +57,7 @@ public class ProjInfo {
 		jsonObject.put("progress", progress);
 		jsonObject.put("createTime", createTime);
 		jsonObject.put("type", type);
+		jsonObject.put("finsihedTime", finishedTime);
 	
 		return jsonObject;
 	}
@@ -84,7 +87,11 @@ public class ProjInfo {
 		task.setFileLocation(username + "/" + projID);
 		task.setName(projName);
 		task.setPercent(progress);
-		task.setMinutes(runtime);
+		long minutes = finishedTime > runtime ? (finishedTime - runtime) / (1000 * 60) : 
+			(System.currentTimeMillis() - runtime)/ (1000 * 60);
+		task.setMinutes(minutes);
+		task.setUsername(username);
+		task.setFinishedTime(finishedTime);
 		
 		return task;
 	}

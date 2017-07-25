@@ -12,9 +12,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.hadoop.mapred.JobStatus;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Job.JobState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +85,7 @@ public class TaskThread extends Thread {
 		ProjDao projDao = daoManager.getProjDao();
 		if(findSuccess) {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.finished.ordinal());
+			projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
 		} else {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.error.ordinal());
 		}
@@ -100,11 +99,14 @@ public class TaskThread extends Thread {
 			String progressDir = workingDir + File.separator + TaskUtils.PROGRESS_FILE;
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataOutputStream fOutputStream = fSystem.create(new Path(progressDir), true);
-			fOutputStream.writeChars(String.valueOf(progress));
+			fOutputStream.writeFloat(progress);
+			fOutputStream.write('\n');
+			fOutputStream.flush();
 			fOutputStream.close();
 		} catch (Exception e) {
 			logger.error("update progress for {} of {} failed, because {}", taskName, username, e.toString());
-			e.printStackTrace();
+			if(!(e instanceof IllegalStateException))
+				e.printStackTrace();
 		}
 	}
 	
@@ -116,7 +118,7 @@ public class TaskThread extends Thread {
 			progressTimer.cancel();
 			examineResult();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			logger.error("Task {} of {} failed because {}",
 					taskName, username, e.toString());
 			handleFailure();

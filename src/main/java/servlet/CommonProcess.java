@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,5 +95,12 @@ public class CommonProcess {
 		} catch (ServletException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void sendMsgToClient(HttpServletResponse response, String msg) throws IOException {
+		PrintWriter pWriter = response.getWriter();
+		pWriter.write(msg);
+		pWriter.flush();
+		pWriter.close();
 	}
 }

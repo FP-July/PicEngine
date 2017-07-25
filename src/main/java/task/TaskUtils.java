@@ -36,6 +36,8 @@ public class TaskUtils {
 	public static final String HADOOP_LOG_FILE = "Hadoop_log"; // this is for hadoop-generated log 
 	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";  // where hadoop-generated logs naturally placed
 	
+	public static final String MR_JAR_PATH = System.getProperty("catalina.home") + File.separator + "wtpwebapps/PicEngine/";
+	
 	public static final URI HDFS_URI = URI.create("hdfs://localhost:9000/");
 	
 	public static String getWorkingDir(String username, String taskID) {
@@ -97,10 +99,9 @@ public class TaskUtils {
 		try {
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataInputStream iStream = fSystem.open(new Path(progressDir));
-			String line = iStream.readLine();
-			return Float.parseFloat(line);
+			return iStream.readFloat();
 				
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("failed to get fs when getting progress, for {}",e.toString());
 		}
 		return -1.0f;
@@ -126,7 +127,7 @@ public class TaskUtils {
 	
 	public static List<String> getLogs(String username, int taskID) throws IOException {
 		List<String> list = localGetLogs(username, taskID);
-		if(list != null) {
+		if(list.size() != 0) {
 			return list;
 		} else {
 			list = remoteGetLogs(username, taskID);
@@ -143,6 +144,7 @@ public class TaskUtils {
 	private static List<String> localGetLogs(String username, int taskID) throws IOException {
 		String workingDir = getWorkingDir(username, String.valueOf(taskID));
 		String hadoop_log = getHadoopLogPath(workingDir);
+		String MR_log = getMRLogPath(workingDir);
 		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
 		Path logPath = new Path(hadoop_log);
 		
@@ -155,9 +157,20 @@ public class TaskUtils {
 				if(line.length() > 0)
 					list.add(line);
 			}
-			return list;
+			bReader.close();
 		}
-		return null;
+		logPath = new Path(MR_log);
+		if(fSystem.exists(logPath)) {
+			FSDataInputStream iStream = fSystem.open(logPath);
+			BufferedReader bReader = new BufferedReader(new InputStreamReader(iStream));
+			String line;
+			while((line = bReader.readLine()) != null) {
+				if(line.length() > 0)
+					list.add(line);
+			}
+			bReader.close();
+		}
+		return list;
 	}
 	
 	/** search the log dir, find the log file corresponding to username and taskName
@@ -191,9 +204,9 @@ public class TaskUtils {
 		return list;
 	}
 
-	/** check the status of a task by looking for _temporary and _SUCCESS
-	 *  notice : the task to be checked is assumed started, so if neither of above are
-	 *  found, the task will be marked error
+	/** check the status of a task by looking for _SUCCESS
+	 *  notice : the task to be checked is assumed started, so if none of above are
+	 *  found, the task will be marked ongoing
 	 * @param username
 	 * @param taskID
 	 * @return new status
@@ -203,15 +216,13 @@ public class TaskUtils {
 	public static int checkStatus(String username, String taskID) throws IllegalArgumentException, IOException {
 		String workingDir = getWorkingDir(username, taskID);
 		String resultDir = getResultDir(workingDir);
-		String tempDir = resultDir + File.separator + "_temporary";
 		String successFile = resultDir + File.separator + "_SUCCESS";
 		FileSystem fSystem = FileSystem.get(HDFS_URI, new Configuration());
-		if(fSystem.exists(new Path(tempDir))) {
-			return ProjInfo.statusEnum.ongoing.ordinal();
-		} else if(fSystem.exists(new Path(successFile))) {
+		// TODO detect dead task
+		if(fSystem.exists(new Path(successFile))) {
 			return ProjInfo.statusEnum.finished.ordinal();
 		} else {
-			return ProjInfo.statusEnum.error.ordinal();
+			return ProjInfo.statusEnum.ongoing.ordinal();
 		}
 	}
 	
