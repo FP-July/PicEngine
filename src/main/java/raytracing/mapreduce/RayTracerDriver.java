@@ -75,15 +75,23 @@ public class RayTracerDriver implements JobRegister, ITask {
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
 			
-			Camera camera = origCamera;
-		    render(camera, conf, processedJobNum);
-		    for (CameraTrace cat : cats) {
-		    	cat.setInitCameraLocation(camera);
-		    	while ((camera = cat.getNextCameraFrame()) != null) {
-				    processedJobNum ++;
-			    	render(camera, conf, processedJobNum);
-			    } 
-		    }
+			boolean _SUCC = false;
+			try {
+				Camera camera = origCamera;
+			    _SUCC = render(camera, conf, processedJobNum);
+			    for (CameraTrace cat : cats) {
+			    	cat.setInitCameraLocation(camera);
+			    	while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
+					    processedJobNum ++;
+				    	_SUCC = render(camera, conf, processedJobNum);
+				    } 
+			    }
+			} catch (Exception e) {
+				_SUCC = false;
+			}
+			
+			if (_SUCC) JobStateFlagCreator.createSuccessFlag(conf);
+			else JobStateFlagCreator.createFailedFlag(conf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -139,22 +147,30 @@ public class RayTracerDriver implements JobRegister, ITask {
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
 			
-			Camera camera = origCamera;
-			int i = 0;
-		    render(camera, conf, i);
-		    for (CameraTrace cat : cats) {
-		    	cat.setInitCameraLocation(camera);
-		    	while ((camera = cat.getNextCameraFrame()) != null) {
-				    i ++;
-			    	render(camera, conf, i);
-			    } 
-		    }
+			boolean _SUCC = false;
+			try {
+				Camera camera = origCamera;
+				int i = 0;
+			    _SUCC = render(camera, conf, i);
+			    for (CameraTrace cat : cats) {
+			    	cat.setInitCameraLocation(camera);
+			    	while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
+					    i ++;
+				    	_SUCC = render(camera, conf, i);
+				    } 
+			    }
+			} catch (Exception e) {
+				_SUCC = false;
+			}
+			
+			if (_SUCC) JobStateFlagCreator.createSuccessFlag(conf);
+			else JobStateFlagCreator.createFailedFlag(conf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void render(Camera camera, Configuration conf, int id) 
+	public boolean render(Camera camera, Configuration conf, int id) 
 		throws IOException, ClassNotFoundException, InterruptedException {
 		conf.set(PARAMS.OUTPUT_FILE_NAME.name(), "image" + id + ".jpg");
 		
@@ -178,17 +194,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		job.setMapOutputValueClass(Text.class);
 		job.setOutputFormatClass(NullOutputFormat.class);
 		
-		try {
-			if (job.waitForCompletion(true)) {
-				JobStateFlagCreator.createSuccessFlag(conf);
-			} else {
-				JobStateFlagCreator.createFailedFlag(conf);
-				throw new InterruptedException();
-			}
-		} catch (Exception e) {
-			JobStateFlagCreator.createFailedFlag(conf);
-			throw e;
-		}
+		return job.waitForCompletion(true);
 	}
 
 	@Override
