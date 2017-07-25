@@ -108,7 +108,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 			cl.parse(origCamera, cats);
 			
 			HashMap<String, String> opts = new HashMap<String, String>();
-			ConfLoader confLoader = new ConfLoader("tmp.conf", true);
+			ConfLoader confLoader = new ConfLoader(inputPath, false);
 			confLoader.parse(opts);
 			
 			/** models settings file input path <*.mods> */
@@ -166,5 +166,11 @@ public class RayTracerDriver implements JobRegister, ITask {
 	@Override
 	public Job getJob() {
 		return job;
+	}
+
+
+	@Override
+	public float getProgress() {
+		return 0;
 	}
 }

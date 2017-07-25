@@ -95,13 +95,12 @@ public class TaskThread extends Thread {
 	private void updateProgress() {
 		Job job = task.getJob();
 		try {
-			float mapProgress = job.mapProgress();
-			float reduceProgress = job.reduceProgress();
+			float progress = task.getProgress();
 			String workingDir = TaskUtils.getWorkingDir(username, taskID);
 			String progressDir = workingDir + File.separator + TaskUtils.PROGRESS_FILE;
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataOutputStream fOutputStream = fSystem.create(new Path(progressDir), true);
-			fOutputStream.writeChars(mapProgress + "," + reduceProgress);
+			fOutputStream.writeChars(String.valueOf(progress));
 			fOutputStream.close();
 		} catch (Exception e) {
 			logger.error("update progress for {} of {} failed, because {}", taskName, username, e.toString());

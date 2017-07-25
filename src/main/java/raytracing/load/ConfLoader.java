@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import raytracing.Camera;
 import raytracing.trace.CameraTrace;
 import raytracing.trace.CameraTraceFactory;
+import task.TaskUtils;
 
 public class ConfLoader {
 	
@@ -60,7 +62,7 @@ public class ConfLoader {
 	
 	private void initHdfs(String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);
@@ -69,7 +71,7 @@ public class ConfLoader {
 				if (lfs.isDirectory()) continue;
 				
 				path = lfs.getPath();
-				if (path.getName().endsWith(".camera")) {
+				if (path.getName().endsWith(".conf")) {
 					confPath = path;
 					break;
 				}

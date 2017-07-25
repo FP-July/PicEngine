@@ -43,12 +43,8 @@ public class FindOngoingProj extends HttpServlet {
 			List<ProjInfo> ongoingInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ongoing.ordinal());
 			// get progress for ongoing tasks
 			for(ProjInfo info : ongoingInfos) {
-				float[] progress = TaskUtils.getProgress(username, info.projName);
-				if(progress != null) {
-					info.progress = (int)((progress[0] + progress[1]) / 2);
-				} else {
-					info.progress = -1;
-				}
+				float progress = TaskUtils.getProgress(username, info.projName);
+				info.progress = (int) (progress*100);
 			}
 			List<ProjInfo> initInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
 			List<ProjInfo> readyInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ready.ordinal());

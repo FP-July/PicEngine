@@ -70,25 +70,25 @@ public class TaskUtils {
 	 * @param taskName
 	 * @return {mapProgress, reduceProgress}
 	 */
-	public static float[] getProgress(String username, String taskName) {
+	public static float getProgress(String username, String taskName) {
 		DaoManager daoManager = null;
 		try {
 			daoManager = DaoManager.getInstance();
 		} catch (ClassNotFoundException | SQLException e) {
 			logger.error("failed to get dao when getting progress, for {}",e.toString());
-			return null;
+			return -1.0f;
 		}
 		ProjDao projDao = daoManager.getProjDao();
 		
 		ProjInfo info = projDao.findProj(username, taskName);
 		if(info == null) {
 			logger.error("can not find task {} of {}",taskName, username);
-			return null;
+			return -1.0f;
 		}
 		if(info.status == ProjInfo.statusEnum.finished.ordinal()) 
-			return new float[]{1.0f, 1.0f};
+			return -1.0f;
 		else if(info.status != ProjInfo.statusEnum.ongoing.ordinal()) {
-			return new float[]{-1.0f, -1.0f};
+			return -1.0f;
 		}
 		
 		String taskID = String.valueOf(info.projID);
@@ -98,19 +98,12 @@ public class TaskUtils {
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataInputStream iStream = fSystem.open(new Path(progressDir));
 			String line = iStream.readLine();
-			String[] sections = line.split(",");
-			if(sections.length < 2) 
-				return null;
-			else {
-				float mapProgress = Float.parseFloat(sections[0]);
-				float reduceProgress = Float.parseFloat(sections[1]);
-				return new float[] {mapProgress, reduceProgress};
-			}
+			return Float.parseFloat(line);
 				
 		} catch (IOException e) {
 			logger.error("failed to get fs when getting progress, for {}",e.toString());
 		}
-		return null;
+		return -1.0f;
 	}
 
 	

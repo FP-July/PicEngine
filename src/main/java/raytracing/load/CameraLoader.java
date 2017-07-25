@@ -24,6 +24,7 @@ import raytracing.model.PrimFactory;
 import raytracing.model.Primitive;
 import raytracing.trace.CameraTrace;
 import raytracing.trace.CameraTraceFactory;
+import task.TaskUtils;
 import raytracing.model.PrimFactory.MOD;
 
 public class CameraLoader {
@@ -72,7 +73,7 @@ public class CameraLoader {
 	
 	private void initHdfs(String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);

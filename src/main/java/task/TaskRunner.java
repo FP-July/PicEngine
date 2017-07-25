@@ -36,7 +36,7 @@ public class TaskRunner {
 		ITask task = TaskFactory.create(taskType);
 		try {
 			TaskThread taskThread = new TaskThread();
-			taskThread.setup(new TaskFrame(), username, taskID, taskName, args);
+			taskThread.setup(task, username, taskID, taskName, args);
 			ProjDao projDao = DaoManager.getInstance().getProjDao();
 			int status = projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.ongoing.ordinal());
 			if(status != ServletConstants.SUCCESS) {

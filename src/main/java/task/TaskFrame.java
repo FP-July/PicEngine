@@ -185,4 +185,10 @@ public class TaskFrame implements ITask {
 	public Job getJob() {
 		return job;
 	}
+
+	@Override
+	public float getProgress() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

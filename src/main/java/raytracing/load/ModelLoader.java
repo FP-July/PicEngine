@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import raytracing.model.PrimFactory.MOD;
+import task.TaskUtils;
 import raytracing.model.PrimFactory;
 import raytracing.model.Primitive;
 
@@ -62,7 +63,7 @@ public class ModelLoader {
 	
 	private void initHdfs(String filePath) throws IOException {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+		FileSystem fs = FileSystem.get(TaskUtils.HDFS_URI, conf);
 		Path path = new Path(filePath);
 		if (fs.isDirectory(path)) {
 			RemoteIterator<LocatedFileStatus> it = fs.listFiles(path, false);
