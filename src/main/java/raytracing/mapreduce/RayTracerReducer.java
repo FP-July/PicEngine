@@ -56,7 +56,8 @@ public class RayTracerReducer
 		FileSystem fs = FileSystem.get(conf);
 		
 		Path path = new Path(conf.get(PARAMS.OUTPUT_PATH.name()));
-		OutputStream fos = fs.create(path, true);
+		Path filePath = new Path(path, conf.get(PARAMS.OUTPUT_FILE_NAME.name()));
+		OutputStream fos = fs.create(filePath, true);
 	    
 	    ImageOutputStream stream = null;
         try {
