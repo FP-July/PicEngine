@@ -10,9 +10,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+import org.mortbay.log.Log;
 
 import main.JobRegister;
 import raytracing.Camera;
@@ -22,6 +22,11 @@ import raytracing.hadoop.PixelInputFormat;
 import raytracing.load.BasicLoader;
 import raytracing.load.CameraLoader;
 import raytracing.load.ConfLoader;
+import raytracing.load.ModelLoader;
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
+import raytracing.mapreduce.RayTracerDriver.PARAMS;
+import raytracing.model.Primitive;
 import raytracing.trace.CameraTrace;
 import task.ITask;
 import task.TaskUtils;
@@ -38,7 +43,8 @@ public class RayTracerDriver implements JobRegister, ITask {
 		OUTPUT_FILE_NAME,
 		HDFS_URI,
 		MAX_RAY_DEPTH,
-		SUPER_SAMPLING_TIMES
+		SUPER_SAMPLING_TIMES,
+		ILOG
 	}
 	
 	@Override
@@ -49,27 +55,41 @@ public class RayTracerDriver implements JobRegister, ITask {
 		String outputPath = "image";
 		
 		try {
+			String logDir = "log";
+			LogFactory.setParams(logDir, BasicLoader.ENV.HDFS);
+			
 			FileSystem fs = FileSystem.get(conf);
 			if (fs.exists(new Path(outputPath)))
 				fs.delete(new Path(outputPath), true);
+			if (fs.exists(new Path(logDir)))
+				fs.delete(new Path(logDir), true);
 			
-			/** models settings file input path <*.mods> */
-			conf.set(PARAMS.INPUT_PATH.name(), "tmp.mods");
+			/**
+			 * Load ray tracing configration file  
+			 */
 			
+			/** camera settings file input path <*.camera> */
 			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
-			/** camera settings file input path <*.camera> */
 			CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.HDFS);
 			cl.parse(origCamera, cats);
-			
-			for (CameraTrace cat : cats) {
-				totalJobNum += cat.getFrames();
-			}
-			
+			cl.close();
+
+			/** global settings file input path <*.conf> */
 			HashMap<String, String> opts = new HashMap<String, String>();
 			ConfLoader confLoader = new ConfLoader("tmp.conf", null, BasicLoader.ENV.HDFS);
 			confLoader.parse(opts);
+			confLoader.close();
 
+			/** models settings file input path <*.mods> */
+		    ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.HDFS);
+		    ml.parse(new ArrayList<Primitive>());
+		    ml.close();
+			
+			/**
+			 *  map reduce configration set 
+			 */
+			conf.set(PARAMS.INPUT_PATH.name(), "tmp.mods");
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
@@ -94,6 +114,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		/* flush log */
+		ILog log = LogFactory.getInstance(PARAMS.ILOG.name());
+		log.close();
 	}
 	
 	
@@ -106,6 +130,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		}
 
 		String username = otherArgs[0];
+		@SuppressWarnings("unused")
 		String taskName = otherArgs[1];
 		String taskID = otherArgs[2];
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
@@ -113,6 +138,9 @@ public class RayTracerDriver implements JobRegister, ITask {
 		String outputPath = TaskUtils.getResultDir(workingDir);
 		String logDir = TaskUtils.getMRLogPath(workingDir);
 		String rootPath = otherArgs[3];
+		
+		LogFactory.setHdfsUri(TaskUtils.HDFS_URI);
+		LogFactory.setParams(logDir, BasicLoader.ENV.HDFS);
 		
 		FileSystem fs = FileSystem.get(conf);
 		if (fs.exists(new Path(outputPath)))
@@ -128,20 +156,33 @@ public class RayTracerDriver implements JobRegister, ITask {
 		conf.set("mr.job.name", username + "_" + taskID);
 		
 		try {
-			/** models settings file input path <*.mods> */
-			conf.set(PARAMS.INPUT_PATH.name(), inputPath);
-			conf.set(PARAMS.HDFS_URI.name(), TaskUtils.HDFS_URI.toString());
+			/**
+			 * Load ray tracing configration file  
+			 */
 			
+			/** camera settings file input path <*.camera> */
 			Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 			ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
-			/** camera settings file input path <*.camera> */
-			CameraLoader cl = new CameraLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
+			CameraLoader cl = new CameraLoader(inputPath, TaskUtils.HDFS_URI, BasicLoader.ENV.HDFS);
 			cl.parse(origCamera, cats);
-			
-			HashMap<String, String> opts = new HashMap<String, String>();
-			ConfLoader confLoader = new ConfLoader(inputPath, URI.create(conf.get(PARAMS.HDFS_URI.name())), BasicLoader.ENV.HDFS);
-			confLoader.parse(opts);
+			cl.close();
 
+			/** global settings file input path <*.conf> */
+			HashMap<String, String> opts = new HashMap<String, String>();
+			ConfLoader confLoader = new ConfLoader(inputPath, TaskUtils.HDFS_URI, BasicLoader.ENV.HDFS);
+			confLoader.parse(opts);
+			confLoader.close();
+
+			/** models settings file input path <*.mods> */
+		    ModelLoader ml = new ModelLoader(inputPath, TaskUtils.HDFS_URI, BasicLoader.ENV.HDFS);
+		    ml.parse(new ArrayList<Primitive>());
+		    ml.close();
+			
+			/**
+			 *  map reduce configration set 
+			 */
+			conf.set(PARAMS.INPUT_PATH.name(), inputPath);
+			conf.set(PARAMS.HDFS_URI.name(), TaskUtils.HDFS_URI.toString());
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
 			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
@@ -167,6 +208,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		/* flush log */
+		ILog log = LogFactory.getInstance(PARAMS.ILOG.name());
+		log.close();
 	}
 	
 	public boolean render(Camera camera, Configuration conf, int id) 
@@ -212,7 +257,6 @@ public class RayTracerDriver implements JobRegister, ITask {
 		try {
 			return 1.0f * (processedJobNum + job.mapProgress()) / totalJobNum;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0.0f;

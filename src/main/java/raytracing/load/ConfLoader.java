@@ -1,6 +1,7 @@
 package raytracing.load;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,12 +16,14 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class ConfLoader {
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
+import raytracing.mapreduce.RayTracerDriver;
+
+public class ConfLoader implements Closeable {
 	
-	private Logger logger = LoggerFactory.getLogger(ConfLoader.class);
+	private ILog logger = LogFactory.getInstance(RayTracerDriver.PARAMS.ILOG.name());
 	
 	private Path confPath;
 	private BufferedReader br = null;
@@ -29,6 +32,7 @@ public class ConfLoader {
 		ConfLoader cl = new ConfLoader("tmp.conf", null, BasicLoader.ENV.NATIVE);
 		HashMap<String, String> opts = new HashMap<String, String>();
 		cl.parse(opts);
+		cl.close();
 		for (Entry<String, String> entry : opts.entrySet()) {
 			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
@@ -85,11 +89,11 @@ public class ConfLoader {
 		br = new BufferedReader(new InputStreamReader(fs.open(confPath)));
 	}
 	
+	@Override
 	public void close() {
 		try {
 			br.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -116,12 +120,14 @@ public class ConfLoader {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		logger.info("parse done global configration settings file");
 	}
 
 	
 	private boolean error(String cause) {
-		logger.error("failed to load models from path [{}] because {}, line count: {}",
-					confPath.toString(), cause, lineCount);
+		logger.error("failed to load models from path [" + confPath.toString() + 
+				"] because " + cause + ", line count: " + lineCount);
 		return false;
 	}
 }

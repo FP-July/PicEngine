@@ -1,36 +1,33 @@
 package raytracing.load;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.sound.sampled.Line;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import raytracing.model.PrimFactory.MOD;
-import task.TaskUtils;
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
+import raytracing.mapreduce.RayTracerDriver;
 import raytracing.model.PrimFactory;
 import raytracing.model.Primitive;
 
-public class ModelLoader {
-	
-	private static Logger logger = LoggerFactory.getLogger(ModelLoader.class);
+public class ModelLoader implements Closeable {
+
+	private ILog logger = LogFactory.getInstance(RayTracerDriver.PARAMS.ILOG.name());
 	
 	private Path modelPath;
 	private BufferedReader br = null;
@@ -39,6 +36,7 @@ public class ModelLoader {
 		ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.NATIVE);
 		ArrayList<Primitive> scene = new ArrayList<Primitive>();
 		ml.parse(scene);
+		ml.close();
 		System.out.println(scene.size());
 	}
 	
@@ -93,6 +91,7 @@ public class ModelLoader {
 		br = new BufferedReader(new InputStreamReader(fs.open(modelPath)));
 	}
 	
+	@Override
 	public void close() {
 		try {
 			br.close();
@@ -152,11 +151,13 @@ public class ModelLoader {
 		} catch (IOException e) {
 			error(e.toString());
 		}
+		
+		logger.info("parse done model settings file");
 	}
 	
 	private boolean error(String cause) {
-		logger.error("failed to load models from path [{}] because {}, line count: {}",
-					modelPath.toString(), cause, lineCount);
+		logger.error("failed to load models from path [" + modelPath.toString() + 
+				"] because " + cause + ", line count: " + lineCount);
 		return false;
 	}
 }

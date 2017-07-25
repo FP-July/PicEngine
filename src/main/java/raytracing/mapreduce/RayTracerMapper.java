@@ -14,6 +14,8 @@ import raytracing.RayTracing;
 import raytracing.Vec3d;
 import raytracing.load.BasicLoader;
 import raytracing.load.ModelLoader;
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
 import raytracing.mapreduce.RayTracerDriver.PARAMS;
 
 public class RayTracerMapper
@@ -22,8 +24,11 @@ public class RayTracerMapper
 	RayTracing rayTracing = new RayTracing();
 	Camera camera = null;
 	
+	@Override
 	public void setup(Context context) 
 		throws IOException, InterruptedException {
+		LogFactory.setIgnore(true);
+		
 	    Configuration conf = context.getConfiguration();
 	    String modelPath = conf.get(PARAMS.INPUT_PATH.name());
 	    URI hdfs_uri = null;
@@ -31,6 +36,7 @@ public class RayTracerMapper
 	    if (hdfs != null) hdfs_uri = URI.create(hdfs);
 	    ModelLoader ml = new ModelLoader(modelPath, hdfs_uri, BasicLoader.ENV.HDFS);
 	    ml.parse(rayTracing.getScene());
+	    ml.close();
 	    
 	    rayTracing.setMaxRayDepth(conf.get(PARAMS.MAX_RAY_DEPTH.name()));
 	    
@@ -43,6 +49,7 @@ public class RayTracerMapper
 	    camera = new Camera(eye, center, up, fov, rows, cols);
 	}
 	
+	@Override
 	public void map(IntWritable key, IntWritable value, Context context) 
 		throws IOException, InterruptedException {
 		Integer x = key.get();

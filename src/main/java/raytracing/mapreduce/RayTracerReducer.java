@@ -1,7 +1,6 @@
 package raytracing.mapreduce;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 

@@ -1,14 +1,11 @@
 package raytracing.hadoop;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -51,7 +48,7 @@ public class PixelInputFormat extends InputFormat<IntWritable, IntWritable> {
 		
 		int widthStep = getSuitableSplitLength(width, splitLength);
 		int heightStep = getSuitableSplitLength(height, splitLength);
-		System.out.println("width step : " + widthStep + ", height step : " + heightStep + ", split len : " + splitLength);
+//		System.out.println("width step : " + widthStep + ", height step : " + heightStep + ", split len : " + splitLength);
 
 		ArrayList<InputSplit> splits = new ArrayList<>();
 		int x = 0, y = 0;

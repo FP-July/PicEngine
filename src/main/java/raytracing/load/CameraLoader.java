@@ -1,6 +1,7 @@
 package raytracing.load;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,24 +10,24 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import raytracing.Camera;
 import raytracing.Vec3d;
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
+import raytracing.mapreduce.RayTracerDriver;
 import raytracing.trace.CameraTrace;
 import raytracing.trace.CameraTraceFactory;
 
-public class CameraLoader {
+public class CameraLoader implements Closeable {
 	
-	private Logger logger = LoggerFactory.getLogger(ModelLoader.class);
+	private ILog logger = LogFactory.getInstance(RayTracerDriver.PARAMS.ILOG.name());
 	
 	private Path cameraPath;
 	private BufferedReader br = null;
@@ -38,13 +39,10 @@ public class CameraLoader {
 	
 	public static void main(String[] args) throws IOException {
 		CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.NATIVE);
-		HashMap<String, String> opts = new HashMap<String, String>();
 		Camera ca = null;
 		ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 		cl.parse(ca, cats);
-		for (Entry<String, String> entry : opts.entrySet()) {
-			System.out.println(entry.getKey() + " : " + entry.getValue());
-		}
+		cl.close();
 		System.out.println(cats.size());
 	}
 	
@@ -99,11 +97,11 @@ public class CameraLoader {
 		br = new BufferedReader(new InputStreamReader(fs.open(cameraPath)));
 	}
 	
+	@Override
 	public void close() {
 		try {
 			br.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -219,12 +217,13 @@ public class CameraLoader {
 		
 		if (!hasCamera) return error("no camera");
 		
+		logger.info("parse done camera settings file");
 		return true;
 	}
 	
 	private boolean error(String cause) {
-		logger.error("failed to load models from path [{}] because {}, line count: {}",
-					cameraPath.toString(), cause, lineCount);
+		logger.error("failed to load models from path [" + cameraPath.toString() + 
+				"] because " + cause + ", line count: " + lineCount);
 		return false;
 	}
 }

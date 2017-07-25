@@ -1,7 +1,6 @@
 package raytracing;
 
 import java.awt.Color;
-import java.util.regex.Pattern;
 
 public class Vec3d {
 	public double x, y, z;

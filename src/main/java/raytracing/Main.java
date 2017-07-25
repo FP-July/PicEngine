@@ -13,12 +13,13 @@ import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageOutputStream;
 
-import org.apache.hadoop.util.hash.Hash;
-
 import raytracing.load.BasicLoader;
 import raytracing.load.CameraLoader;
 import raytracing.load.ConfLoader;
 import raytracing.load.ModelLoader;
+import raytracing.log.ILog;
+import raytracing.log.LogFactory;
+import raytracing.mapreduce.RayTracerDriver;
 import raytracing.trace.CameraTrace;
 import utils.DirectoryChecker;
 
@@ -28,22 +29,30 @@ public class Main {
 	private static int superSamplingTimes = 3;
 	
 	public static void main(String[] args) throws IOException {
+		LogFactory.setParams("log", BasicLoader.ENV.NATIVE);
+		
 		ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.NATIVE);
 		ml.parse(rayTracing.getScene());
+		ml.close();
 		
 		CameraLoader cl = new CameraLoader("tmp.camera", null, BasicLoader.ENV.NATIVE);
 		Camera origCamera = new Camera(new Vec3d(), new Vec3d(), new Vec3d(), 60.0, 480, 640);
 		ArrayList<CameraTrace> cats = new ArrayList<CameraTrace>();
 		cl.parse(origCamera, cats);
+		cl.close();
 
 		HashMap<String, String> opts = new HashMap<String, String>();
 		ConfLoader confLoader = new ConfLoader("tmp.conf", null, BasicLoader.ENV.NATIVE);
 		confLoader.parse(opts);
+		confLoader.close();
 		
 		rayTracing.setMaxRayDepth(opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 		superSamplingTimes = Integer.parseInt(opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
 		
 	    render(origCamera, cats);
+	    
+	    ILog log = LogFactory.getInstance(RayTracerDriver.PARAMS.ILOG.name());
+	    log.close();
 	}
 
 	public static void render(Camera origCamera, ArrayList<CameraTrace> cats) {
