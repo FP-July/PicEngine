@@ -25,6 +25,8 @@ import task.TaskUtils;
 public class RayTracerDriver implements JobRegister, ITask {
 
 	private Job job;
+	private int totalJobNum = 1;
+	private int processedJobNum = 0;
 	
 	public static enum PARAMS {
 		INPUT_PATH,
@@ -45,6 +47,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 			CameraLoader cl = new CameraLoader("tmp.camera", false);
 			cl.parse(origCamera, cats);
 			
+			for (CameraTrace cat : cats) {
+				totalJobNum += cat.getFrames();
+			}
+			
 			HashMap<String, String> opts = new HashMap<String, String>();
 			ConfLoader confLoader = new ConfLoader("tmp.conf", true);
 			confLoader.parse(opts);
@@ -55,13 +61,12 @@ public class RayTracerDriver implements JobRegister, ITask {
 			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
 			
 			Camera camera = origCamera;
-			int i = 0;
-		    render(camera, conf, "image", i);
+		    render(camera, conf, "image", processedJobNum);
 		    for (CameraTrace cat : cats) {
 		    	cat.setInitCameraLocation(camera);
 		    	while ((camera = cat.getNextCameraFrame()) != null) {
-				    i ++;
-			    	render(camera, conf, "image", i);
+				    processedJobNum ++;
+			    	render(camera, conf, "image", processedJobNum);
 			    } 
 		    }
 		} catch (Exception e) {
@@ -171,6 +176,12 @@ public class RayTracerDriver implements JobRegister, ITask {
 
 	@Override
 	public float getProgress() {
-		return 0;
+		try {
+			return 1.0f * (processedJobNum + job.mapProgress()) / totalJobNum;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0.0f;
 	}
 }
