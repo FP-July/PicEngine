@@ -12,19 +12,22 @@ import dao.DBConstants;
 import dao.DaoManager;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
-import sessionManager.SessionIDGen;
-import sessionManager.SessionManager;
+import session.SessionIDGen;
+import session.SessionManager;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
 
 /**
  * Created by THU73 on 17/7/14.
  */
 public class Login extends HttpServlet {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     	DaoManager daoManager;
     	HttpSession session = req.getSession();

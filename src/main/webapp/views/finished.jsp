@@ -1,3 +1,5 @@
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="bean.Task" %>
 <%--
   Created by IntelliJ IDEA.
   User: THU73
@@ -23,9 +25,14 @@
 <div class="navbar">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span
-                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a> <a
-                href="#" class="brand">Distributed Rendering Engine - <%=session.getAttribute("username")%></a>
+            <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a href="#myModal" role="button" data-toggle="modal" class="brand">
+                Distributed Rendering Engine - <%=session.getAttribute("username")%>
+            </a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav">
                     <li>
@@ -63,6 +70,16 @@
             <h2>
                 已经完成的任务
             </h2>
+            <%
+                ArrayList<Task> taskList = (ArrayList<Task>) session.getAttribute("taskList");
+                if (taskList.size() == 0) {
+            %>
+            <h4>
+                当前没有已完成的任务。
+            </h4>
+            <%
+            } else {
+            %>
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -90,130 +107,84 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="danger">
+                <%
+                    for (int i = 0; i < taskList.size(); ++i) {
+                        Task task = taskList.get(i);
+                        String color = "";
+                        if (task.getState() == Task.error) {
+                            color = "error";
+                        } else if (task.getState() == Task.error) {
+                            color = "success";
+                        } else {
+                %>
+                <h2>
+                    返回的"已完成"任务中只能是失败或已完成！
+                </h2>
+                <%
+                    }
+                    int minutes = task.getMinutes();
+                    int hours = minutes / 60;
+                    minutes = minutes % 60;
+                %>
+                <tr class="<%=color%>">
                     <td>
-                        1
+                        <%=task.getId()%>
                     </td>
                     <td>
-                        17/7终稿
+                        <%=task.getName()%>
                     </td>
                     <td>
-                        图像渲染
+                        <%=task.getType()%>
                     </td>
                     <td>
-                        2017/07/02
+                        <%=task.getDate()%>
                     </td>
                     <td>
-                        失败
+                        <%=task.getState()%>
                     </td>
                     <td>
-                        1 时 22 分
+                        <%=hours%> 时 <%=minutes%> 分
                     </td>
                     <td>
-                        <button class="btn btn-small btn-danger">详细信息</button>
-                    </td>
-                </tr>
-                <tr class="success">
-                    <td>
-                        2
-                    </td>
-                    <td>
-                        公司景观设计
-                    </td>
-                    <td>
-                        图像渲染
-                    </td>
-                    <td>
-                        2017/05/06
-                    </td>
-                    <td>
-                        已完成
-                    </td>
-                    <td>
-                        2 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
+                        <button class="btn btn-small btn-info">详细信息</button>
+                        <%
+                            if (task.getState() == Task.finished) {
+                        %>
                         <button class="btn btn-small btn-primary">下载</button>
+                        <%
+                            }
+                        %>
                     </td>
                 </tr>
-                <tr class="success">
-                    <td>
-                        3
-                    </td>
-                    <td>
-                        图形学大作业
-                    </td>
-                    <td>
-                        图像渲染
-                    </td>
-                    <td>
-                        2017/05/25
-                    </td>
-                    <td>
-                        已完成
-                    </td>
-                    <td>
-                        999 时 59 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                        <button class="btn btn-small btn-primary">下载</button>
-                    </td>
-                </tr>
-                <tr class="success">
-                    <td>
-                        4
-                    </td>
-                    <td>
-                        光线追踪测试
-                    </td>
-                    <td>
-                        图像渲染
-                    </td>
-                    <td>
-                        2017/06/60
-                    </td>
-                    <td>
-                        已完成
-                    </td>
-                    <td>
-                        2 时 45 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                        <button class="btn btn-small btn-primary">下载</button>
-                    </td>
-                </tr>
-                <tr class="success">
-                    <td>
-                        5
-                    </td>
-                    <td>
-                        宣传片初稿
-                    </td>
-                    <td>
-                        图像渲染
-                    </td>
-                    <td>
-                        2017/01/20
-                    </td>
-                    <td>
-                        已完成
-                    </td>
-                    <td>
-                        72 时 0 分
-                    </td>
-                    <td>
-                        <button class="btn btn-small btn-danger">删除</button>
-                        <button class="btn btn-small btn-primary">下载</button>
-                    </td>
-                </tr>
+                <%
+                        }
+                    }
+                %>
+
                 </tbody>
             </table>
         </div>
         <div class="span2">
         </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">相关信息</h3>
+    </div>
+    <div class="modal-body">
+        <h4>小组名单</h4>
+        <p>计45 江天</p>
+        <p>计45 王龙涛</p>
+        <p>计45 张琛昱</p>
+        <hr>
+        <h4>Final Project for Distributed Data Processing</h4>
+        <p>Distributed Image Rendering Engine</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
     </div>
 </div>
 

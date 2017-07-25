@@ -49,9 +49,7 @@ public class DaoManager {
 	
 	private void createTables() throws SQLException {
 		for(String sql : DBConstants.tableCreateSQL) {
-			boolean success = statement.execute(sql);
-			if(!success)
-				logger.error("sql " + sql + " fails to excute");
+			statement.execute(sql);
 		}
 	}
 	
@@ -68,7 +66,17 @@ public class DaoManager {
 			return null;
 		}
 		renderingCount = projInfos.size();
-		
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.init.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		renderingCount += projInfos.size();	
+		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.ready.ordinal());
+		if (projInfos == null) {
+			return null;
+		}
+		renderingCount += projInfos.size();	
+	
 		projInfos = projDao.findProjsByInt(username, "status", ProjInfo.statusEnum.finished.ordinal());
 		if (projInfos == null) {
 			return null;

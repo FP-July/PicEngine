@@ -1,4 +1,4 @@
-package sessionManager;
+package session;
 
 import java.util.HashMap;
 

@@ -54,7 +54,6 @@ public class ProjTest {
 	@Test
 	public void listTest() {
 		String projName = "firstProj", username = "newuser5";
-		boolean success = false;
 		ProjDao projDao = daoManager.getProjDao();
 		for(int i = 0; i < 5; i++) {
 			projDao.deleteProj(username + i, projName);
@@ -105,7 +104,6 @@ public class ProjTest {
 	@Test
 	public void findTest() {
 		String projName = "findTest", username = "newuserfindtest";
-		int status = DBConstants.SQL_EXCUTION_ERROR;
 		ProjDao projDao = daoManager.getProjDao();
 		for(int i = 0; i < 10; i++) {
 			projDao.deleteProj(username, projName + i);

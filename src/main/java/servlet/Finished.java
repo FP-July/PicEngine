@@ -15,7 +15,12 @@ import java.util.ArrayList;
  * use proj/FindFinishedProj instead
  */
 public class Finished extends HttpServlet {
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");
@@ -28,8 +33,9 @@ public class Finished extends HttpServlet {
 
     ArrayList<Task> getFinishedTasks(String username) {
 
+        ArrayList<Task> taskList = new ArrayList<Task>();
         // return the on-going tasks of this user
 
-        return new ArrayList<Task>();
+        return taskList;
     }
 }

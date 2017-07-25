@@ -1,7 +1,6 @@
 package servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bean.Task;
-import dao.DBConstants;
 import model.ProjInfo;
-import sessionManager.SessionManager;
+import session.SessionManager;
+import task.TaskUtils;
 
 public class CommonProcess {
 	
@@ -56,6 +55,7 @@ public class CommonProcess {
 	 * @return true if the request's cookie is valid
 	 */
 	public static boolean checkSession(HttpServletRequest req, HttpServletResponse resp){
+		//return true;
 		String[] userSession = CommonProcess.cookies2Session(req.getCookies());
 		if(userSession == null) {
 			try {
@@ -84,8 +84,9 @@ public class CommonProcess {
 	 */
 	public static void sendProjsToClient(HttpServletRequest req, HttpServletResponse res, List<ProjInfo> infos, String targetPage) throws IOException {
 		List<Task> taskList = new ArrayList<>();
-		for(ProjInfo info : infos) 
+		for(ProjInfo info : infos) {
 			taskList.add(info.convertToTask());
+		}
 		HttpSession session = req.getSession();
 		session.setAttribute("taskList", taskList);
 		try {

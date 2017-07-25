@@ -15,6 +15,11 @@ import servlet.CommonProcess;
 import servlet.ServletConstants;
 
 public class RenameProj extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
@@ -22,16 +27,16 @@ public class RenameProj extends HttpServlet {
 			return;
 		
 		String username = req.getParameter("username"),
-				projName = req.getParameter("projName"),
-				newProjName = req.getParameter("newProjName");
+				projName = req.getParameter("taskName"),
+				newProjName = req.getParameter("newTaskName");
 		if(username == null || projName == null || newProjName == null) {
 			String argLack = "";
 			if(username == null)
 				argLack += "username ";
 			if(projName == null)
-				argLack += "projName ";
+				argLack += "taskName ";
 			if(newProjName == null)
-				argLack += "newProjName";
+				argLack += "newTaskName";
 			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
 		

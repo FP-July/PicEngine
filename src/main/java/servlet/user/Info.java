@@ -16,6 +16,11 @@ import servlet.ServletConstants;
 
 public class Info extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);

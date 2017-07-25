@@ -17,6 +17,11 @@ import servlet.CommonProcess;
 import servlet.ServletConstants;
 
 public class FindProj extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean cookieValid = CommonProcess.checkSession(req, resp);
@@ -24,13 +29,13 @@ public class FindProj extends HttpServlet {
 			return;
 		
 		String username = req.getParameter("username"),
-				projName = req.getParameter("projName");
+				projName = req.getParameter("taskName");
 		if(username == null || projName == null) {
 			String argLack = "";
 			if(username == null)
 				argLack += "username ";
 			if(projName == null)
-				argLack += "projName ";
+				argLack += "taskName ";
 			resp.sendError(ServletConstants.LACK_ARG, argLack);
 		}
 		

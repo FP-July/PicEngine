@@ -17,7 +17,12 @@ import java.sql.SQLException;
  * Created by THU73 on 17/7/17.
  */
 public class Register extends HttpServlet {
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");

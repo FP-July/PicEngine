@@ -11,7 +11,12 @@ import java.io.IOException;
  * Created by THU73 on 17/7/17.
  */
 public class Create extends HttpServlet {
-    @Override
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String username = req.getParameter("username");

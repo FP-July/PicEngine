@@ -9,9 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import servlet.CommonProcess;
 import servlet.ServletConstants;
-import sessionManager.SessionManager;
+import session.SessionManager;
 
 public class Logout extends HttpServlet {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -22,8 +27,7 @@ public class Logout extends HttpServlet {
 		}
 		
 		SessionManager.abortSession(userSession[0]);
-		//TODO send the user to the login page
-		resp.sendRedirect("link to the login in page");
+		req.getRequestDispatcher("index.jsp").forward(req, resp);
 	}
 
 }
