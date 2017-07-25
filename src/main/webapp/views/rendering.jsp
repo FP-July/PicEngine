@@ -144,7 +144,7 @@
                         <%=task.getDate()%>
                     </td>
                     <td>
-	                    <% if(task.getType().equals(Task.ongoing)){
+	                    <% if(task.getState().equals(Task.ongoing)){
 	                    %>
                         <div class="progress progress-striped active">
                             <div class="bar bar-<%=color%>" style="width: <%=task.getPercent()%>%;"></div>

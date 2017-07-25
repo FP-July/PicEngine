@@ -36,7 +36,7 @@ public class TaskUtils {
 	public static final String HADOOP_LOG_FILE = "Hadoop_log"; // this is for hadoop-generated log 
 	public static final String HADOOP_LOG_DIR = "/tmp/hadoop-yarn/staging/history/done";  // where hadoop-generated logs naturally placed
 	
-	public static final String MR_JAR_PATH = System.getProperty("catalina.home") + File.separator + "wtpwebapps/PicEngine/MR_jars";
+	public static final String MR_JAR_PATH = System.getProperty("catalina.home") + File.separator + "wtpwebapps/PicEngine/";
 	
 	public static final URI HDFS_URI = URI.create("hdfs://localhost:9000/");
 	

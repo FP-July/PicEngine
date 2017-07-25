@@ -12,9 +12,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.hadoop.mapred.JobStatus;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Job.JobState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
