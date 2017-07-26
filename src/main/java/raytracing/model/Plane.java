@@ -16,25 +16,29 @@ public class Plane extends Primitive {
 		center,
 		norm,
 		surfaceColor,
-		emissionColor
+		emissionColor,
+		diffuse
 	}
 	
 	public Vec3d center;
 	public Vec3d norm;
 	public Vec3d surfaceColor, emissionColor;
+	public Double diffuse;
 	
 	public Plane(Vec3d center,
 				  Vec3d norm,
 				  Vec3d sc,
-				  Vec3d ec) throws IllegalArgumentException {
+				  Vec3d ec,
+				  Double diffuse) throws IllegalArgumentException {
 		if (center == null || norm == null
-			|| sc == null || ec == null) {
+			|| sc == null || ec == null || diffuse == null) {
 			throw new IllegalArgumentException();
 		}
 		this.center = center; 
 		this.norm = norm;
 		this.surfaceColor = sc; 
 		this.emissionColor = ec;
+		this.diffuse = diffuse;
 	}
 
 	public boolean isLight() {
@@ -82,5 +86,10 @@ public class Plane extends Primitive {
 	@Override
 	public String toString() {
 		return "Plane";
+	}
+
+	@Override
+	public Double getDiffusion(Vec3d pHit) {
+		return diffuse;
 	}
 }

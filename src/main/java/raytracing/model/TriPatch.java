@@ -64,4 +64,9 @@ public class TriPatch extends Primitive {
 		return null;
 	}
 
+	@Override
+	public Double getDiffusion(Vec3d pHit) {
+		return null;
+	}
+
 }

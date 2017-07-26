@@ -9,6 +9,7 @@ emissionColor = 0.0, 0.0, 0.0
 
 reflection = 0.0
 transparency = 0.3
+diffuse = 0.01
 end
 
 # id : 2, Sphere
@@ -22,6 +23,7 @@ emissionColor = 0.0, 0.0, 0.0
 
 reflection = 1.0
 transparency = 0.5
+diffuse = 0.01
 end
 
 # id : 3, Sphere
@@ -35,6 +37,7 @@ emissionColor = 0.0, 0.0, 0.0
 
 reflection = 1.0
 transparency = 0.7
+diffuse = 0.01
 end
 
 # id : 4, Sphere
@@ -48,6 +51,7 @@ emissionColor = 0.0, 0.0, 0.0
 
 reflection = 1.0
 transparency = 0.0
+diffuse = 0.0
 end
 
 # id : 5, Sphere
@@ -61,22 +65,24 @@ emissionColor = 0.0, 0.0, 0.0
 
 reflection = 1.0
 transparency = 0.3
+diffuse = 0.01
 end
 
 # id : 6, Sphere, This is a light
 _sphere_init:
 
-center = -1000.0, 0.0, 11000.0
-radius = 10000.0
+center = -5.0, 0.0, 25.0
+radius = 3
 # r, g, b
 surfaceColor = 0.20, 0.20, 0.20
 emissionColor = 1.0, 1.0, 1.0
 
 reflection = 0.3
 transparency = 0.0
+diffuse = 0.1
 end
 
-# id : 7, Plane
+# id : 7, Plane, floor
 _plane_init:
 
 center = 0.0, 0.0, -4.0
@@ -84,4 +90,17 @@ norm = 0.0, 0.0, 1.0
 # r, g, b
 surfaceColor = 0.3, 0.3, 0.3
 emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.7
 end
+
+# id : 11, Plane, front
+_plane_init:
+
+center = 50.0, 0.0, 0.0
+norm = -1.0, 0.0, 0.0
+# r, g, b
+surfaceColor = 0.3, 0.3, 0.3
+emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.7
+end
+

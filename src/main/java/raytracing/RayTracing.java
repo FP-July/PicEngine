@@ -19,6 +19,8 @@ public class RayTracing {
 	}
 	
 	public Primitive trace(Ray ray, Vec3d color, int depth) {
+		if (depth >= MAX_RAY_DEPTH) return null;
+		
 		double tnear = Double.MAX_VALUE; 
 	    Primitive obj = null; 
 	    // find intersection of this ray with the sphere in the scene
@@ -54,7 +56,7 @@ public class RayTracing {
 	    	nhit = nhit.inv();
 	    	inside = true; 
 	    }
-	    if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0) && depth < MAX_RAY_DEPTH) { 
+	    if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0)) { 
 	        double facingratio = -ray.raydir.dot(nhit); 
 	        // change the mix value to tweak the effect
 	        double fresneleffect = mix(Math.pow(1 - facingratio, 3), 1, 0.1); 
@@ -82,12 +84,11 @@ public class RayTracing {
 	            	(1 - fresneleffect) * obj.getTransparency(phit))
 	        	).mul(obj.getSurfaceColor(phit)); 
 	    } 
-	    else { 
-	    	
-	        // it's a diffuse object, no need to raytrace any further
+	    
+	    if (obj.getDiffusion(phit) > 0) { 
 	        for (Primitive sc : scene) { 
 	            if (sc.isLight()) { 
-	                double transmission = 1.0; 
+	                double transmission = obj.getDiffusion(phit); 
 	                Vec3d lightDirection = sc.getLightDirection(phit); 
 	                lightDirection.normalize(); 
 	                for (Primitive block : scene) { 
@@ -99,6 +100,9 @@ public class RayTracing {
 	                        } 
 	                    } 
 	                } 
+	                if (obj.getDiffusion(phit) > 0.6) {
+	                	System.out.println(transmission + ", " + nhit.dot(lightDirection.inv()));
+	                }
 	                surfaceColor.addToThis(
 	                	obj.getSurfaceColor(phit).mul(
 	                	transmission).mul( 

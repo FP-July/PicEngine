@@ -107,8 +107,8 @@ public class PhotonTracing {
             double fresneleffect = mix(Math.pow(1 - facingratio, 3), 1, 0.1);
             // compute reflection direction (not need to normalize because all vectors
             // are already normalized)
-            double rand = Math.random();
-            if(rand < fresneleffect) {
+//            double rand = Math.random();
+//            if(rand < fresneleffect) {
                 Vec3d refldir = ray.raydir.sub(nhit.mul(2.0).mul(ray.raydir.dot(nhit)));
                 refldir.normalize();
                 tracePhoton(new Ray(phit.add(nhit.mul(bias)), refldir), depth + 1, intensity * fresneleffect);
@@ -117,12 +117,12 @@ public class PhotonTracing {
                 photon.setPosition(phit);
                 photon.setStrength(intensity * fresneleffect);
                 photonList.add(photon);
-            }
+//            }
 
             // if the sphere is also transparent compute refraction ray (transmission)
             if (obj.getTransparency(phit) != 0) {
-                rand = Math.random();
-                if(rand < (1 - fresneleffect)) {
+//                rand = Math.random();
+//                if(rand < (1 - fresneleffect)) {
                     double ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface?
                     double cosi = -nhit.dot(ray.raydir);
                     double k = 1 - eta * eta * (1 - cosi * cosi);
@@ -130,11 +130,11 @@ public class PhotonTracing {
                     refrdir.normalize();
                     tracePhoton(new Ray(phit.sub(nhit.mul(bias)), refrdir), depth + 1, intensity * (1 - fresneleffect));
 
-                    Photon photon = new Photon();
-                    photon.setPosition(phit);
-                    photon.setStrength(intensity * (1 - fresneleffect));
-                    photonList.add(photon);
-                }
+//                    Photon photon = new Photon();
+//                    photon.setPosition(phit);
+//                    photon.setStrength(intensity * (1 - fresneleffect));
+//                    photonList.add(photon);
+//                }
             }
             // the result is a mix of reflection and refraction (if the sphere is transparent)
         } else {
@@ -143,29 +143,33 @@ public class PhotonTracing {
             Photon photon = new Photon();
             photon.setPosition(phit);
             photon.setStrength(intensity);
+            count ++;
             photonList.add(photon);
         }
     }
+    private static int count = 0;
 
     private double mix(double a, double b, double mix) {
         return b * mix + a * (1 - mix);
     }
 
     public void printFile(String path) throws IOException {
+    	System.out.println(count + ", " + photonList.size());
         File file = new File(path);
         if(!file.exists()) {
             file.createNewFile(); // 创建新文件
-            BufferedWriter out = new BufferedWriter(new FileWriter(file));
-            for(int i = 0; i < photonList.size(); ++i) {
-                Photon p = photonList.get(i);
-                double x = p.getPosition().x;
-                double y = p.getPosition().y;
-                double z = p.getPosition().z;
-                double intensity = p.getStrength();
-                String info = x + "\t" + y + "\t" + z + "\t" + intensity + "\n";
-                out.write(info); // \r\n即为换行
-            }
-            out.close(); // 最后记得关闭文件
         }
+        
+        BufferedWriter out = new BufferedWriter(new FileWriter(file, false));
+        for(int i = 0; i < photonList.size(); ++i) {
+            Photon p = photonList.get(i);
+            double x = p.getPosition().x;
+            double y = p.getPosition().y;
+            double z = p.getPosition().z;
+            double intensity = p.getStrength();
+            String info = x + "\t" + y + "\t" + z + "\t" + intensity + "\n";
+            out.write(info); // \r\n即为换行
+        }
+        out.close(); // 最后记得关闭文件
     }
 }

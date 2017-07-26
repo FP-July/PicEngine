@@ -31,9 +31,12 @@ public abstract class Primitive {
 	public abstract Double getTransparency(Vec3d pHit);
 	/*
 	 * 返回物体表面该点的反射系数，为0时表示不反射。
-	 * : 注意，默认不折射，不反射的物体为漫反射物体。
 	 */
 	public abstract Double getReflection(Vec3d pHit);
+	/*
+	 * 返回物体表面该点的漫反射系数，为0时表示不反射。
+	 */
+	public abstract Double getDiffusion(Vec3d pHit);
 	
 	/*
 	 * 返回该物体是否为光源。

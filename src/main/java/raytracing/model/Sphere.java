@@ -16,22 +16,24 @@ public class Sphere extends Primitive {
 		surfaceColor,
 		emissionColor,
 		transparency,
-		reflection
+		reflection,
+		diffuse
 	};
 	
 	public Vec3d center;
 	public Vec3d emissionLoc;
 	public Double radius, radius2;
 	public Vec3d surfaceColor, emissionColor;
-	public Double transparency = 0.0, reflection = 0.0;
+	public Double transparency = 0.0, reflection = 0.0, diffuse = 0.0;
 	
 	public Sphere(Vec3d c,
 				  Double r,
 				  Vec3d sc,
 				  Double refl,
 				  Double transp,
+				  Double diff,
 				  Vec3d ec) throws IllegalArgumentException {
-		if (c == null || r == null || sc == null
+		if (c == null || r == null || sc == null || diff == null
 			|| refl == null || transp == null || ec == null) {
 			throw new IllegalArgumentException();
 		}
@@ -40,6 +42,7 @@ public class Sphere extends Primitive {
 		radius = r; radius2 = r*r;
 		surfaceColor = sc; emissionColor = ec;
 		transparency = transp; reflection = refl;
+		diffuse = diff;
 	}
 	
 	public static Primitive loadProperties(HashMap<String, String> opts) {
@@ -93,6 +96,11 @@ public class Sphere extends Primitive {
 	@Override
 	public String toString() {
 		return "Sphere";
+	}
+
+	@Override
+	public Double getDiffusion(Vec3d pHit) {
+		return diffuse;
 	}
 	
 }

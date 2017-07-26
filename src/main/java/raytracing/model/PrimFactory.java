@@ -23,8 +23,9 @@ public class PrimFactory {
 			Vec3d emissionColor = BasicLoader.parseVectorProperty(Sphere.Property.emissionColor.name(), opts.get(Sphere.Property.emissionColor.name()), err);
 			Double transparency = BasicLoader.parseDoubleProperty(Sphere.Property.transparency.name(), opts.get(Sphere.Property.transparency.name()), err);
 			Double reflection = BasicLoader.parseDoubleProperty(Sphere.Property.reflection.name(), opts.get(Sphere.Property.reflection.name()), err);
+			Double diffuse = BasicLoader.parseDoubleProperty(Sphere.Property.diffuse.name(), opts.get(Sphere.Property.diffuse.name()), err);
 			try {
-				prim = new Sphere(center, radius, surfaceColor, reflection, transparency, emissionColor);
+				prim = new Sphere(center, radius, surfaceColor, reflection, transparency, diffuse, emissionColor);
 			} catch (IllegalArgumentException e) {
 				prim = null;
 			}
@@ -36,8 +37,9 @@ public class PrimFactory {
 			Vec3d norm = BasicLoader.parseVectorProperty(Plane.Property.norm.name(), opts.get(Plane.Property.norm.name()), err);
 			Vec3d surfaceColor = BasicLoader.parseVectorProperty(Plane.Property.surfaceColor.name(), opts.get(Plane.Property.surfaceColor.name()), err);
 			Vec3d emissionColor = BasicLoader.parseVectorProperty(Plane.Property.emissionColor.name(), opts.get(Plane.Property.emissionColor.name()), err);
+			Double diffuse = BasicLoader.parseDoubleProperty(Plane.Property.diffuse.name(), opts.get(Plane.Property.diffuse.name()), err);
 			try {
-				prim = new Plane(center, norm, surfaceColor, emissionColor);
+				prim = new Plane(center, norm, surfaceColor, emissionColor, diffuse);
 			} catch (IllegalArgumentException e) {
 				prim = null;
 			}
