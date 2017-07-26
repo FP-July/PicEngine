@@ -13,7 +13,7 @@ import raytracing.Vec3d;
 public abstract class Primitive {
 	
 	/*
-	 * 返回光线是否与该物体有交点，如果有，将交点与光线源节点的距离信息存储在pHits中，。
+	 * 返回光线是否与该物体有交点，如果有，将交点与光线源节点的距离信息存储在pHits中，距离必须大于0。
 	 */
 	public abstract boolean intersect(Ray ray, List<Double> pHits);
 	/*
@@ -31,9 +31,12 @@ public abstract class Primitive {
 	public abstract Double getTransparency(Vec3d pHit);
 	/*
 	 * 返回物体表面该点的反射系数，为0时表示不反射。
-	 * : 注意，默认不折射，不反射的物体为漫反射物体。
 	 */
 	public abstract Double getReflection(Vec3d pHit);
+	/*
+	 * 返回物体表面该点的漫反射系数，为0时表示不反射。
+	 */
+	public abstract Double getDiffusion(Vec3d pHit);
 	
 	/*
 	 * 返回该物体是否为光源。
@@ -44,7 +47,7 @@ public abstract class Primitive {
 	 */
 	public abstract Vec3d getEmissionColor(Vec3d point);
 	/*
-	 * 返回该物体发出的光线到某点的方向。
+	 * 返回该物体发出的光线到某点的方向和距离。
 	 */
 	public abstract Vec3d getLightDirection(Vec3d point);
 	

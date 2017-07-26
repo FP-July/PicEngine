@@ -71,6 +71,7 @@ public class Main {
 	    
 	}
 	
+	public static int x = 0, y = 0;
 	public static void render(Camera camera, int id) {
 		camera.viewFrame(id);
 		
@@ -78,8 +79,8 @@ public class Main {
 	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     	
 	    int times = superSamplingTimes;
-	    for (int y = 0; y < height; ++y) { 
-	        for (int x = 0; x < width; ++x) { 
+	    for (y = 0; y < height; ++y) { 
+	        for (x = 0; x < width; ++x) { 
             	Vec3d rgb = new Vec3d();
                 ArrayList<Ray> rays = new ArrayList<Ray>();
                 camera.getSuperSamplingRays(x, y, times, rays);
