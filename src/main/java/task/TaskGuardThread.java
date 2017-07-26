@@ -46,6 +46,7 @@ public class TaskGuardThread extends Thread {
 					info.status = TaskUtils.checkStatus(info.username, String.valueOf(info.projID));
 					if(info.status != ProjInfo.statusEnum.ongoing.ordinal()) {
 						projDao.updateProjStatus(info.username, info.projName, info.status);
+						projDao.updateProjLong(info.username, info.projName, "finishedTime", System.currentTimeMillis());
 					}
 				} catch (IllegalArgumentException | IOException e) {
 					logger.error("check status of {} of {} failed due to {}",

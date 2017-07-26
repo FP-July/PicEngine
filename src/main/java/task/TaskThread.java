@@ -85,10 +85,10 @@ public class TaskThread extends Thread {
 		ProjDao projDao = daoManager.getProjDao();
 		if(findSuccess) {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.finished.ordinal());
-			projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
 		} else {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.error.ordinal());
 		}
+		projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
 	}
 	
 	private void updateProgress() {
