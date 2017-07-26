@@ -13,4 +13,6 @@ public interface ITask {
 	 * @return the job related to the task
 	 */
 	public Job getJob();
+	
+	public float getProgress();
 }

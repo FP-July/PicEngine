@@ -113,7 +113,7 @@
                         String color = "";
                         if (task.getState() == Task.error) {
                             color = "error";
-                        } else if (task.getState() == Task.error) {
+                        } else if (task.getState() == Task.finished) {
                             color = "success";
                         } else {
                 %>
@@ -122,8 +122,8 @@
                 </h2>
                 <%
                     }
-                    int minutes = task.getMinutes();
-                    int hours = minutes / 60;
+                    long minutes = task.getMinutes();
+                    long hours = minutes / 60;
                     minutes = minutes % 60;
                 %>
                 <tr class="<%=color%>">
@@ -146,11 +146,16 @@
                         <%=hours%> 时 <%=minutes%> 分
                     </td>
                     <td>
-                        <button class="btn btn-small btn-info">详细信息</button>
+                    <button class="btn btn-small btn-danger" onclick="deleteTask('<%=task.getUsername()%>','<%=task.getName()%>')">删除</button>
+                        <button class="btn btn-small btn-info" onclick="getTaskLog('<%=task.getUsername()%>','<%=task.getName()%>')">详细信息</button>
                         <%
-                            if (task.getState() == Task.finished) {
+                            if (task.getState().equals(Task.finished)) {
                         %>
-                        <button class="btn btn-small btn-primary">下载</button>
+                        <button class="btn btn-small btn-primary" onclick="downloadResult('<%=task.getUsername()%>','<%=task.getId()%>')">下载</button>
+                        <%
+                            } else if (task.getState().equals(Task.error)) {
+                        %>
+                        <button class="btn btn-small btn-primary" onclick="runTask('<%=task.getUsername()%>','<%=task.getName()%>')">运行</button>
                         <%
                             }
                         %>
@@ -192,5 +197,6 @@
 <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="../vendor/cookie/jquery.cookie.js"></script>
 <script src="../js/navbar.js"></script>
+<script src="../js/taskOperations.js"></script>
 </body>
 </html>

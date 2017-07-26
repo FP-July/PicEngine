@@ -85,6 +85,7 @@ public class TaskThread extends Thread {
 		ProjDao projDao = daoManager.getProjDao();
 		if(findSuccess) {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.finished.ordinal());
+			projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
 		} else {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.error.ordinal());
 		}
@@ -93,17 +94,19 @@ public class TaskThread extends Thread {
 	private void updateProgress() {
 		Job job = task.getJob();
 		try {
-			float mapProgress = job.mapProgress();
-			float reduceProgress = job.reduceProgress();
+			float progress = task.getProgress();
 			String workingDir = TaskUtils.getWorkingDir(username, taskID);
 			String progressDir = workingDir + File.separator + TaskUtils.PROGRESS_FILE;
 			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
 			FSDataOutputStream fOutputStream = fSystem.create(new Path(progressDir), true);
-			fOutputStream.writeChars(mapProgress + "," + reduceProgress);
+			fOutputStream.writeFloat(progress);
+			fOutputStream.write('\n');
+			fOutputStream.flush();
 			fOutputStream.close();
 		} catch (Exception e) {
 			logger.error("update progress for {} of {} failed, because {}", taskName, username, e.toString());
-			e.printStackTrace();
+			if(!(e instanceof IllegalStateException))
+				e.printStackTrace();
 		}
 	}
 	
@@ -115,7 +118,7 @@ public class TaskThread extends Thread {
 			progressTimer.cancel();
 			examineResult();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			logger.error("Task {} of {} failed because {}",
 					taskName, username, e.toString());
 			handleFailure();

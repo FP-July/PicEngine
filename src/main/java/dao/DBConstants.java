@@ -42,6 +42,7 @@ public class DBConstants {
 			"projName TEXT NOT NULL," +
 			"status INTEGER NOT NULL," +
 			"runtime INTEGER NOT NULL," +
+			"finishedTime INTEGER," +
 			"progress INTEGER NOT NULL," +
 			"type TEXT NOT NULL," +
 			"createTime LONG NOT NULL);"

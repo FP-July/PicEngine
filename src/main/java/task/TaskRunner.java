@@ -42,6 +42,7 @@ public class TaskRunner {
 						,taskName, username, ServletConstants.codeToString(status) );
 				return status;
 			}
+			projDao.updateProjLong(username, taskName, "runtime", System.currentTimeMillis());
 			taskThread.start();
 		} catch (Exception e) {
 			logger.error("failed to run task {} of {} because {}"

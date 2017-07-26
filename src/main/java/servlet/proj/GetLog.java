@@ -39,7 +39,7 @@ public class GetLog extends HttpServlet {
 	private void sendLogsToClient(HttpServletRequest req, HttpServletResponse resp, List<String> logs) throws IOException {
 		PrintWriter pWriter = resp.getWriter();
 		for(String log : logs) {
-			pWriter.write(log);
+			pWriter.write(log + "\n");
 		}
 		pWriter.flush();
 		pWriter.close();

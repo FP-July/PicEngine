@@ -39,7 +39,7 @@ public class ServletConstants {
 	public static final String STR_NO_SUCH_FILE = "the file does not exist";
 	public static final String STR_NOT_A_FILE = "the file is a directory";
 	// session lifetime
-	public static final long SESSION_EXPANSION = 1000 * 60 * 15; 
+	public static final long SESSION_EXPANSION = 1000 * 60 * 60; 
 	
 	
 	public static String codeToString(int status) {
