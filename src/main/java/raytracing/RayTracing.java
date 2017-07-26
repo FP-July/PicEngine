@@ -90,19 +90,23 @@ public class RayTracing {
 	            if (sc.isLight()) { 
 	                double transmission = obj.getDiffusion(phit); 
 	                Vec3d lightDirection = sc.getLightDirection(phit); 
+	                double disFromLight = lightDirection.length();
 	                lightDirection.normalize(); 
 	                for (Primitive block : scene) { 
 	                    if (block != sc) { 
 	                    	List<Double> phits = new ArrayList<Double>();
-	                        if (block.intersect(new Ray(phit.add(nhit.mul(bias)), lightDirection.inv()), phits)) { 
+	                    	boolean intersect = block.intersect(new Ray(phit.add(nhit.mul(bias)), lightDirection.inv()), phits);
+	                        if (intersect && (phits.get(0) < disFromLight)) { 
+//	        	                if (obj.getDiffusion(phit) > 0.6) {
+//	        	                	if (Main.x == 0 && Main.y == 0) {
+//	        	                		System.out.println(transmission + ", " + block.toString());
+//	        	                	}
+//	        	                }
 	                            transmission = 0.0; 
 	                            break; 
 	                        } 
 	                    } 
 	                } 
-	                if (obj.getDiffusion(phit) > 0.6) {
-	                	System.out.println(transmission + ", " + nhit.dot(lightDirection.inv()));
-	                }
 	                surfaceColor.addToThis(
 	                	obj.getSurfaceColor(phit).mul(
 	                	transmission).mul( 

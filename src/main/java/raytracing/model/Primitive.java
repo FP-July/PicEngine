@@ -13,7 +13,7 @@ import raytracing.Vec3d;
 public abstract class Primitive {
 	
 	/*
-	 * 返回光线是否与该物体有交点，如果有，将交点与光线源节点的距离信息存储在pHits中，。
+	 * 返回光线是否与该物体有交点，如果有，将交点与光线源节点的距离信息存储在pHits中，距离必须大于0。
 	 */
 	public abstract boolean intersect(Ray ray, List<Double> pHits);
 	/*
@@ -47,7 +47,7 @@ public abstract class Primitive {
 	 */
 	public abstract Vec3d getEmissionColor(Vec3d point);
 	/*
-	 * 返回该物体发出的光线到某点的方向。
+	 * 返回该物体发出的光线到某点的方向和距离。
 	 */
 	public abstract Vec3d getLightDirection(Vec3d point);
 	
