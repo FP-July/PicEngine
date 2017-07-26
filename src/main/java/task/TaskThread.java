@@ -118,7 +118,7 @@ public class TaskThread extends Thread {
 			progressTimer.cancel();
 			examineResult();
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			logger.error("Task {} of {} failed because {}",
 					taskName, username, e.toString());
 			handleFailure();

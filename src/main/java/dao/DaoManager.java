@@ -30,12 +30,17 @@ public class DaoManager {
 		return instance;
 	}
 
-	private void init() throws SQLException, ClassNotFoundException   {
-		connect2DB();
-		createTables();
-		setUserDao(new UserDao(statement));
-		setProjDao(new ProjDao(statement));
-		userDao.createUser("admin", "admin");
+	private void init()  {
+		try {
+			connect2DB();
+			createTables();
+			setUserDao(new UserDao(statement));
+			setProjDao(new ProjDao(statement));
+			userDao.createUser("admin", "admin");
+		} catch (ClassNotFoundException | SQLException e) {
+			logger.error("fail to start database due to {}", e.toString());
+			System.exit(0);
+		}
 	}
 	
 	private void connect2DB() throws SQLException, ClassNotFoundException {

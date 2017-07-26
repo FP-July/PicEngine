@@ -50,7 +50,6 @@ public class DeleteProj extends HttpServlet {
 			int status = projDao.deleteProj(username, taskName);
 			if(status == DBConstants.SUCCESS) {
 				TaskUtils.cleanTaskFile(username, taskName, String.valueOf(projInfo.projID));
-				//TODO send client a success msg
 				CommonProcess.sendMsgToClient(resp, "success");
 			} else {
 				resp.sendError(status, ServletConstants.codeToString(status));

@@ -146,7 +146,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		conf.addResource(new Path(rootPath + "yarn-site.xml"));
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
-		// TODO make this flexible
+
 		conf.set("mapreduce.job.jar", TaskUtils.MR_JAR_PATH + "RayTracerDriver.jar");
 		conf.set("username", username);
 		conf.set("taskID", taskID);
