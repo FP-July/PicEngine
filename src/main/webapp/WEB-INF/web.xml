@@ -148,5 +148,21 @@
 		<url-pattern>/downloadResult</url-pattern>
 	</servlet-mapping>
 
+	<!-- Error Handler -->
+	<servlet>
+		<servlet-name>ErrorServlet</servlet-name>
+		<servlet-class>servlet.ErrorServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ErrorServlet</servlet-name>
+		<url-pattern>/ErrorServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- error page -->
+	<error-page>
+		<location>/ErrorServlet</location>
+	</error-page>
+
 </web-app>
 
