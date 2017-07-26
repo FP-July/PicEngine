@@ -33,8 +33,6 @@ public class RayTracing {
 	        			break;
 	        		}
 	        	}
-	        } else {
-//	        	System.out.println(raydir.serialize());
 	        }
 	    } 
 	    

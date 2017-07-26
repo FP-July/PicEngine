@@ -46,6 +46,14 @@ public class RayTracerDriver implements JobRegister, ITask {
 	@Override
 	public void execute(String[] args) {
 		Configuration conf = new Configuration();
+		
+//		try {
+//			new GenericOptionsParser(conf, args);
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
+//		System.out.println(conf.get("tmpjars"));
+		
 		conf.set("mr.job.name", "raytracing");
 
 		String outputPath = "image";
