@@ -214,8 +214,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		}
 		
 		/* flush log */
-		ILog log = LogFactory.getInstance(PARAMS.ILOG.name());
-		log.close();
+		LogFactory.close(PARAMS.ILOG.name());
 	}
 
 	public boolean render(Camera camera, Configuration conf, int id)
