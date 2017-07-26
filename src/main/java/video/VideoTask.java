@@ -1,6 +1,7 @@
 package video;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.sun.tools.doclets.internal.toolkit.MemberSummaryWriter;
 
 import raytracing.mapreduce.RayTracerDriver;
 import task.ITask;
@@ -131,9 +134,12 @@ public class VideoTask implements ITask {
 			return false;
 		}
 		// generate a video with the imgs
+		BufferedImage[] imgArray = images.toArray(new BufferedImage[0]);
 		try {
-			FSDataOutputStream oStream = fSystem.create(new Path(resultPath, DEFAULT_VIDEO_NAME), true);
-			//PicToAviUtil.convertPicToAvi(imgs, oStream, fps, mWidth, mHeight);
+			Path remotePath = new Path(resultPath);
+			File tempFile = new File("result_" + System.currentTimeMillis() + "_" + (int) (Math.random()*100000) + ".avi");
+			PicToAviUtil.convertPicToAvi(imgArray, tempFile.getAbsolutePath(), fps, width, height);
+			fSystem.copyFromLocalFile(true, true, new Path(tempFile.getAbsolutePath()), remotePath);
 		} catch (IOException e) {
 			logger.error("cannot create video due to {}", e.toString());
 			return false;
