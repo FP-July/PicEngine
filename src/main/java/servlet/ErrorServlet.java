@@ -1,7 +1,6 @@
 package servlet;
 
 import dao.DBConstants;
-import sessionManager.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
