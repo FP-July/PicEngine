@@ -46,7 +46,7 @@ public class ProjDao {
 	/**
 	 * list all projs of a user
 	 * 
-	 * @param userName
+	 * @param username
 	 * @return list of projs, null when failed
 	 */
 	public List<ProjInfo> listUserProj(String username) {
@@ -69,8 +69,8 @@ public class ProjDao {
 	 * update status of a given proj
 	 * 
 	 * @param username
-	 * @param proName
-	 * @param Status
+	 * @param projName
+	 * @param newStatus
 	 * @return status code
 	 */
 	public int updateProjStatus(String username, String projName, int newStatus) {
