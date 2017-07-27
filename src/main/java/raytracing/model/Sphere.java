@@ -1,5 +1,6 @@
 package raytracing.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,8 +70,8 @@ public class Sphere extends Primitive {
 	public Vec3d getEmissionColor(Vec3d point) {
 		return emissionColor;
 	}
-	public Vec3d getLightDirection(Vec3d point) {
-		return point.sub(center);
+	public Ray getLightRay(Vec3d point) {
+		return new Ray(center, point.sub(center));
 	}
 	
 	@Override
@@ -101,6 +102,29 @@ public class Sphere extends Primitive {
 	@Override
 	public Double getDiffusion(Vec3d pHit) {
 		return diffuse;
+	}
+
+	@Override
+	public ArrayList<Ray> renderSoftShadowRays(Vec3d point, int num) {
+		Vec3d lightDirection = point.sub(center).normalize();
+		Vec3d dir = new Vec3d(lightDirection.x, lightDirection.y, lightDirection.z + 1);
+		Vec3d vx = lightDirection.cross(dir).normalize();
+		Vec3d vy = vx.cross(lightDirection).normalize();
+		Vec3d vz = lightDirection.normalize();
+		
+		ArrayList<Ray> rays = new ArrayList<Ray>();
+		double angleStep = 360.0 / num;
+		double angle = 0.0;
+		do {
+			Vec3d tmp = new Vec3d(radius * Math.cos(angle * Math.PI / 180), radius * Math.sin(angle * Math.PI / 180), 0.0);
+			Vec3d coord = new Vec3d();
+			coord.x = tmp.x * vx.x + tmp.y * vy.x + tmp.z * vz.x + center.x;
+			coord.y = tmp.x * vx.y + tmp.y * vy.y + tmp.z * vz.y + center.y;
+			coord.z = tmp.x * vx.z + tmp.y * vy.z + tmp.z * vz.z + center.z;
+			rays.add(new Ray(coord, point.sub(coord)));
+			angle += angleStep;
+		} while (angle < 360);
+		return rays;
 	}
 	
 }

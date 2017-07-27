@@ -20,6 +20,8 @@ import raytracing.load.ModelLoader;
 import raytracing.log.ILog;
 import raytracing.log.LogFactory;
 import raytracing.mapreduce.RayTracerDriver;
+import raytracing.mapreduce.RayTracerDriver.PARAMS;
+import raytracing.photon.PhotonLoader;
 import raytracing.trace.CameraTrace;
 import utils.DirectoryChecker;
 
@@ -28,7 +30,14 @@ public class Main {
 	private static RayTracing rayTracing = new RayTracing();
 	private static int superSamplingTimes = 3;
 	
+	/** Time Log : 
+	 * Map Reduce run a image with softshadow consumes 1769.226s.
+	 * Rendering a local image consumes 467.977 s
+	 */
+	
 	public static void main(String[] args) throws IOException {
+		long tStart = System.currentTimeMillis();
+		
 		LogFactory.setParams("log", BasicLoader.ENV.NATIVE);
 		
 		ModelLoader ml = new ModelLoader("tmp.mods", null, BasicLoader.ENV.NATIVE);
@@ -47,12 +56,22 @@ public class Main {
 		confLoader.close();
 		
 		rayTracing.setMaxRayDepth(opts.getOrDefault("MAX_RAY_DEPTH", "5"));
+	    if (opts.getOrDefault(RayTracerDriver.PARAMS.IS_ON_SOFT_SHADOW.name(), "off").toLowerCase().equals("on")) {
+	    	rayTracing.setSoftShadow(opts.get(PARAMS.SOFT_SHADOW_NUMBER.name()));
+	    } else {
+	    	rayTracing.setSoftShadow(false);
+	    }
 		superSamplingTimes = Integer.parseInt(opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
 		
 	    render(origCamera, cats);
 	    
 	    ILog log = LogFactory.getInstance(RayTracerDriver.PARAMS.ILOG.name());
 	    log.close();
+	    
+	    long tEnd = System.currentTimeMillis();
+	    long tDelta = tEnd - tStart;
+	    double elapsedSeconds = tDelta / 1000.0;
+	    System.out.println("Time Consume : " + elapsedSeconds + " s");
 	}
 
 	public static void render(Camera origCamera, ArrayList<CameraTrace> cats) {
@@ -62,9 +81,10 @@ public class Main {
 	    int i = 0;
 	    render(camera, i);
 	    for (CameraTrace cat : cats) {
-	    	cat.setInitCameraLocation(camera);
+	    	cat.setInitCameraLocation(origCamera);
 	    	while ((camera = cat.getNextCameraFrame()) != null) {
 			    i ++;
+			    origCamera = camera;
 		    	render(camera, i);
 		    } 
 	    }
@@ -78,8 +98,11 @@ public class Main {
 		int width = camera.getCols(), height = camera.getRows();
 	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     	
+//	    rayTracing.setPhotonLoader(new PhotonLoader("tmp.photon"), 1.0);
+	    
 	    int times = superSamplingTimes;
 	    for (y = 0; y < height; ++y) { 
+	    	if (y % 100 == 0) System.out.println("Rows : " + y);
 	        for (x = 0; x < width; ++x) { 
             	Vec3d rgb = new Vec3d();
                 ArrayList<Ray> rays = new ArrayList<Ray>();

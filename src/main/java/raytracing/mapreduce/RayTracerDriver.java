@@ -40,7 +40,8 @@ public class RayTracerDriver implements JobRegister, ITask {
 
 	public static enum PARAMS {
 		INPUT_PATH, OUTPUT_PATH, OUTPUT_FILE_NAME, HDFS_URI, 
-		MAX_RAY_DEPTH, SUPER_SAMPLING_TIMES, ILOG
+		MAX_RAY_DEPTH, SUPER_SAMPLING_TIMES, ILOG,
+		IS_ON_SOFT_SHADOW, SOFT_SHADOW_NUMBER
 	}
 
 	@Override
@@ -95,17 +96,20 @@ public class RayTracerDriver implements JobRegister, ITask {
 			 */
 			conf.set(PARAMS.INPUT_PATH.name(), "tmp.mods");
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
-			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
-			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
+			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault(PARAMS.MAX_RAY_DEPTH.name(), "5"));
+			conf.set(PARAMS.IS_ON_SOFT_SHADOW.name(), opts.getOrDefault(PARAMS.IS_ON_SOFT_SHADOW.name(), "off"));
+			conf.set(PARAMS.SOFT_SHADOW_NUMBER.name(), opts.getOrDefault(PARAMS.SOFT_SHADOW_NUMBER.name(), "10"));
+			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault(PARAMS.SUPER_SAMPLING_TIMES.name(), "3"));
 
 			boolean _SUCC = false;
 			try {
 				Camera camera = origCamera;
 				_SUCC = render(camera, conf, processedJobNum);
 				for (CameraTrace cat : cats) {
-					cat.setInitCameraLocation(camera);
+					cat.setInitCameraLocation(origCamera);
 					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
 						processedJobNum++;
+						origCamera = camera;
 						_SUCC = render(camera, conf, processedJobNum);
 					}
 				}
@@ -194,8 +198,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 			}
 
 			conf.set(PARAMS.OUTPUT_PATH.name(), outputPath);
-			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault("MAX_RAY_DEPTH", "5"));
-			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault("SUPER_SAMPLING_TIMES", "3"));
+			conf.set(PARAMS.MAX_RAY_DEPTH.name(), opts.getOrDefault(PARAMS.MAX_RAY_DEPTH.name(), "5"));
+			conf.set(PARAMS.IS_ON_SOFT_SHADOW.name(), opts.getOrDefault(PARAMS.IS_ON_SOFT_SHADOW.name(), "off"));
+			conf.set(PARAMS.SOFT_SHADOW_NUMBER.name(), opts.getOrDefault(PARAMS.SOFT_SHADOW_NUMBER.name(), "10"));
+			conf.set(PARAMS.SUPER_SAMPLING_TIMES.name(), opts.getOrDefault(PARAMS.SUPER_SAMPLING_TIMES.name(), "3"));
 
 			boolean _SUCC = false;
 			try {
@@ -203,9 +209,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 				processedJobNum = 0;
 				_SUCC = render(camera, conf, processedJobNum);
 				for (CameraTrace cat : cats) {
-					cat.setInitCameraLocation(camera);
+					cat.setInitCameraLocation(origCamera);
 					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
 						processedJobNum++;
+						origCamera = camera;
 						_SUCC = render(camera, conf, processedJobNum);
 					}
 				}

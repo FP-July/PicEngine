@@ -1,0 +1,41 @@
+
+
+_camera_init:
+
+CAMERA_EYE = -1.0, 0.0, 0.0
+CAMERA_CENTER = 0.0, 0.0, 0.0
+CAMERA_UP = 0.0, 0.0, 1.0
+CAMERA_FOV = 60.0
+CAMERA_HEIGHT = 640
+CAMERA_WIDTH = 640
+
+end
+
+
+_trace_init:
+
+_translation_with_in_line_init:
+direction = 1,0,0
+scope = 5
+frame = 3
+end
+
+_rotation_with_in_horizontal_plane_init:
+dis = 4
+range = -90
+frame = 2
+end
+
+_translation_with_in_line_init:
+direction = 1,0,0
+scope = 5
+frame = 3
+end
+
+_rotation_with_in_horizontal_plane_init:
+dis = 4
+range = -90
+frame = 2
+end
+
+end

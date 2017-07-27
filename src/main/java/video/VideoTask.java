@@ -29,8 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.tools.doclets.internal.toolkit.MemberSummaryWriter;
-
 import raytracing.mapreduce.RayTracerDriver;
 import task.ITask;
 import task.TaskUtils;

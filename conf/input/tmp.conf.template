@@ -1,0 +1,11 @@
+# 光线追踪配置
+
+# 最大反射折射深度
+MAX_RAY_DEPTH = 5
+
+# 超采样倍数
+SUPER_SAMPLING_TIMES = 3
+
+# 软阴影
+IS_ON_SOFT_SHADOW = off
+SOFT_SHADOW_NUMBER = 60
