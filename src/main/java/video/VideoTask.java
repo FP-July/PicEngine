@@ -37,8 +37,9 @@ import task.TaskUtils;
 
 public class VideoTask implements ITask {
 	private static Logger logger = LoggerFactory.getLogger(VideoTask.class);
-	private static final String DEFAULT_VIDEO_NAME = "vid.avi";
+	private static final String DEFAULT_VIDEO_DIR = "video";
 	private static final String DEFAULT_CONF_NAME = "video_conf.xml";
+	private static final String SUCCESS_FLAG = "_SUCCESS";
 	private RayTracerDriver renderTask = new RayTracerDriver();
 
 	private Map<String, String> confMap = new HashMap<>();
@@ -52,9 +53,13 @@ public class VideoTask implements ITask {
 		String taskID = args[2];
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
 		String srcDir = TaskUtils.getSrcDir(workingDir);
+		String resultDir = TaskUtils.getResultDir(workingDir);
 		if(!loadConfig(srcDir))
 			return;
 		renderTask.run(args);
+		cleanSuccessFlag(resultDir);
+		if(genVideo(resultDir))
+			setSuccessFlag(resultDir);
 	}
 
 	@Override
@@ -65,6 +70,24 @@ public class VideoTask implements ITask {
 	@Override
 	public float getProgress() {
 		return renderTask.getProgress();
+	}
+	
+	private void cleanSuccessFlag(String resultDir) {
+		try {
+			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
+			fSystem.delete(new Path(resultDir, SUCCESS_FLAG), false);
+		} catch (Exception e) {
+			logger.error("cannot clean flag in {} because {}", resultDir, e.toString());
+		}
+	}
+	
+	private void setSuccessFlag(String resultDir) {
+		try {
+			FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
+			fSystem.create(new Path(resultDir, SUCCESS_FLAG), false);
+		} catch (Exception e) {
+			logger.error("cannot set flag in {} because {}", resultDir, e.toString());
+		}
 	}
 
 	private boolean loadConfig(String confPath) {
@@ -105,7 +128,7 @@ public class VideoTask implements ITask {
 		return true;
 	}
 	
-	private boolean GenVideo(String resultPath) {
+	private boolean genVideo(String resultPath) {
 		FileSystem fSystem = null;
 		try {
 			fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
@@ -129,18 +152,19 @@ public class VideoTask implements ITask {
 				images.add(img);
 				iStream.close();
 			}
-		} catch (IllegalArgumentException | IOException e) {
+		} catch (Exception e) {
 			logger.error("cannot create video due to {}", e.toString());
 			return false;
 		}
 		// generate a video with the imgs
 		BufferedImage[] imgArray = images.toArray(new BufferedImage[0]);
 		try {
-			Path remotePath = new Path(resultPath);
+			Path remotePath = new Path(resultPath, DEFAULT_VIDEO_DIR);
+			fSystem.mkdirs(remotePath);
 			File tempFile = new File("result_" + System.currentTimeMillis() + "_" + (int) (Math.random()*100000) + ".avi");
 			PicToAviUtil.convertPicToAvi(imgArray, tempFile.getAbsolutePath(), fps, width, height);
 			fSystem.copyFromLocalFile(true, true, new Path(tempFile.getAbsolutePath()), remotePath);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("cannot create video due to {}", e.toString());
 			return false;
 		}

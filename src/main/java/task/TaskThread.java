@@ -20,6 +20,7 @@ import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
 import model.ProjInfo;
+import userfiles.FileUtils;
 
 /** this thread is created for running a specific task
  * @author jt
@@ -89,6 +90,7 @@ public class TaskThread extends Thread {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.error.ordinal());
 		}
 		projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
+		FileUtils.cleanZip(username, taskID);
 	}
 	
 	private void updateProgress() {
@@ -109,6 +111,8 @@ public class TaskThread extends Thread {
 				e.printStackTrace();
 		}
 	}
+	
+	
 	
 	@Override
 	public void run() {

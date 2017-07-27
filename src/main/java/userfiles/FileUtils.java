@@ -127,4 +127,12 @@ public class FileUtils {
     		compressDir(resultDir, zipDir);
     	userDownload(username, taskID, ZIPPED_RESULT_NAME, oStream);
     }
+    
+    public static void cleanZip(String username, String taskID) throws IOException {
+    	String workingDir = TaskUtils.getWorkingDir(username, taskID);
+    	String resultDir = TaskUtils.getResultDir(workingDir);
+    	String zipDir = workingDir + ZIPPED_RESULT_NAME;
+    	FileSystem fSystem = FileSystem.get(TaskUtils.HDFS_URI, new Configuration());
+    	fSystem.delete(new Path(zipDir), true);
+    }
 }
