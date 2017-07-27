@@ -81,9 +81,10 @@ public class Main {
 	    int i = 0;
 	    render(camera, i);
 	    for (CameraTrace cat : cats) {
-	    	cat.setInitCameraLocation(camera);
+	    	cat.setInitCameraLocation(origCamera);
 	    	while ((camera = cat.getNextCameraFrame()) != null) {
 			    i ++;
+			    origCamera = camera;
 		    	render(camera, i);
 		    } 
 	    }
@@ -101,7 +102,7 @@ public class Main {
 	    
 	    int times = superSamplingTimes;
 	    for (y = 0; y < height; ++y) { 
-	    	System.out.println("Rows : " + y);
+	    	if (y % 100 == 0) System.out.println("Rows : " + y);
 	        for (x = 0; x < width; ++x) { 
             	Vec3d rgb = new Vec3d();
                 ArrayList<Ray> rays = new ArrayList<Ray>();

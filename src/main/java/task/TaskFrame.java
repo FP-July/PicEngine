@@ -30,7 +30,6 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class TaskFrame implements ITask {
 
-	private static String WORK_DIR = "/user/jt/";
 	private static final float STOP_PERC = 0.01f; // percentage of stop words
 	private static Job job;
 
@@ -138,12 +137,11 @@ public class TaskFrame implements ITask {
 		}
 		// ------------------------------------
 		String username = otherArgs[0];
-		String taskName = otherArgs[1];
 		String taskID = otherArgs[2];
 		String workingDir = TaskUtils.getWorkingDir(username, taskID);
 		String inputPath = TaskUtils.getSrcDir(workingDir);
 		String outputPath = TaskUtils.getResultDir(workingDir);
-		String logDir = TaskUtils.getMRLogPath(workingDir);
+		TaskUtils.getMRLogPath(workingDir);
 		String rootPath = otherArgs[3];
 		
 		FileSystem fs = FileSystem.get(conf);
@@ -172,7 +170,7 @@ public class TaskFrame implements ITask {
 		MultipleOutputs.addNamedOutput(new JobConf(conf), "wordCounts", TextOutputFormat.class, Text.class,
 				IntWritable.class);
 
-		int exitCode = job.waitForCompletion(true) ? 0 : 1;
+		job.waitForCompletion(true);
 
 	}
 

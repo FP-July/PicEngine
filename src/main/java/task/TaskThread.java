@@ -20,6 +20,7 @@ import dao.DBConstants;
 import dao.DaoManager;
 import dao.ProjDao;
 import model.ProjInfo;
+import userfiles.FileUtils;
 
 /** this thread is created for running a specific task
  * @author jt
@@ -85,10 +86,11 @@ public class TaskThread extends Thread {
 		ProjDao projDao = daoManager.getProjDao();
 		if(findSuccess) {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.finished.ordinal());
-			projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
 		} else {
 			projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.error.ordinal());
 		}
+		projDao.updateProjLong(username, taskName, "finishedTime", System.currentTimeMillis());
+		FileUtils.cleanZip(username, taskID);
 	}
 	
 	private void updateProgress() {
@@ -110,6 +112,8 @@ public class TaskThread extends Thread {
 		}
 	}
 	
+	
+	
 	@Override
 	public void run() {
 		try {
@@ -118,7 +122,7 @@ public class TaskThread extends Thread {
 			progressTimer.cancel();
 			examineResult();
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			logger.error("Task {} of {} failed because {}",
 					taskName, username, e.toString());
 			handleFailure();

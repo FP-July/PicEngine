@@ -26,6 +26,17 @@ public class LogFactory {
 		ignore = ig;
 	}
 	
+	public static void close(String logName) {
+		if(logs.containsKey(logName)) {
+			try {
+				ILog log = logs.get(logName);
+				log.close();
+			} catch (Exception e) {
+			}
+			logs.remove(logName);
+		}
+	}
+	
 	public static ILog getInstance(String logName) {
 		if (logs.containsKey(logName)) return logs.get(logName);
 		try {

@@ -53,7 +53,6 @@ public class RunProj extends HttpServlet {
 			int status = runProj(info);
 			
 			if(status == ServletConstants.SUCCESS) {
-				// TODO send client success
 				CommonProcess.sendMsgToClient(resp, ServletConstants.codeToString(status));
 			} else {
 				resp.sendError(status, ServletConstants.codeToString(status));

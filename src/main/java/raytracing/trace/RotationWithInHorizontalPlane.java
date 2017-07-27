@@ -5,7 +5,7 @@ import raytracing.Ray;
 import raytracing.Vec3d;
 import raytracing.trace.CameraTrace;
 
-public class RotationWithInHorizontalPlane extends CameraTrace {
+public class RotationWithInHorizontalPlane implements CameraTrace {
 	
 	public static enum Property {
 		dis,

@@ -101,52 +101,34 @@ public class PhotonTracing {
             nhit = nhit.inv();
             inside = true;
         }
-        if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0) && depth < MAX_RAY_DEPTH) {
+
+        Photon photon = new Photon();
+        photon.setPosition(phit);
+        photon.setStrength(intensity);
+        photonList.add(photon);
+
+
+        if ((obj.getTransparency(phit) > 0 || obj.getReflection(phit) > 0)) {
             double facingratio = -ray.raydir.dot(nhit);
-            // change the mix value to tweak the effect
             double fresneleffect = mix(Math.pow(1 - facingratio, 3), 1, 0.1);
-            // compute reflection direction (not need to normalize because all vectors
-            // are already normalized)
-//            double rand = Math.random();
-//            if(rand < fresneleffect) {
-                Vec3d refldir = ray.raydir.sub(nhit.mul(2.0).mul(ray.raydir.dot(nhit)));
-                refldir.normalize();
-                tracePhoton(new Ray(phit.add(nhit.mul(bias)), refldir), depth + 1, intensity * fresneleffect);
-                // little change in the final effect
-                Photon photon = new Photon();
-                photon.setPosition(phit);
-                photon.setStrength(intensity * fresneleffect);
-                photonList.add(photon);
-//            }
+            Vec3d refldir = ray.raydir.sub(nhit.mul(2.0).mul(ray.raydir.dot(nhit)));
+            refldir.normalize();
+            tracePhoton(new Ray(phit.add(nhit.mul(bias)), refldir), depth + 1, intensity * fresneleffect);
+            // little change in the final effect
 
             // if the sphere is also transparent compute refraction ray (transmission)
-            if (obj.getTransparency(phit) != 0) {
-//                rand = Math.random();
-//                if(rand < (1 - fresneleffect)) {
-                    double ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface?
-                    double cosi = -nhit.dot(ray.raydir);
-                    double k = 1 - eta * eta * (1 - cosi * cosi);
-                    Vec3d refrdir = ray.raydir.mul(eta).add(nhit.mul((eta * cosi - Math.sqrt(k))));
-                    refrdir.normalize();
-                    tracePhoton(new Ray(phit.sub(nhit.mul(bias)), refrdir), depth + 1, intensity * (1 - fresneleffect));
+            if (obj.getTransparency(phit) > 0) {
+                double ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface?
+                double cosi = -nhit.dot(ray.raydir);
+                double k = 1 - eta * eta * (1 - cosi * cosi);
+                Vec3d refrdir = ray.raydir.mul(eta).add(nhit.mul((eta * cosi - Math.sqrt(k))));
+                refrdir.normalize();
+                tracePhoton(new Ray(phit.sub(nhit.mul(bias)), refrdir), depth + 1, intensity * (1 - fresneleffect));
 
-//                    Photon photon = new Photon();
-//                    photon.setPosition(phit);
-//                    photon.setStrength(intensity * (1 - fresneleffect));
-//                    photonList.add(photon);
-//                }
             }
-            // the result is a mix of reflection and refraction (if the sphere is transparent)
-        } else {
-
-            // it's a diffuse object, no need to raytrace any further
-            Photon photon = new Photon();
-            photon.setPosition(phit);
-            photon.setStrength(intensity);
-            count ++;
-            photonList.add(photon);
         }
     }
+
     private static int count = 0;
 
     private double mix(double a, double b, double mix) {
@@ -154,14 +136,14 @@ public class PhotonTracing {
     }
 
     public void printFile(String path) throws IOException {
-    	System.out.println(count + ", " + photonList.size());
+        System.out.println(count + ", " + photonList.size());
         File file = new File(path);
-        if(!file.exists()) {
+        if (!file.exists()) {
             file.createNewFile(); // 创建新文件
         }
-        
+
         BufferedWriter out = new BufferedWriter(new FileWriter(file, false));
-        for(int i = 0; i < photonList.size(); ++i) {
+        for (int i = 0; i < photonList.size(); ++i) {
             Photon p = photonList.get(i);
             double x = p.getPosition().x;
             double y = p.getPosition().y;

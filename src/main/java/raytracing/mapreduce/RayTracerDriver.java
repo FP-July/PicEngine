@@ -106,9 +106,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 				Camera camera = origCamera;
 				_SUCC = render(camera, conf, processedJobNum);
 				for (CameraTrace cat : cats) {
-					cat.setInitCameraLocation(camera);
+					cat.setInitCameraLocation(origCamera);
 					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
 						processedJobNum++;
+						origCamera = camera;
 						_SUCC = render(camera, conf, processedJobNum);
 					}
 				}
@@ -157,7 +158,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		conf.addResource(new Path(rootPath + "yarn-site.xml"));
 		conf.addResource(new Path(rootPath + "hdfs-site.xml"));
 		conf.addResource(new Path(rootPath + "mapred-site.xml"));
-		// TODO make this flexible
+
 		conf.set("mapreduce.job.jar", TaskUtils.MR_JAR_PATH + "RayTracerDriver.jar");
 		conf.set("username", username);
 		conf.set("taskID", taskID);
@@ -208,9 +209,10 @@ public class RayTracerDriver implements JobRegister, ITask {
 				processedJobNum = 0;
 				_SUCC = render(camera, conf, processedJobNum);
 				for (CameraTrace cat : cats) {
-					cat.setInitCameraLocation(camera);
+					cat.setInitCameraLocation(origCamera);
 					while ((camera = cat.getNextCameraFrame()) != null && _SUCC) {
 						processedJobNum++;
+						origCamera = camera;
 						_SUCC = render(camera, conf, processedJobNum);
 					}
 				}
@@ -227,8 +229,7 @@ public class RayTracerDriver implements JobRegister, ITask {
 		}
 		
 		/* flush log */
-		ILog log = LogFactory.getInstance(PARAMS.ILOG.name());
-		log.close();
+		LogFactory.close(PARAMS.ILOG.name());
 	}
 
 	public boolean render(Camera camera, Configuration conf, int id)

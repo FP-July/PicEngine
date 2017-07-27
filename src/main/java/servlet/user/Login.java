@@ -35,7 +35,6 @@ public class Login extends HttpServlet {
     		daoManager = DaoManager.getInstance();
     		String username = req.getParameter("username");
     		String password = req.getParameter("password");
-   
     		int status = daoManager.getUserDao().logIn(username, password);
     		if(status == DBConstants.SUCCESS) {
     			String sessionID = SessionIDGen.gen(username);

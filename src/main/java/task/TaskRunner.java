@@ -1,7 +1,5 @@
 package task;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +32,12 @@ public class TaskRunner {
 	
 		String[] args = new String[] {username, taskName, taskID, TaskUtils.getHadoopConfPath()};
 		ITask task = TaskFactory.create(taskType);
+		logger.info("user {} is running a job {} of class {}", username, taskName, task.getClass().getName());
 		try {
 			TaskThread taskThread = new TaskThread();
 			taskThread.setup(task, username, taskID, taskName, args);
 			ProjDao projDao = DaoManager.getInstance().getProjDao();
+			
 			int status = projDao.updateProjStatus(username, taskName, ProjInfo.statusEnum.ongoing.ordinal());
 			if(status != ServletConstants.SUCCESS) {
 				logger.error("failed to run task {} of {} because {}"

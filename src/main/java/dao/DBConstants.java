@@ -26,7 +26,7 @@ public class DBConstants {
 	public static final String USER_TABLE = "userData";
 	public static final String PROJ_TABLE = "projectData";
 	
-	public static final String DB_PATH = "/Users/THU73/sqlite";
+	public static final String DB_PATH = "/home/jt/sqlite";
 	
 	public static enum DB_PREVILIGE {admin, user};
 	

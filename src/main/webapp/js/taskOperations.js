@@ -32,6 +32,11 @@ function getTaskLog(username, taskName) {
 	};
 	$.post("/taskLog", params, function(data) {
 		// TODO show this more friendly
+		var logs = data.split('\n#next#\n');
+		for(var log in logs) {
+			if(logs[log].indexOf("MR_Logs:") != -1)
+				alert(logs[log]);
+		}
 		console.log(data);
 	});
 }

@@ -2,7 +2,6 @@ package servlet.proj;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,10 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.DBConstants;
-import dao.DaoManager;
-import dao.ProjDao;
-import model.ProjInfo;
 import servlet.CommonProcess;
 import servlet.ServletConstants;
 import task.TaskUtils;
@@ -44,7 +39,7 @@ public class GetLog extends HttpServlet {
 	private void sendLogsToClient(HttpServletRequest req, HttpServletResponse resp, List<String> logs) throws IOException {
 		PrintWriter pWriter = resp.getWriter();
 		for(String log : logs) {
-			pWriter.write(log + "\n");
+			pWriter.write(log + "\n#next#\n");
 		}
 		pWriter.flush();
 		pWriter.close();

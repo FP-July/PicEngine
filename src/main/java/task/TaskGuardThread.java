@@ -26,7 +26,7 @@ public class TaskGuardThread extends Thread {
 		while(true) {
 			ensureAllRunning();
 			try {
-				this.sleep(CHECK_INTERVAL);
+				Thread.sleep(CHECK_INTERVAL);
 			} catch (InterruptedException e) {
 				logger.error("unexpected interruption {}", e.toString());
 				e.printStackTrace();
@@ -46,6 +46,7 @@ public class TaskGuardThread extends Thread {
 					info.status = TaskUtils.checkStatus(info.username, String.valueOf(info.projID));
 					if(info.status != ProjInfo.statusEnum.ongoing.ordinal()) {
 						projDao.updateProjStatus(info.username, info.projName, info.status);
+						projDao.updateProjLong(info.username, info.projName, "finishedTime", System.currentTimeMillis());
 					}
 				} catch (IllegalArgumentException | IOException e) {
 					logger.error("check status of {} of {} failed due to {}",

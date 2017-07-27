@@ -2,7 +2,7 @@ package raytracing.trace;
 
 import raytracing.Camera;
 
-public abstract class CameraTrace {
+public interface CameraTrace {
 
 	public abstract boolean setInitCameraLocation(Camera ca);
 	
