@@ -1,5 +1,6 @@
 package raytracing.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import raytracing.Ray;
@@ -47,9 +48,13 @@ public abstract class Primitive {
 	 */
 	public abstract Vec3d getEmissionColor(Vec3d point);
 	/*
-	 * 返回该物体发出的光线到某点的方向和距离。
+	 * 返回该物体发出的光线到某点的光线，含方向和距离。
 	 */
-	public abstract Vec3d getLightDirection(Vec3d point);
+	public abstract Ray getLightRay(Vec3d point);
+	/*
+	 * 返回该物体发出到某点的num条光线，用于计算软阴影。
+	 */
+	public abstract ArrayList<Ray> renderSoftShadowRays(Vec3d point, int num);
 	
 	@Override
 	public String toString() {

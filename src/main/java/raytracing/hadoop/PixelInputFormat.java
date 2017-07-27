@@ -27,6 +27,7 @@ public class PixelInputFormat extends InputFormat<IntWritable, IntWritable> {
 	
 	private final int STD_MAX_RAY_DAPTH = 5;
 	private final int STD_SUPER_SAMPLING_TIMES = 5;
+	private final int STD_SOFT_SHADOW_NUMBER = 10;
 
 	@Override
 	public RecordReader<IntWritable, IntWritable> createRecordReader(InputSplit inputSplit, TaskAttemptContext context)
@@ -42,12 +43,17 @@ public class PixelInputFormat extends InputFormat<IntWritable, IntWritable> {
 		int max_ray_depth = Integer.parseInt(conf.get(RayTracerDriver.PARAMS.MAX_RAY_DEPTH.name()));
 		int super_sampling_times = Integer.parseInt(conf.get(RayTracerDriver.PARAMS.SUPER_SAMPLING_TIMES.name()));
 
-		int splitLength = (int) (1.0f * STD_LEN 
+		double splitLength = (1.0f * STD_LEN 
 				* STD_MAX_RAY_DAPTH * STD_SUPER_SAMPLING_TIMES * STD_SUPER_SAMPLING_TIMES  
 				/ max_ray_depth / super_sampling_times  / super_sampling_times);
 		
-		int widthStep = getSuitableSplitLength(width, splitLength);
-		int heightStep = getSuitableSplitLength(height, splitLength);
+		if (conf.get(RayTracerDriver.PARAMS.IS_ON_SOFT_SHADOW.name()).toLowerCase().equals("on")) {
+			int softShadowNum = Integer.parseInt(conf.get(RayTracerDriver.PARAMS.SOFT_SHADOW_NUMBER.name()));
+			splitLength = splitLength * STD_SOFT_SHADOW_NUMBER / softShadowNum;
+		}
+		
+		int widthStep = getSuitableSplitLength(width, (int) splitLength);
+		int heightStep = getSuitableSplitLength(height, (int) splitLength);
 //		System.out.println("width step : " + widthStep + ", height step : " + heightStep + ", split len : " + splitLength);
 
 		ArrayList<InputSplit> splits = new ArrayList<>();

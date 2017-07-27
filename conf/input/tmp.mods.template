@@ -1,81 +1,54 @@
-# id : 1, Sphere
-_sphere_init:
-
-center = 10.0, -4.0, 0.0
-radius = 2.0
-# r, g, b
-surfaceColor = 0.40, 0.57, 0.74
-emissionColor = 0.0, 0.0, 0.0
-
-reflection = 0.0
-transparency = 0.3
-diffuse = 0.01
-end
-
-# id : 2, Sphere
-_sphere_init:
-
-center = 22.0, 5.0, 0.0
-radius = 4.0
-# r, g, b
-surfaceColor = 1.00, 0.32, 0.36
-emissionColor = 0.0, 0.0, 0.0
-
-reflection = 1.0
-transparency = 0.5
-diffuse = 0.01
-end
 
 # id : 3, Sphere
 _sphere_init:
 
-center = 15.0, -3.0, -2.0
-radius = 2.0
+center = 7.5, -1.5, -2.0
+radius = 1.0
 # r, g, b
 surfaceColor = 0.90, 0.76, 0.46
 emissionColor = 0.0, 0.0, 0.0
 
-reflection = 1.0
+reflection = 0.5
 transparency = 0.7
-diffuse = 0.01
+diffuse = 0.4
 end
 
 # id : 4, Sphere
 _sphere_init:
 
-center = 25.0, 0.0, 10.0
-radius = 3.0
+center = 13.0, 0.0, 3.0
+radius = 2
 # r, g, b
-surfaceColor = 0.65, 0.77, 0.57
-emissionColor = 0.0, 0.0, 0.0
+surfaceColor = 1, 1, 1
+emissionColor = 0.2, 0.2, 0.2
 
 reflection = 1.0
-transparency = 0.0
+transparency = 1.0
 diffuse = 0.0
 end
 
 # id : 5, Sphere
 _sphere_init:
 
-center = 15.0, 2.0, 0.0
-radius = 3
+center = 7, 1.0, -1.0
+radius = 1.5
 # r, g, b
 surfaceColor = 0.90, 0.90, 0.90
 emissionColor = 0.0, 0.0, 0.0
 
-reflection = 1.0
-transparency = 0.3
-diffuse = 0.01
+reflection = 1.2
+transparency = 0.0
+diffuse = 0.2
 end
 
 # id : 6, Sphere, This is a light
 _sphere_init:
 
-center = -5.0, 0.0, 25.0
-radius = 3
+center = 0.0, 0.0, 5.0
+radius = 0.1
 # r, g, b
 surfaceColor = 0.20, 0.20, 0.20
-emissionColor = 1.0, 1.0, 1.0
+emissionColor = 2, 2, 2
 
 reflection = 0.3
 transparency = 0.0
@@ -90,17 +63,60 @@ norm = 0.0, 0.0, 1.0
 # r, g, b
 surfaceColor = 0.3, 0.3, 0.3
 emissionColor = 0.0, 0.0, 0.0
-diffuse = 0.7
+diffuse = 0.9
 end
 
 # id : 11, Plane, front
 _plane_init:
 
-center = 50.0, 0.0, 0.0
+center = 20.0, 0.0, 0.0
 norm = -1.0, 0.0, 0.0
 # r, g, b
-surfaceColor = 0.3, 0.3, 0.3
+surfaceColor = 0.0, 0.0, 1
 emissionColor = 0.0, 0.0, 0.0
-diffuse = 0.7
+diffuse = 0.9
 end
 
+# id : 9, Plane, left
+_plane_init:
+
+center = 0.0, -5.0, 0.0
+norm = 0.0, 1.0, 0.0
+# r, g, b
+surfaceColor = 0.0, 1, 0
+emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.9
+end
+
+# id : 10, Plane, right
+_plane_init:
+
+center = 0.0, 5.0, 0.0
+norm = 0.0, -1.0, 0.0
+# r, g, b
+surfaceColor = 1.0, 0.0, 0.0
+emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.9
+end
+
+# id : 12, Plane, head
+_plane_init:
+
+center = 0.0, 0.0, 7.0
+norm = 0.0, 0.0, -1.0
+# r, g, b
+surfaceColor = 1, 1, 1
+emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.9
+end
+
+# id : 8, Plane, back
+_plane_init:
+
+center = -4.0, 0.0, 0.0
+norm = 1.0, 0.0, 0.0
+# r, g, b
+surfaceColor = 1, 1, 0
+emissionColor = 0.0, 0.0, 0.0
+diffuse = 0.9
+end

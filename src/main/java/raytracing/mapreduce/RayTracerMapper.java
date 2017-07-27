@@ -39,6 +39,11 @@ public class RayTracerMapper
 	    ml.close();
 	    
 	    rayTracing.setMaxRayDepth(conf.get(PARAMS.MAX_RAY_DEPTH.name()));
+	    if (conf.get(PARAMS.IS_ON_SOFT_SHADOW.name()).toLowerCase().equals("on")) {
+	    	rayTracing.setSoftShadow(conf.get(PARAMS.SOFT_SHADOW_NUMBER.name()));
+	    } else {
+	    	rayTracing.setSoftShadow(false);
+	    }
 	    
 	    Vec3d eye    = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_EYE.name(),    new Vec3d(-1.0, 0.0, 0.0).serialize()));
 	    Vec3d center = Vec3d.deSerialize(  conf.get(Camera.Property.CAMERA_CENTER.name(), new Vec3d().serialize()));

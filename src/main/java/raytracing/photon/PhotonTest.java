@@ -50,7 +50,7 @@ public class PhotonTest {
 
         photonTracing.setMaxRayDepth(opts.getOrDefault("MAX_RAY_DEPTH", "5"));
 
-        photonTracing.emitPhoton(100000);
+        photonTracing.emitPhoton(200000);
 
         photonTracing.printFile("tmp.photon");
     }

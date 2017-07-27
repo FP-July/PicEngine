@@ -20,6 +20,7 @@ import raytracing.load.ModelLoader;
 import raytracing.log.ILog;
 import raytracing.log.LogFactory;
 import raytracing.mapreduce.RayTracerDriver;
+import raytracing.photon.PhotonLoader;
 import raytracing.trace.CameraTrace;
 import utils.DirectoryChecker;
 
@@ -78,8 +79,11 @@ public class Main {
 		int width = camera.getCols(), height = camera.getRows();
 	    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     	
+//	    rayTracing.setPhotonLoader(new PhotonLoader("tmp.photon"), 1.0);
+	    
 	    int times = superSamplingTimes;
 	    for (y = 0; y < height; ++y) { 
+	    	System.out.println("Rows : " + y);
 	        for (x = 0; x < width; ++x) { 
             	Vec3d rgb = new Vec3d();
                 ArrayList<Ray> rays = new ArrayList<Ray>();

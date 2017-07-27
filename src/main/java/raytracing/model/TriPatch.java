@@ -1,5 +1,6 @@
 package raytracing.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import raytracing.Ray;
@@ -60,12 +61,17 @@ public class TriPatch extends Primitive {
 	}
 
 	@Override
-	public Vec3d getLightDirection(Vec3d point) {
+	public Double getDiffusion(Vec3d pHit) {
 		return null;
 	}
 
 	@Override
-	public Double getDiffusion(Vec3d pHit) {
+	public ArrayList<Ray> renderSoftShadowRays(Vec3d point, int num) {
+		return null;
+	}
+
+	@Override
+	public Ray getLightRay(Vec3d point) {
 		return null;
 	}
 

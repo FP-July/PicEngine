@@ -17,7 +17,7 @@ public class PhotonLoader {
     KDTree tree;
     ArrayList<Photon> list;
 
-    PhotonLoader(String filePath) {
+    public PhotonLoader(String filePath) {
         list = new ArrayList<>();
         try {
             File file = new File(filePath);
@@ -50,7 +50,7 @@ public class PhotonLoader {
             System.out.println("读取文件内容出错");
             e.printStackTrace();
         }
-        tree = KDFactory.generate((Photon[]) list.toArray());
+        tree = KDFactory.generate((Photon[]) list.toArray(new Photon[0]));
     }
 
     public Photon getNearest(Vec3d position) {
