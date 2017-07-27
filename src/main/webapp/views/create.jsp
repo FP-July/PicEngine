@@ -15,6 +15,7 @@
 
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap-responsive.min.css">
     <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/fileinput.css">
 </head>
 
 <body style="background-color: #f5f5f5;">
@@ -89,7 +90,7 @@
                     <label class="control-label" for="task_file">任务文件</label>
                     <div class="controls">
                         <input id="task_file" name="task_file" type="file" title="请选择文件"
-                               accept="text/plain" onchange="examine_size();">
+                               multiple accept="text/plain" onchange="examine_size();">
                     </div>
                 </div>
                 <div class="control-group">
@@ -128,10 +129,17 @@
 <script src="../vendor/cookie/jquery.cookie.js"></script>
 <script src="../vendor/bootstrap-file/bootstrap-file.js"></script>
 <script src="../js/navbar.js"></script>
+<script src="../js/fileinput.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('input[type=file]').bootstrapFileInput();
-        $('.file-inputs').bootstrapFileInput();
+        $('input[type=file]').fileinput({
+        	uploadUrl : "/upload_img",//上传图片的url
+        	overwriteInitial : false,
+        	maxFileSize : 1000,//上传文件最大的尺寸
+        	maxFilesNum : 10,//上传最大的文件数量
+        	showPreview  : false,
+        	showUpload : false
+        });
     });
 
     examine_size = function () {
